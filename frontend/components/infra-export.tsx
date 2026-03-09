@@ -99,19 +99,19 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Export Infrastructure</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <h2 className="text-xl sm:text-2xl font-bold">Export Infrastructure</h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Download your generated infrastructure templates and deploy them.
         </p>
       </div>
 
       {/* Download Card */}
       <Card className="border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileArchive className="h-5 w-5" />
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileArchive className="h-4 w-4 sm:h-5 sm:w-5" />
             Download Package
           </CardTitle>
           <CardDescription>
@@ -231,8 +231,8 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
       <Separator />
 
       {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" size="sm" onClick={onBackToHome}>
             <Home className="mr-2 h-4 w-4" />
             Back to Home
@@ -242,7 +242,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
             Back to Generate
           </Button>
         </div>
-        <Button variant="outline" onClick={handleStartOver}>
+        <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto">
           <RotateCcw className="mr-2 h-4 w-4" />
           Start Over
         </Button>

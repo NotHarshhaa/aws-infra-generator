@@ -29,24 +29,24 @@ import { Badge } from "@/components/ui/badge";
 
 function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
   return (
-    <div className="space-y-16 py-8">
+    <div className="space-y-12 sm:space-y-16 py-6 sm:py-8">
       {/* Hero */}
-      <section className="text-center space-y-6 py-12">
+      <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 px-3">
         <Badge variant="secondary" className="text-sm px-4 py-1">
           Platform Engineering Tool
         </Badge>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
           Design AWS Infrastructure
           <br />
           <span className="text-primary">Generate IaC Templates</span>
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
           Select AWS services, configure parameters, and instantly generate
           production-ready Terraform or CloudFormation templates. No manual
           coding required.
         </p>
-        <div className="flex items-center justify-center gap-4 pt-4">
-          <Button size="lg" onClick={onGetStarted} className="text-base px-8 h-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
+          <Button size="lg" onClick={onGetStarted} className="text-base px-8 h-12 w-full sm:w-auto">
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
@@ -55,7 +55,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button variant="outline" size="lg" className="text-base px-8 h-12">
+            <Button variant="outline" size="lg" className="text-base px-8 h-12 w-full sm:w-auto">
               View on GitHub
             </Button>
           </a>
@@ -63,7 +63,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Features */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-3">
         {[
           {
             icon: Cloud,
@@ -87,21 +87,21 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
           },
         ].map((feature) => (
           <Card key={feature.title} className="text-center">
-            <CardContent className="pt-6 space-y-3">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <feature.icon className="h-6 w-6" />
+            <CardContent className="pt-4 sm:pt-6 space-y-2 sm:space-y-3">
+              <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <feature.icon className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <h3 className="font-semibold">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.desc}</p>
+              <h3 className="text-sm sm:text-base font-semibold">{feature.title}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">{feature.desc}</p>
             </CardContent>
           </Card>
         ))}
       </section>
 
       {/* Supported Services */}
-      <section className="text-center space-y-6">
+      <section className="text-center space-y-6 px-3">
         <h2 className="text-2xl font-bold">Supported AWS Services</h2>
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {[
             { icon: Network, name: "VPC" },
             { icon: Server, name: "EC2" },
@@ -112,9 +112,9 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
           ].map((svc) => (
             <div
               key={svc.name}
-              className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium"
+              className="flex items-center gap-2 rounded-full border px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium"
             >
-              <svc.icon className="h-4 w-4 text-primary" />
+              <svc.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
               {svc.name}
             </div>
           ))}
@@ -122,9 +122,9 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Workflow */}
-      <section className="space-y-6">
+      <section className="space-y-6 px-3">
         <h2 className="text-2xl font-bold text-center">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {[
             {
               step: "1",
@@ -143,12 +143,12 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
             },
           ].map((item) => (
             <Card key={item.step}>
-              <CardContent className="pt-6 space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-lg">
+              <CardContent className="pt-4 sm:pt-6 space-y-2 sm:space-y-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm sm:text-lg">
                   {item.step}
                 </div>
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
+                <h3 className="font-semibold text-sm sm:text-lg">{item.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{item.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -211,12 +211,12 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
             },
           ].map((useCase, index) => (
             <Card key={index} className="text-center">
-              <CardContent className="pt-6 space-y-3">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <useCase.icon className="h-6 w-6" />
+              <CardContent className="pt-4 sm:pt-6 space-y-2 sm:space-y-3">
+                <div className="mx-auto flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <useCase.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <h3 className="font-semibold">{useCase.title}</h3>
-                <p className="text-sm text-muted-foreground">{useCase.desc}</p>
+                <h3 className="text-sm sm:text-base font-semibold">{useCase.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">{useCase.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -224,42 +224,42 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Benefits */}
-      <section className="space-y-6">
-        <h2 className="text-2xl font-bold text-center">Why Choose AWS Infra Generator?</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+      <section className="space-y-4 sm:space-y-6 px-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-center">Why Choose AWS Infra Generator?</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               Save Time & Reduce Errors
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Eliminate manual IaC writing and avoid common configuration mistakes. Our templates follow AWS best practices and include proper security configurations.
             </p>
           </div>
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               Learn Cloud Architecture
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Understand how AWS services connect and depend on each other. Visualize relationships and learn proper infrastructure patterns.
             </p>
           </div>
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               Consistent Standards
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Generate standardized infrastructure across teams and projects. Ensure naming conventions, tagging, and security policies are consistent.
             </p>
           </div>
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               Multi-Format Support
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Choose between Terraform and CloudFormation based on your team's preferences. Export clean, readable, and production-ready code.
             </p>
           </div>
@@ -267,9 +267,9 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Technical Details */}
-      <section className="space-y-6">
-        <h2 className="text-2xl font-bold text-center">What You Get</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section className="space-y-4 sm:space-y-6 px-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-center">What You Get</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -374,7 +374,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 pb-12">
+      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12">
         {!showWizard ? (
           <LandingHero onGetStarted={handleGetStarted} />
         ) : (
@@ -384,7 +384,7 @@ export default function Home() {
               onStepClick={setStep}
               completedSteps={completedSteps}
             />
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto px-1 sm:px-0">
               {currentStep === "services" && <ServiceSelector onBackToHome={handleBackToHome} />}
               {currentStep === "configure" && <ServiceConfigurator onBackToHome={handleBackToHome} />}
               {currentStep === "generate" && <InfraGenerator onBackToHome={handleBackToHome} />}

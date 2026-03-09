@@ -109,19 +109,19 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Generate Infrastructure</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <h2 className="text-xl sm:text-2xl font-bold">Generate Infrastructure</h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Validate and generate your infrastructure templates.
         </p>
       </div>
 
       {/* Summary */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FolderTree className="h-5 w-5" />
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FolderTree className="h-4 w-4 sm:h-5 sm:w-5" />
             Infrastructure Summary
           </CardTitle>
         </CardHeader>
@@ -270,8 +270,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" size="sm" onClick={onBackToHome}>
             <Home className="mr-2 h-4 w-4" />
             Back to Home
@@ -281,11 +281,12 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
             Back to Configure
           </Button>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="outline"
             onClick={handleValidate}
             disabled={isGenerating}
+            className="w-full sm:w-auto"
           >
             <CheckCircle2 className="mr-2 h-4 w-4" />
             Validate
@@ -294,6 +295,7 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
             onClick={handleGenerate}
             disabled={isGenerating}
             size="lg"
+            className="w-full sm:w-auto"
           >
             {isGenerating ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -303,9 +305,9 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
             Generate
           </Button>
           {generatedFiles.length > 0 && (
-            <Button onClick={() => setStep("export")} size="lg">
-              Export
+            <Button onClick={() => setStep("export")} size="lg" className="w-full sm:w-auto">
               <ArrowRight className="ml-2 h-4 w-4" />
+              Export & Download
             </Button>
           )}
         </div>

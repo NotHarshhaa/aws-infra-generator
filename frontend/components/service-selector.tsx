@@ -47,10 +47,10 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Select AWS Services</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <h2 className="text-xl sm:text-2xl font-bold">Select AWS Services</h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Choose the AWS services you need for your infrastructure. Dependencies
           will be automatically resolved.
         </p>
@@ -62,14 +62,14 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
         const CategoryIcon = iconMap[category.icon];
 
         return (
-          <div key={category.id} className="space-y-3">
+          <div key={category.id} className="space-y-2 sm:space-y-3">
             <div className="flex items-center gap-2">
               {CategoryIcon && (
-                <CategoryIcon className="h-5 w-5 text-muted-foreground" />
+                <CategoryIcon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               )}
-              <h3 className="text-lg font-semibold">{category.label}</h3>
+              <h3 className="text-base sm:text-lg font-semibold">{category.label}</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {services.map((service) => {
                 const isSelected = selectedServices.includes(service.id);
                 const Icon = iconMap[service.icon];
@@ -89,18 +89,18 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
                     )}
                     onClick={() => toggleService(service.id)}
                   >
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-1 sm:pb-2">
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <div
                             className={cn(
-                              "flex h-10 w-10 items-center justify-center rounded-lg",
+                              "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg",
                               isSelected
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-muted text-muted-foreground"
                             )}
                           >
-                            {Icon && <Icon className="h-5 w-5" />}
+                            {Icon && <Icon className="h-4 w-4 sm:h-5 sm:w-5" />}
                           </div>
                           <div>
                             <CardTitle className="text-base">
@@ -116,10 +116,10 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                         {service.description}
                       </p>
-                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                      <div className="flex items-center gap-2 mt-2 sm:mt-3 flex-wrap">
                         {service.dependencies.length > 0 && (
                           <Tooltip>
                             <TooltipTrigger>
@@ -160,13 +160,13 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
         );
       })}
 
-      <div className="flex items-center justify-between pt-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pt-3 sm:pt-4">
         <Button variant="outline" size="sm" onClick={onBackToHome}>
           <Home className="mr-2 h-4 w-4" />
           Back to Home
         </Button>
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <p className="text-sm text-muted-foreground text-center sm:text-left">
             {selectedServices.length} service
             {selectedServices.length !== 1 ? "s" : ""} selected
           </p>
@@ -174,6 +174,7 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
             onClick={handleNext}
             disabled={selectedServices.length === 0}
             size="lg"
+            className="w-full sm:w-auto"
           >
             Configure Services
             <ArrowRight className="ml-2 h-4 w-4" />

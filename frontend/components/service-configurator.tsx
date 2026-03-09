@@ -76,37 +76,38 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
   }, [initServiceConfig]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Configure Infrastructure</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <h2 className="text-xl sm:text-2xl font-bold">Configure Infrastructure</h2>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Set project-level options and fine-tune each service configuration.
         </p>
       </div>
 
       {/* Global Configuration */}
       <Card>
-        <CardHeader>
-          <CardTitle>Project Settings</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-lg">Project Settings</CardTitle>
+          <CardDescription className="text-sm">
             General settings for your infrastructure project
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="projectName">Project Name</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="projectName" className="text-sm">Project Name</Label>
               <Input
                 id="projectName"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="my-infra"
+                className="h-9 sm:h-10"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="region">AWS Region</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="region" className="text-sm">AWS Region</Label>
               <Select value={region} onValueChange={(v) => v && setRegion(v)}>
-                <SelectTrigger id="region">
+                <SelectTrigger id="region" className="h-9 sm:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -118,15 +119,15 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="environment">Environment</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="environment" className="text-sm">Environment</Label>
               <Select
                 value={environment}
                 onValueChange={(v) =>
                   v && setEnvironment(v as "development" | "staging" | "production")
                 }
               >
-                <SelectTrigger id="environment">
+                <SelectTrigger id="environment" className="h-9 sm:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -136,15 +137,15 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="format">Output Format</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="format" className="text-sm">Output Format</Label>
               <Select
                 value={outputFormat}
                 onValueChange={(v) =>
                   v && setOutputFormat(v as "terraform" | "cloudformation")
                 }
               >
-                <SelectTrigger id="format">
+                <SelectTrigger id="format" className="h-9 sm:h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -161,9 +162,9 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
 
       {/* Per-Service Configuration */}
       <Card>
-        <CardHeader>
-          <CardTitle>Service Configuration</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-lg">Service Configuration</CardTitle>
+          <CardDescription className="text-sm">
             Configure each selected AWS service
           </CardDescription>
         </CardHeader>
@@ -326,8 +327,8 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
 
       <Separator />
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" size="sm" onClick={onBackToHome}>
               <Home className="mr-2 h-4 w-4" />
               Back to Home
@@ -337,7 +338,7 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
             Back to Services
           </Button>
         </div>
-        <Button onClick={() => setStep("generate")} size="lg">
+        <Button onClick={() => setStep("generate")} size="lg" className="w-full sm:w-auto">
           Generate Infrastructure
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
