@@ -9,11 +9,13 @@ import {
   GitFork,
   Info,
   ArrowRight,
+  Home,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 import {
   Tooltip,
   TooltipContent,
@@ -33,7 +35,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   GitFork,
 };
 
-export function ServiceSelector() {
+interface ServiceSelectorProps {
+  onBackToHome: () => void;
+}
+
+export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
   const { selectedServices, toggleService, setStep } = useInfraStore();
 
   const handleNext = () => {
@@ -155,18 +161,24 @@ export function ServiceSelector() {
       })}
 
       <div className="flex items-center justify-between pt-4">
-        <p className="text-sm text-muted-foreground">
-          {selectedServices.length} service
-          {selectedServices.length !== 1 ? "s" : ""} selected
-        </p>
-        <Button
-          onClick={handleNext}
-          disabled={selectedServices.length === 0}
-          size="lg"
-        >
-          Configure Services
-          <ArrowRight className="ml-2 h-4 w-4" />
+        <Button variant="outline" size="sm" onClick={onBackToHome}>
+          <Home className="mr-2 h-4 w-4" />
+          Back to Home
         </Button>
+        <div className="flex items-center gap-4">
+          <p className="text-sm text-muted-foreground">
+            {selectedServices.length} service
+            {selectedServices.length !== 1 ? "s" : ""} selected
+          </p>
+          <Button
+            onClick={handleNext}
+            disabled={selectedServices.length === 0}
+            size="lg"
+          >
+            Configure Services
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

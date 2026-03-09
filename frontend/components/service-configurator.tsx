@@ -9,6 +9,7 @@ import {
   GitFork,
   ArrowLeft,
   ArrowRight,
+  Home,
 } from "lucide-react";
 import {
   Card,
@@ -28,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 import {
   Accordion,
   AccordionContent,
@@ -48,7 +50,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   GitFork,
 };
 
-export function ServiceConfigurator() {
+interface ServiceConfiguratorProps {
+  onBackToHome: () => void;
+}
+
+export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) {
   const {
     selectedServices,
     serviceConfig,
@@ -321,10 +327,16 @@ export function ServiceConfigurator() {
       <Separator />
 
       <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => setStep("services")}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Services
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={onBackToHome}>
+              <Home className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          <Button variant="outline" onClick={() => setStep("services")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Services
+          </Button>
+        </div>
         <Button onClick={() => setStep("generate")} size="lg">
           Generate Infrastructure
           <ArrowRight className="ml-2 h-4 w-4" />

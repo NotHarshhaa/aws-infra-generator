@@ -20,9 +20,11 @@ import {
   Network,
   HardDrive,
   GitFork,
+  CheckCircle2,
+  FileCode2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
@@ -172,6 +174,161 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
         </div>
       </section>
 
+      {/* Use Cases */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-center">Perfect For</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              icon: Server,
+              title: "DevOps Engineers",
+              desc: "Quickly prototype and deploy infrastructure without manual IaC writing",
+            },
+            {
+              icon: ShieldCheck,
+              title: "Platform Teams",
+              desc: "Build internal tools and standardized infrastructure patterns",
+            },
+            {
+              icon: Database,
+              title: "Developers",
+              desc: "Learn cloud architecture and generate proper infrastructure for applications",
+            },
+            {
+              icon: Zap,
+              title: "Startups",
+              desc: "Rapidly set up production-ready infrastructure without DevOps expertise",
+            },
+            {
+              icon: Package,
+              title: "Consultants",
+              desc: "Generate consistent infrastructure templates for client projects",
+            },
+            {
+              icon: Network,
+              title: "Educators",
+              desc: "Teach cloud concepts with practical, hands-on infrastructure examples",
+            },
+          ].map((useCase, index) => (
+            <Card key={index} className="text-center">
+              <CardContent className="pt-6 space-y-3">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <useCase.icon className="h-6 w-6" />
+                </div>
+                <h3 className="font-semibold">{useCase.title}</h3>
+                <p className="text-sm text-muted-foreground">{useCase.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-center">Why Choose AWS Infra Generator?</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Save Time & Reduce Errors
+            </h3>
+            <p className="text-muted-foreground">
+              Eliminate manual IaC writing and avoid common configuration mistakes. Our templates follow AWS best practices and include proper security configurations.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Learn Cloud Architecture
+            </h3>
+            <p className="text-muted-foreground">
+              Understand how AWS services connect and depend on each other. Visualize relationships and learn proper infrastructure patterns.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Consistent Standards
+            </h3>
+            <p className="text-muted-foreground">
+              Generate standardized infrastructure across teams and projects. Ensure naming conventions, tagging, and security policies are consistent.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Multi-Format Support
+            </h3>
+            <p className="text-muted-foreground">
+              Choose between Terraform and CloudFormation based on your team's preferences. Export clean, readable, and production-ready code.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Technical Details */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-center">What You Get</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileCode2 className="h-5 w-5" />
+                Terraform Output
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">main.tf - Provider and core resources</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">variables.tf - Input parameters</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">outputs.tf - Resource references</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Service-specific .tf files</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileCode2 className="h-5 w-5" />
+                CloudFormation Output
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">template.json - Complete infrastructure</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Parameters - Configurable inputs</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Resources - All AWS components</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">Outputs - Stack references</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="text-center text-sm text-muted-foreground border-t pt-8">
         <p>
@@ -190,7 +347,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
 }
 
 export default function Home() {
-  const { currentStep, setStep, selectedServices, generatedFiles } =
+  const { currentStep, setStep, selectedServices, generatedFiles, reset } =
     useInfraStore();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -209,6 +366,11 @@ export default function Home() {
     setStep("services");
   };
 
+  const handleBackToHome = () => {
+    setShowWizard(false);
+    reset();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -223,10 +385,10 @@ export default function Home() {
               completedSteps={completedSteps}
             />
             <div className="max-w-5xl mx-auto">
-              {currentStep === "services" && <ServiceSelector />}
-              {currentStep === "configure" && <ServiceConfigurator />}
-              {currentStep === "generate" && <InfraGenerator />}
-              {currentStep === "export" && <InfraExport />}
+              {currentStep === "services" && <ServiceSelector onBackToHome={handleBackToHome} />}
+              {currentStep === "configure" && <ServiceConfigurator onBackToHome={handleBackToHome} />}
+              {currentStep === "generate" && <InfraGenerator onBackToHome={handleBackToHome} />}
+              {currentStep === "export" && <InfraExport onBackToHome={handleBackToHome} />}
             </div>
           </>
         )}

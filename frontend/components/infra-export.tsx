@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   RotateCcw,
   Terminal,
+  Home,
 } from "lucide-react";
 import {
   Card,
@@ -23,10 +24,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 import { useInfraStore } from "@/lib/store";
 import { downloadInfrastructure } from "@/lib/api";
 
-export function InfraExport() {
+interface InfraExportProps {
+  onBackToHome: () => void;
+}
+
+export function InfraExport({ onBackToHome }: InfraExportProps) {
   const {
     selectedServices,
     serviceConfig,
@@ -226,10 +232,16 @@ export function InfraExport() {
 
       {/* Navigation */}
       <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => setStep("generate")}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Generate
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={onBackToHome}>
+            <Home className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
+          <Button variant="outline" onClick={() => setStep("generate")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Generate
+          </Button>
+        </div>
         <Button variant="outline" onClick={handleStartOver}>
           <RotateCcw className="mr-2 h-4 w-4" />
           Start Over

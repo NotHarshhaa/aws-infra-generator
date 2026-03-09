@@ -10,6 +10,7 @@ import {
   XCircle,
   FileCode2,
   FolderTree,
+  Home,
 } from "lucide-react";
 import {
   Card,
@@ -25,11 +26,16 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 import { useInfraStore } from "@/lib/store";
 import { generateInfrastructure, validateInfrastructure } from "@/lib/api";
 import { getServiceById } from "@/lib/aws-services";
 
-export function InfraGenerator() {
+interface InfraGeneratorProps {
+  onBackToHome: () => void;
+}
+
+export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
   const {
     selectedServices,
     serviceConfig,
@@ -265,10 +271,16 @@ export function InfraGenerator() {
 
       {/* Actions */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <Button variant="outline" onClick={() => setStep("configure")}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Configure
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={onBackToHome}>
+            <Home className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
+          <Button variant="outline" onClick={() => setStep("configure")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Configure
+          </Button>
+        </div>
         <div className="flex gap-3">
           <Button
             variant="outline"
