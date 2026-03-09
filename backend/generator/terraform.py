@@ -2,17 +2,26 @@
 
 from jinja2 import Environment, FileSystemLoader, BaseLoader
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates", "terraform")
 
 
 class TerraformGenerator:
     def __init__(self):
-        self.jinja_env = Environment(
-            loader=FileSystemLoader(TEMPLATES_DIR),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
+        # Use BaseLoader if templates directory doesn't exist
+        if os.path.exists(TEMPLATES_DIR):
+            self.jinja_env = Environment(
+                loader=FileSystemLoader(TEMPLATES_DIR),
+                trim_blocks=True,
+                lstrip_blocks=True,
+            )
+            logger.info(f"Using templates from: {TEMPLATES_DIR}")
+        else:
+            self.jinja_env = Environment(loader=BaseLoader())
+            logger.warning(f"Templates directory not found: {TEMPLATES_DIR}. Using inline templates.")
 
     def generate(
         self,

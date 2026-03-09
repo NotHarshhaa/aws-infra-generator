@@ -1,6 +1,9 @@
 """Infrastructure validation engine."""
 
 from services.dependency import DependencyResolver
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class InfraValidator:
@@ -9,6 +12,7 @@ class InfraValidator:
 
     def validate(self, services: list[str], config: dict) -> dict:
         """Validate infrastructure configuration."""
+        logger.info(f"Validating services: {services}")
         errors = []
         warnings = []
 
