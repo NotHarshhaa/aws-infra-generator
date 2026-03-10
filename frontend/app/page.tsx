@@ -22,6 +22,11 @@ import {
   GitFork,
   CheckCircle2,
   FileCode2,
+  Github,
+  ExternalLink,
+  Code,
+  CloudCog,
+  Verified,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -327,6 +332,113 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* Creator Section */}
+      <section className="space-y-6 px-3 py-8 sm:py-12">
+        <div className="text-center space-y-4">
+          <Badge variant="secondary" className="text-sm px-4 py-1">
+            Creator
+          </Badge>
+          <h2 className="text-2xl sm:text-3xl font-bold">Meet the Creator</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Built by a passionate engineer focused on cloud automation and platform engineering
+          </p>
+        </div>
+
+        <Card className="max-w-4xl mx-auto border-primary/20 bg-gradient-to-br from-background to-primary/5">
+          <CardContent className="p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              {/* Avatar */}
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <img
+                    src="https://github.com/NotHarshhaa.png"
+                    alt="H A R S H H A A"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-lg border-2 border-primary/20"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
+                    <Code className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 text-center sm:text-left space-y-3">
+                <div>
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
+                      H A R S H H A A
+                    </h3>
+                    <Verified className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                  </div>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    Development Platform & Automation Enthusiast
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    <CloudCog className="w-3 h-3 mr-1" />
+                    Cloud Engineer
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <GitFork className="w-3 h-3 mr-1" />
+                    DevOps
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <Package className="w-3 h-3 mr-1" />
+                    MLops
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <Server className="w-3 h-3 mr-1" />
+                    Platform Engineering
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
+                  <a
+                    href="https://github.com/NotHarshhaa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    <Github className="w-4 h-4" />
+                    <span>Follow on GitHub</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div className="mt-6 pt-6 border-t space-y-3">
+              <p className="text-sm text-muted-foreground leading-relaxed text-center">
+                Passionate about building scalable infrastructure solutions and automation tools. 
+                Specializing in cloud architecture, DevOps practices, and platform engineering with 
+                a focus on creating developer-friendly tools that simplify complex infrastructure management.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Cloud className="w-3 h-3" />
+                  <span>AWS Solutions</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Code className="w-3 h-3" />
+                  <span>Infrastructure as Code</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  <span>Automation</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span>Platform Engineering</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Footer */}
