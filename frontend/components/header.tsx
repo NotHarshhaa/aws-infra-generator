@@ -1,6 +1,6 @@
 "use client";
 
-import { Cloud, Github, Moon, Sun } from "lucide-react";
+import { Github, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -22,7 +22,11 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <Cloud className="h-6 w-6 text-primary" />
+          <img 
+            src={dark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
+            alt="AWS Logo" 
+            className="h-6 w-6"
+          />
           <span className="text-xl font-bold tracking-tight">
             AWS Infra Generator
           </span>

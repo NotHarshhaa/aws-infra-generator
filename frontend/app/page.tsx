@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/header";
 import { StepIndicator } from "@/components/step-indicator";
 import { ServiceSelector } from "@/components/service-selector";
@@ -37,10 +37,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setDark(isDark);
+    };
+
+    checkTheme();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="space-y-12 sm:space-y-16 py-6 sm:py-8">
       {/* Hero */}
       <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 px-3">
+        <div className="mb-4 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-orange-500 shadow-lg dark:shadow-orange-500/20 mx-auto">
+            <img 
+              src={dark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
+              alt="AWS Logo" 
+              className="h-14 sm:h-16 md:h-18 w-auto"
+            />
+          </div>
+        </div>
         <Badge variant="secondary" className="text-sm px-4 py-1">
           Platform Engineering Tool
         </Badge>
@@ -335,6 +364,185 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Supported Services Section */}
+      <section className="space-y-6 px-3 py-8 sm:py-12">
+        <div className="text-center space-y-4">
+          <Badge variant="secondary" className="text-sm px-4 py-1">
+            Services
+          </Badge>
+          <h2 className="text-2xl sm:text-3xl font-bold">Supported AWS Services</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Generate infrastructure for 15+ AWS services with comprehensive configuration options
+          </p>
+        </div>
+
+        <div className="max-w-6xl mx-auto">
+          {/* Compute Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Server className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Compute</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: Server, name: "EC2", desc: "Virtual Servers" },
+                { icon: Zap, name: "Lambda", desc: "Serverless Functions" },
+                { icon: Package, name: "ECS", desc: "Container Service" },
+                { icon: Package, name: "EKS", desc: "Kubernetes Service" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Storage Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <HardDrive className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Storage</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: HardDrive, name: "S3", desc: "Object Storage" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Database Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Database className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Database</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: Database, name: "RDS", desc: "Relational Database" },
+                { icon: Database, name: "DynamoDB", desc: "NoSQL Database" },
+                { icon: Database, name: "ElastiCache", desc: "In-Memory Cache" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Networking Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Network className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Networking</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: Network, name: "VPC", desc: "Virtual Cloud" },
+                { icon: GitFork, name: "ALB", desc: "Load Balancer" },
+                { icon: Globe, name: "API Gateway", desc: "API Management" },
+                { icon: Cloud, name: "CloudFront", desc: "CDN" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Security Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Security</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: ShieldCheck, name: "IAM", desc: "Access Management" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Messaging Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <MessageSquare className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Messaging</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: MessageSquare, name: "SQS", desc: "Message Queue" },
+                { icon: Bell, name: "SNS", desc: "Notifications" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Management Services */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Management</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { icon: Activity, name: "CloudWatch", desc: "Monitoring" },
+              ].map((service, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                  <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="font-medium">{service.name}</div>
+                    <div className="text-sm text-muted-foreground">{service.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Service Count Summary */}
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+              <Package className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">15+ AWS Services Supported</span>
+            </div>
+          </div>
         </div>
       </section>
 

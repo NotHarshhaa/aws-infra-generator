@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   title: "AWS Infra Generator",
   description:
     "Design AWS infrastructure and generate Terraform or CloudFormation templates instantly.",
+  icons: {
+    icon: "/AWS-Light.svg",
+    shortcut: "/AWS-Light.svg",
+    apple: "/AWS-Light.svg",
+  },
 };
 
 export default function RootLayout({
