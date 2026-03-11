@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export function Header() {
+interface HeaderProps {
+  onBackToHome?: () => void;
+}
+
+export function Header({ onBackToHome }: HeaderProps) {
   const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -50,7 +54,10 @@ export function Header() {
     }`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo and Title */}
-        <Link href="/" className="group flex items-center gap-3 hover:opacity-90 transition-all duration-200">
+        <button 
+          onClick={onBackToHome}
+          className="group flex items-center gap-3 hover:opacity-90 transition-all duration-200 bg-transparent border-none cursor-pointer"
+        >
           <div className="relative">
             <img 
               src={dark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
@@ -67,17 +74,33 @@ export function Header() {
               Infrastructure as Code
             </span>
           </div>
-        </Link>
+        </button>
 
         {/* Navigation and Actions */}
         <div className="flex items-center gap-2">
           {/* Quick Actions */}
           <div className="hidden md:flex items-center gap-1 mr-4">
-            <Button variant="ghost" size="sm" className="text-xs h-8 px-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-8 px-3"
+              onClick={() => {
+                const element = document.getElementById('features');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               <Sparkles className="w-3 h-3 mr-1" />
               Features
             </Button>
-            <Button variant="ghost" size="sm" className="text-xs h-8 px-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-8 px-3"
+              onClick={() => {
+                const element = document.getElementById('services');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               Services
             </Button>
           </div>
@@ -124,8 +147,9 @@ export function Header() {
             size="sm" 
             className="hidden md:flex h-9 px-4 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-200 hover:scale-105 shadow-sm"
             onClick={() => {
-              const element = document.getElementById('get-started');
-              element?.scrollIntoView({ behavior: 'smooth' });
+              // Trigger the wizard to open
+              const event = new CustomEvent('open-wizard');
+              window.dispatchEvent(event);
             }}
           >
             Get Started

@@ -37,6 +37,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+
 function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
   const [dark, setDark] = useState(false);
 
@@ -61,7 +62,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
   return (
     <div className="space-y-12 sm:space-y-16 py-6 sm:py-8">
       {/* Hero */}
-      <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 px-3">
+      <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 px-3 overflow-x-hidden">
         <div className="mb-4 sm:mb-6">
           <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-orange-500 shadow-lg dark:shadow-orange-500/20 mx-auto">
             <img 
@@ -85,7 +86,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
           coding required.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
-          <Button size="lg" onClick={onGetStarted} className="text-base px-8 h-12 w-full sm:w-auto">
+          <Button size="lg" onClick={onGetStarted} className="text-base px-8 h-12 w-full sm:w-auto" id="get-started">
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
@@ -102,7 +103,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Features */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-3">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-3" id="features">
         {[
           {
             icon: Cloud,
@@ -369,7 +370,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
       </section>
 
       {/* Supported Services Section */}
-      <section className="space-y-6 px-3 py-8 sm:py-12">
+      <section className="space-y-6 px-3 py-8 sm:py-12 overflow-x-hidden" id="services">
         <div className="text-center space-y-4">
           <Badge variant="secondary" className="text-sm px-4 py-1">
             Services
@@ -460,7 +461,11 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
                 { icon: Network, name: "VPC", desc: "Virtual Cloud" },
                 { icon: GitFork, name: "ALB", desc: "Load Balancer" },
                 { icon: Globe, name: "API Gateway", desc: "API Management" },
-                { icon: Cloud, name: "CloudFront", desc: "CDN" },
+                { 
+                  icon: Cloud, 
+                  name: "CloudFront", 
+                  desc: "CDN" 
+                },
               ].map((service, idx) => (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                   <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
@@ -691,15 +696,25 @@ export default function Home() {
     setStep("services");
   };
 
+  useEffect(() => {
+    const handleOpenWizard = () => {
+      setShowWizard(true);
+      setStep("services");
+    };
+
+    window.addEventListener('open-wizard', handleOpenWizard);
+    return () => window.removeEventListener('open-wizard', handleOpenWizard);
+  }, []);
+
   const handleBackToHome = () => {
     setShowWizard(false);
     reset();
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
+      <Header onBackToHome={handleBackToHome} />
+      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12 overflow-x-hidden">
         {!showWizard ? (
           <LandingHero onGetStarted={handleGetStarted} />
         ) : (

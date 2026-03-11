@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${jetbrainsMono.variable} antialiased font-mono`}
+        className={`${jetbrainsMono.variable} antialiased font-mono overflow-x-hidden`}
       >
         <TooltipProvider>{children}</TooltipProvider>
       </body>

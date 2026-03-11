@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Bell,
   Activity,
+  Cloud,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   MessageSquare,
   Bell,
   Activity,
+  Cloud,
   // Add new icons to the map here
   // e.g. NewIcon,
 };
