@@ -8,7 +8,7 @@ export interface AWSService {
   configFields: ConfigField[];
 }
 
-export type ServiceCategory = "compute" | "storage" | "database" | "networking" | "security";
+export type ServiceCategory = "compute" | "storage" | "database" | "networking" | "security" | "messaging" | "management";
 
 export interface ConfigField {
   name: string;

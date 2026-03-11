@@ -7,6 +7,16 @@ DEPENDENCY_MAP = {
     "rds": ["vpc"],
     "alb": ["vpc"],
     "iam": [],
+    "lambda": ["iam"],
+    "api-gateway": ["iam"],
+    "cloudfront": ["s3"],
+    "ecs": ["vpc", "iam"],
+    "eks": ["vpc", "iam"],
+    "dynamodb": ["iam"],
+    "elasticache": ["vpc"],
+    "sqs": ["iam"],
+    "sns": ["iam"],
+    "cloudwatch": ["iam"],
 }
 
 
@@ -30,7 +40,7 @@ class DependencyResolver:
             _resolve(svc)
 
         # Return in dependency order: dependencies first
-        order = ["vpc", "iam", "s3", "ec2", "rds", "alb"]
+        order = ["vpc", "iam", "s3", "ec2", "rds", "alb", "lambda", "api-gateway", "cloudfront", "ecs", "eks", "dynamodb", "elasticache", "sqs", "sns", "cloudwatch"]
         ordered = [s for s in order if s in resolved]
         # Add any remaining that aren't in our predefined order
         for s in resolved:

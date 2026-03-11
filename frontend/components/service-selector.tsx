@@ -10,6 +10,12 @@ import {
   Info,
   ArrowRight,
   Home,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +39,14 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Database,
   Shield,
   GitFork,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
+  // Add new icons to the map here
+  // e.g. NewIcon,
 };
 
 interface ServiceSelectorProps {

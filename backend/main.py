@@ -55,7 +55,7 @@ class GenerateRequest(BaseModel):
         if not v:
             raise ValueError('At least one service must be selected')
         
-        valid_services = ['vpc', 'ec2', 's3', 'rds', 'alb', 'iam']
+        valid_services = ['vpc', 'ec2', 's3', 'rds', 'alb', 'iam', 'lambda', 'api-gateway', 'cloudfront', 'ecs', 'eks', 'dynamodb', 'elasticache', 'sqs', 'sns', 'cloudwatch']
         for service in v:
             if service not in valid_services:
                 raise ValueError(f'Invalid service: {service}')
@@ -97,7 +97,7 @@ class ValidateRequest(BaseModel):
         if not v:
             raise ValueError('At least one service must be selected')
         
-        valid_services = ['vpc', 'ec2', 's3', 'rds', 'alb', 'iam']
+        valid_services = ['vpc', 'ec2', 's3', 'rds', 'alb', 'iam', 'lambda', 'api-gateway', 'cloudfront', 'ecs', 'eks', 'dynamodb', 'elasticache', 'sqs', 'sns', 'cloudwatch']
         for service in v:
             if service not in valid_services:
                 raise ValueError(f'Invalid service: {service}')
