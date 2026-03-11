@@ -7,6 +7,7 @@ import { ServiceSelector } from "@/components/service-selector";
 import { ServiceConfigurator } from "@/components/service-configurator";
 import { InfraGenerator } from "@/components/infra-generator";
 import { InfraExport } from "@/components/infra-export";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { useInfraStore } from "@/lib/store";
 import { WizardStep } from "@/lib/types";
 import {
@@ -717,6 +718,7 @@ export default function Home() {
           </>
         )}
       </main>
+      <ScrollToTop />
     </div>
   );
 }
