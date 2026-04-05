@@ -46,7 +46,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { getServiceById, AWS_REGIONS } from "@/lib/aws-services";
 import { useInfraStore } from "@/lib/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Network,
@@ -68,6 +68,12 @@ interface ServiceConfiguratorProps {
   onBackToHome: () => void;
 }
 
+interface FieldError {
+  [serviceId: string]: {
+    [fieldName: string]: string | undefined;
+  };
+}
+
 export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) {
   const {
     selectedServices,
@@ -85,9 +91,113 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
     setStep,
   } = useInfraStore();
 
+  const [fieldErrors, setFieldErrors] = useState<FieldError>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+
   useEffect(() => {
     initServiceConfig();
   }, [initServiceConfig]);
+
+  const validateField = (serviceId: string, fieldName: string, value: any): string | null => {
+    const service = getServiceById(serviceId);
+    if (!service) return null;
+    
+    const field = service.configFields.find(f => f.name === fieldName);
+    if (!field) return null;
+
+    // Required field validation
+    if (field.required && (value === undefined || value === null || value === "")) {
+      return `${field.label} is required`;
+    }
+
+    // Number validation
+    if (field.type === "number" && value !== "") {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue)) {
+        return `${field.label} must be a valid number`;
+      }
+      if (fieldName.includes("port") && (numValue < 1 || numValue > 65535)) {
+        return `${field.label} must be between 1 and 65535`;
+      }
+      if (fieldName.includes("size") && numValue < 0) {
+        return `${field.label} must be positive`;
+      }
+    }
+
+    // Text validation
+    if (field.type === "text" && typeof value === "string") {
+      if (fieldName.includes("name") && value.length > 255) {
+        return `${field.label} must be less than 255 characters`;
+      }
+      if (fieldName.includes("email") && value && !value.includes("@")) {
+        return `${field.label} must be a valid email`;
+      }
+    }
+
+    return null;
+  };
+
+  const handleFieldChange = (serviceId: string, fieldName: string, value: any) => {
+    // Clear previous error for this field
+    setFieldErrors(prev => ({
+      ...prev,
+      [serviceId]: {
+        ...prev[serviceId],
+        [fieldName]: undefined
+      }
+    }));
+
+    // Update the field value
+    updateServiceConfig(serviceId, fieldName, value);
+
+    // Validate the field
+    const error = validateField(serviceId, fieldName, value);
+    if (error) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [serviceId]: {
+          ...prev[serviceId],
+          [fieldName]: error
+        }
+      }));
+    }
+  };
+
+  const validateAllFields = (): boolean => {
+    const errors: FieldError = {};
+    let hasErrors = false;
+
+    selectedServices.forEach(serviceId => {
+      const service = getServiceById(serviceId);
+      if (!service) return;
+
+      const config = serviceConfig[serviceId]?.config || {};
+      errors[serviceId] = {};
+
+      service.configFields.forEach(field => {
+        const error = validateField(serviceId, field.name, config[field.name]);
+        if (error) {
+          errors[serviceId][field.name] = error;
+          hasErrors = true;
+        }
+      });
+    });
+
+    setFieldErrors(errors);
+    return !hasErrors;
+  };
+
+  const handleGenerate = () => {
+    if (!validateAllFields()) {
+      return;
+    }
+    setIsGenerating(true);
+    // Simulate generation process
+    setTimeout(() => {
+      setIsGenerating(false);
+      setStep("generate");
+    }, 1000);
+  };
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -113,10 +223,33 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
               <Input
                 id="projectName"
                 value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
+                onChange={(e) => {
+                  setProjectName(e.target.value);
+                  // Basic project name validation
+                  if (e.target.value.length > 0 && !/^[a-zA-Z0-9-_]+$/.test(e.target.value)) {
+                    setFieldErrors(prev => ({
+                      ...prev,
+                      project: {
+                        ...prev.project,
+                        projectName: "Project name can only contain letters, numbers, hyphens, and underscores"
+                      }
+                    }));
+                  } else {
+                    setFieldErrors(prev => ({
+                      ...prev,
+                      project: {
+                        ...prev.project,
+                        projectName: undefined
+                      }
+                    }));
+                  }
+                }}
                 placeholder="my-infra"
-                className="h-9 sm:h-10"
+                className={`h-9 sm:h-10 ${fieldErrors.project?.projectName ? "border-red-500" : ""}`}
               />
+              {fieldErrors.project?.projectName && (
+                <p className="text-xs text-red-500">{fieldErrors.project.projectName}</p>
+              )}
             </div>
             <div className="space-y-1.5 sm:space-y-2">
               <Label htmlFor="region" className="text-sm">AWS Region</Label>
@@ -174,6 +307,41 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
         </CardContent>
       </Card>
 
+      {/* Configuration Summary */}
+      <Card>
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="text-lg">Configuration Summary</CardTitle>
+          <CardDescription className="text-sm">
+            Overview of your infrastructure configuration
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold text-primary">{selectedServices.length}</div>
+              <div className="text-sm text-muted-foreground">Services Selected</div>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold text-primary">{environment}</div>
+              <div className="text-sm text-muted-foreground">Environment</div>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold text-primary">{region.split('-')[1]?.toUpperCase() || region}</div>
+              <div className="text-sm text-muted-foreground">AWS Region</div>
+            </div>
+          </div>
+          {Object.keys(fieldErrors).some(serviceId => 
+            Object.values(fieldErrors[serviceId]).some(error => error)
+          ) && (
+            <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200">
+              <p className="text-sm text-red-700">
+                ⚠️ Please fix validation errors before generating infrastructure
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Per-Service Configuration */}
       <Card>
         <CardHeader className="pb-3 sm:pb-6">
@@ -224,7 +392,7 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                           return (
                             <div
                               key={field.name}
-                              className="flex items-center justify-between rounded-lg border p-3"
+                              className={`flex items-center justify-between rounded-lg border p-3 ${fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}`}
                             >
                               <div className="space-y-0.5">
                                 <Label className="text-sm">{field.label}</Label>
@@ -237,11 +405,7 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                               <Switch
                                 checked={value as boolean}
                                 onCheckedChange={(checked) =>
-                                  updateServiceConfig(
-                                    serviceId,
-                                    field.name,
-                                    checked
-                                  )
+                                  handleFieldChange(serviceId, field.name, checked)
                                 }
                               />
                             </div>
@@ -251,18 +415,17 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                         if (field.type === "select") {
                           return (
                             <div key={field.name} className="space-y-2">
-                              <Label>{field.label}</Label>
+                              <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
+                                {field.label}
+                                {field.required && <span className="text-red-500 ml-1">*</span>}
+                              </Label>
                               <Select
                                 value={String(value)}
                                 onValueChange={(v) =>
-                                  v && updateServiceConfig(
-                                    serviceId,
-                                    field.name,
-                                    v
-                                  )
+                                  v && handleFieldChange(serviceId, field.name, v)
                                 }
                               >
-                                <SelectTrigger>
+                                <SelectTrigger className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -281,6 +444,9 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                                   {field.description}
                                 </p>
                               )}
+                              {fieldErrors[serviceId]?.[field.name] && (
+                                <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
+                              )}
                             </div>
                           );
                         }
@@ -288,22 +454,33 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                         if (field.type === "number") {
                           return (
                             <div key={field.name} className="space-y-2">
-                              <Label>{field.label}</Label>
+                              <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
+                                {field.label}
+                                {field.required && <span className="text-red-500 ml-1">*</span>}
+                              </Label>
                               <Input
                                 type="number"
                                 value={value as number}
-                                onChange={(e) =>
-                                  updateServiceConfig(
-                                    serviceId,
-                                    field.name,
-                                    parseInt(e.target.value) || 0
-                                  )
-                                }
+                                onChange={(e) => {
+                                  const inputValue = e.target.value;
+                                  if (inputValue === "") {
+                                    handleFieldChange(serviceId, field.name, 0);
+                                  } else {
+                                    const numValue = parseFloat(inputValue);
+                                    if (!isNaN(numValue)) {
+                                      handleFieldChange(serviceId, field.name, numValue);
+                                    }
+                                  }
+                                }}
+                                className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}
                               />
                               {field.description && (
                                 <p className="text-xs text-muted-foreground">
                                   {field.description}
                                 </p>
+                              )}
+                              {fieldErrors[serviceId]?.[field.name] && (
+                                <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
                               )}
                             </div>
                           );
@@ -311,21 +488,25 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
 
                         return (
                           <div key={field.name} className="space-y-2">
-                            <Label>{field.label}</Label>
+                            <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
+                              {field.label}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
                             <Input
                               value={String(value)}
                               onChange={(e) =>
-                                updateServiceConfig(
-                                  serviceId,
-                                  field.name,
-                                  e.target.value
-                                )
+                                handleFieldChange(serviceId, field.name, e.target.value)
                               }
+                              className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}
+                              placeholder=""
                             />
                             {field.description && (
                               <p className="text-xs text-muted-foreground">
                                 {field.description}
                               </p>
+                            )}
+                            {fieldErrors[serviceId]?.[field.name] && (
+                              <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
                             )}
                           </div>
                         );
@@ -352,9 +533,23 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
             Back to Services
           </Button>
         </div>
-        <Button onClick={() => setStep("generate")} size="lg" className="w-full sm:w-auto">
-          Generate Infrastructure
-          <ArrowRight className="ml-2 h-4 w-4" />
+        <Button 
+          onClick={handleGenerate} 
+          size="lg" 
+          className="w-full sm:w-auto"
+          disabled={isGenerating}
+        >
+          {isGenerating ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Generating...
+            </>
+          ) : (
+            <>
+              Generate Infrastructure
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     </div>
