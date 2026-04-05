@@ -521,42 +521,30 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                       </div>
                     )}
                     <div className="flex items-center gap-2">
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => copyToClipboard(file.content, file.name)}
-                            className="flex items-center gap-2"
-                          >
-                            {copiedFile === file.name ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                            {copiedFile === file.name ? 'Copied!' : 'Copy'}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Copy file content to clipboard</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => downloadFile(file.content, file.name)}
-                            className="flex items-center gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            Download
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Download this file</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(file.content, file.name)}
+                        className="flex items-center gap-2"
+                        title="Copy file content to clipboard"
+                      >
+                        {copiedFile === file.name ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                        {copiedFile === file.name ? 'Copied!' : 'Copy'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadFile(file.content, file.name)}
+                        className="flex items-center gap-2"
+                        title="Download this file"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download
+                      </Button>
                     </div>
                     <ScrollArea className="h-[400px] w-full rounded-md border">
                       <pre className="p-4 text-sm">

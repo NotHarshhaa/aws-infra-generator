@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Moon, Sun, ExternalLink, Sparkles } from "lucide-react";
+import { Github, Moon, Sun, ExternalLink, Sparkles, Package, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -97,10 +97,23 @@ export function Header({ onBackToHome }: HeaderProps) {
               size="sm" 
               className="text-xs h-8 px-3"
               onClick={() => {
+                const element = document.getElementById('templates');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <Package className="w-3 h-3 mr-1" />
+              Templates
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-8 px-3"
+              onClick={() => {
                 const element = document.getElementById('services');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
+              <Server className="w-3 h-3 mr-1" />
               Services
             </Button>
           </div>

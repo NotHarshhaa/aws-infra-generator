@@ -271,23 +271,23 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{stats.totalFiles}</div>
+              <div className="text-2xl font-bold">{stats.totalFiles}</div>
               <div className="text-xs text-muted-foreground">Files</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalSize}</div>
+              <div className="text-2xl font-bold">{stats.totalSize}</div>
               <div className="text-xs text-muted-foreground">Size</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.totalLines}</div>
+              <div className="text-2xl font-bold">{stats.totalLines}</div>
               <div className="text-xs text-muted-foreground">Lines</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{stats.securityScore}%</div>
+              <div className="text-2xl font-bold">{stats.securityScore}%</div>
               <div className="text-xs text-muted-foreground">Security Score</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{stats.estimatedDeployTime}</div>
+              <div className="text-2xl font-bold">{stats.estimatedDeployTime}</div>
               <div className="text-xs text-muted-foreground">Deploy Time</div>
             </div>
           </div>

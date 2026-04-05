@@ -8,11 +8,17 @@ import {
   ValidationResult,
 } from "./types";
 import { getServiceById, getServiceDependencies } from "./aws-services";
+import { PresetTemplate } from "./preset-templates";
 
 interface InfraStore {
   // Wizard navigation
   currentStep: WizardStep;
   setStep: (step: WizardStep) => void;
+
+  // Preset templates
+  selectedTemplate: PresetTemplate | null;
+  setSelectedTemplate: (template: PresetTemplate | null) => void;
+  applyPresetTemplate: (template: PresetTemplate) => void;
 
   // Service selection
   selectedServices: string[];
@@ -52,6 +58,7 @@ interface InfraStore {
 
 const initialState = {
   currentStep: "services" as WizardStep,
+  selectedTemplate: null as PresetTemplate | null,
   selectedServices: [] as string[],
   serviceConfig: {} as ServiceConfig,
   projectName: "my-infra",
@@ -67,6 +74,38 @@ export const useInfraStore = create<InfraStore>((set, get) => ({
   ...initialState,
 
   setStep: (step) => set({ currentStep: step }),
+
+  // Preset template functions
+  setSelectedTemplate: (template) => set({ selectedTemplate: template }),
+
+  applyPresetTemplate: (template) => {
+    // Extract service IDs from template
+    const serviceIds = template.services
+      .filter(service => service.enabled)
+      .map(service => service.serviceId);
+
+    // Build service config from template
+    const newServiceConfig: ServiceConfig = {};
+    template.services.forEach(service => {
+      if (service.enabled) {
+        newServiceConfig[service.serviceId] = {
+          enabled: true,
+          config: service.config
+        };
+      }
+    });
+
+    // Apply all template settings
+    set({
+      selectedTemplate: template,
+      selectedServices: serviceIds,
+      serviceConfig: newServiceConfig,
+      projectName: template.globalConfig.projectName,
+      environment: template.globalConfig.environment,
+      region: template.globalConfig.region,
+      outputFormat: template.globalConfig.outputFormat,
+    });
+  },
 
   toggleService: (serviceId) => {
     const { selectedServices } = get();
