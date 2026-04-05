@@ -8,6 +8,14 @@ import { generateS3 } from './services/s3';
 import { generateRds } from './services/rds';
 import { generateAlb } from './services/alb';
 import { generateIam } from './services/iam';
+import { generateRoute53 } from './services/route53';
+import { generateEfs } from './services/efs';
+import { generateSqs } from './services/sqs';
+import { generateSns } from './services/sns';
+import { generateLambda } from './services/lambda';
+import { generateElastiCache } from './services/elasticache';
+import { generateApiGateway } from './services/api-gateway';
+import { generateCloudWatch } from './services/cloudwatch';
 
 export type { 
   ServiceConfig, 
@@ -42,6 +50,14 @@ export class TerraformGenerator {
       rds: generateRds,
       alb: generateAlb,
       iam: generateIam,
+      'route53': generateRoute53,
+      'efs': generateEfs,
+      'sqs': generateSqs,
+      'sns': generateSns,
+      'lambda': generateLambda,
+      'elasticache': generateElastiCache,
+      'api-gateway': generateApiGateway,
+      'cloudwatch': generateCloudWatch,
     };
 
     for (const svc of services) {
