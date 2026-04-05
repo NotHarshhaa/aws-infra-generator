@@ -6,6 +6,14 @@ import { buildS3 } from './services/s3';
 import { buildRds } from './services/rds';
 import { buildAlb } from './services/alb';
 import { buildIam } from './services/iam';
+import { generateRoute53 } from './services/route53';
+import { generateEfs } from './services/efs';
+import { generateSqs } from './services/sqs';
+import { generateSns } from './services/sns';
+import { generateLambda } from './services/lambda';
+import { generateElastiCache } from './services/elasticache';
+import { generateApiGateway } from './services/api-gateway';
+import { generateCloudWatch } from './services/cloudwatch';
 
 export type { 
   ServiceConfig, 
@@ -42,6 +50,14 @@ export class CloudFormationGenerator {
       rds: buildRds,
       alb: buildAlb,
       iam: buildIam,
+      'route53': generateRoute53,
+      'efs': generateEfs,
+      'sqs': generateSqs,
+      'sns': generateSns,
+      'lambda': generateLambda,
+      'elasticache': generateElastiCache,
+      'api-gateway': generateApiGateway,
+      'cloudwatch': generateCloudWatch,
     };
 
     // Build resources and outputs for each service
