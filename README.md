@@ -23,9 +23,9 @@ Instead of manually writing infrastructure code, users can select the AWS servic
 |-------|-----------|
 | Frontend | Next.js, React, Tailwind CSS, shadcn/ui |
 | State Management | Zustand |
-| Backend | Python, FastAPI |
-| Template Engine | Jinja2 (Terraform), JSON builder (CloudFormation) |
-| Packaging | ZIP export |
+| Infrastructure Generation | Client-side TypeScript (Terraform & CloudFormation) |
+| Template Engine | TypeScript template builders |
+| Packaging | Browser-based ZIP export (JSZip) |
 
 ---
 
@@ -34,7 +34,6 @@ Instead of manually writing infrastructure code, users can select the AWS servic
 ### Prerequisites
 
 - **Node.js** >= 18
-- **Python** >= 3.10
 - **npm** or **yarn**
 
 ### 1. Clone the repository
@@ -44,25 +43,21 @@ git clone https://github.com/NotHarshhaa/aws-infra-generator.git
 cd aws-infra-generator
 ```
 
-### 2. Start the Backend
+### 2. Install dependencies
 
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+npm install
 ```
 
-The API will be available at `http://localhost:8000`.
-
-### 3. Start the Frontend
+### 3. Start the Application
 
 ```bash
-cd frontend
-npm install
 npm run dev
 ```
 
 The app will be available at `http://localhost:3000`.
+
+**Note**: This application runs entirely in the browser without requiring a backend server. All infrastructure generation happens client-side using TypeScript implementations.
 
 ---
 
@@ -122,15 +117,13 @@ aws cloudformation deploy \
 
 ---
 
-## 📡 API Endpoints
+## 📡 Client-side Functions
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | API info |
-| GET | `/api/health` | Health check |
-| POST | `/api/validate` | Validate infrastructure config |
-| POST | `/api/generate` | Generate IaC templates |
-| POST | `/api/download` | Download as ZIP archive |
+| Function | Description |
+|----------|-------------|
+| `generateInfrastructure()` | Generate IaC templates locally |
+| `validateInfrastructure()` | Validate infrastructure config locally |
+| `downloadInfrastructure()` | Download as ZIP archive (browser) |
 
 ---
 
@@ -139,13 +132,11 @@ aws cloudformation deploy \
 ```
 Frontend UI (Next.js + shadcn/ui)
         ↓
-Backend API (FastAPI)
+Client-side Infrastructure Generation (TypeScript)
         ↓
-Infrastructure Generator
+Terraform / CloudFormation Builders
         ↓
-Terraform / CloudFormation Builder
-        ↓
-Download Infrastructure Package (ZIP)
+Browser-based ZIP Download
 ```
 
 ---
