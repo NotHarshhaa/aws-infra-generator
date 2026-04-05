@@ -1,4 +1,4 @@
-import { AWSService } from "./types";
+import { AWSService, Environment } from "./types";
 
 export interface PresetTemplate {
   id: string;
@@ -18,7 +18,7 @@ export interface PresetTemplate {
   globalConfig: {
     projectName: string;
     region: string;
-    environment: string;
+    environment: Environment;
     outputFormat: "terraform" | "cloudformation";
   };
 }
