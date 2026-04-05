@@ -10,6 +10,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Home,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
+  Cloud,
 } from "lucide-react";
 import {
   Card,
@@ -48,6 +55,13 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Database,
   Shield,
   GitFork,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
+  Cloud,
 };
 
 interface ServiceConfiguratorProps {
