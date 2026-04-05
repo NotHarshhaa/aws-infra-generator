@@ -724,7 +724,7 @@ export default function Home() {
               onStepClick={setStep}
               completedSteps={completedSteps}
             />
-            <div className="max-w-5xl mx-auto px-1 sm:px-0">
+            <div className="max-w-7xl mx-auto px-1 sm:px-0">
               {currentStep === "services" && <ServiceSelector onBackToHome={handleBackToHome} />}
               {currentStep === "configure" && <ServiceConfigurator onBackToHome={handleBackToHome} />}
               {currentStep === "generate" && <InfraGenerator onBackToHome={handleBackToHome} />}
