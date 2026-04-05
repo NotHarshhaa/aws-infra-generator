@@ -43,14 +43,14 @@ resource "aws_lambda_function" "main" {
   }
   
   tags = {
-    Name = "${'${var.project_name}-${var.environment}-lambda'}"
-    Environment = "${'${var.environment}'}"
+    Name = "\${var.project_name}-\${var.environment}-lambda"
+    Environment = "\${var.environment}"
   }
 }
 
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda" {
-  name = "${'${var.project_name}-${var.environment}-lambda-role'}"
+  name = "\${var.project_name}-\${var.environment}-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -66,7 +66,7 @@ resource "aws_iam_role" "lambda" {
   })
 
   tags = {
-    Name = "${'${var.project_name}-${var.environment}-lambda-role'}"
+    Name = "\${var.project_name}-\${var.environment}-lambda-role"
   }
 }
 
@@ -78,6 +78,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 
 `;
 
+  // VPC access policy
   if (enableVpc) {
     content += `# VPC access policy
 resource "aws_iam_role_policy_attachment" "lambda_vpc" {
@@ -87,7 +88,7 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc" {
 
 # Security group for Lambda
 resource "aws_security_group" "lambda" {
-  name_prefix = "${'${var.project_name}-${var.environment}-lambda-'}"
+  name_prefix = "\${var.project_name}-\${var.environment}-lambda-"
   vpc_id      = aws_vpc.main.id
   description = "Security group for Lambda function"
 
@@ -99,7 +100,7 @@ resource "aws_security_group" "lambda" {
   }
 
   tags = {
-    Name = "${'${var.project_name}-${var.environment}-lambda-sg'}"
+    Name = "\${var.project_name}-\${var.environment}-lambda-sg"
   }
 }
 
@@ -109,13 +110,13 @@ resource "aws_security_group" "lambda" {
   // Add S3 access if needed
   if (cfg.s3_access === true) {
     content += `# S3 access policy
-resource "aws_iam_role_policy" "lambda_s3" {
-  name = "${'${var.project_name}-${var.environment}-lambda-s3'}"
-  role = aws_iam_role.lambda.name
+resource "aws_iam_policy" "lambda_s3" {
+  name        = "\${var.project_name}-\${var.environment}-lambda-s3"
+  role        = aws_iam_role.lambda.name
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement: [
       {
         Effect = "Allow"
         Action = [
@@ -125,8 +126,8 @@ resource "aws_iam_role_policy" "lambda_s3" {
           "s3:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.main.arn,
-          "${aws_s3_bucket.main.arn}/*"
+          ${cfg.s3_bucket_arn || 'aws_s3_bucket.main.arn'},
+          ${cfg.s3_bucket_arn ? `"${cfg.s3_bucket_arn}/*"` : '"${aws_s3_bucket.main.arn}/*"'}
         ]
       }
     ]
@@ -139,13 +140,13 @@ resource "aws_iam_role_policy" "lambda_s3" {
   // Add DynamoDB access if needed
   if (cfg.dynamodb_access === true) {
     content += `# DynamoDB access policy
-resource "aws_iam_role_policy" "lambda_dynamodb" {
-  name = "${'${var.project_name}-${var.environment}-lambda-dynamodb'}"
-  role = aws_iam_role.lambda.name
+resource "aws_iam_policy" "lambda_dynamodb" {
+  name        = "\${var.project_name}-\${var.environment}-lambda-dynamodb"
+  role        = aws_iam_role.lambda.name
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement: [
       {
         Effect = "Allow"
         Action = [
@@ -156,7 +157,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
           "dynamodb:Query",
           "dynamodb:Scan"
         ]
-        Resource = aws_dynamodb_table.main.arn
+        Resource: aws_dynamodb_table.main.arn
       }
     ]
   })
@@ -168,13 +169,13 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
   // Add SQS access if needed
   if (cfg.sqs_access === true) {
     content += `# SQS access policy
-resource "aws_iam_role_policy" "lambda_sqs" {
-  name = "${'${var.project_name}-${var.environment}-lambda-sqs'}"
-  role = aws_iam_role.lambda.name
+resource "aws_iam_policy" "lambda_sqs" {
+  name        = "\${var.project_name}-\${var.environment}-lambda-sqs"
+  role        = aws_iam_role.lambda.name
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement: [
       {
         Effect = "Allow"
         Action = [
@@ -195,12 +196,12 @@ resource "aws_iam_role_policy" "lambda_sqs" {
   if (cfg.eventbridge_trigger === true) {
     content += `# EventBridge rule for Lambda trigger
 resource "aws_cloudwatch_event_rule" "lambda_trigger" {
-  name                = "${'${var.project_name}-${var.environment}-lambda-trigger'}"
+  name                = "\${var.project_name}-\${var.environment}-lambda-trigger"
   description         = "Trigger Lambda function on schedule"
-  schedule_expression = "${cfg.schedule_expression || 'rate(5 minutes)'}"
+  schedule_expression = "${cfg.schedule_expression || "rate(5 minutes)"}"
 
   tags = {
-    Name = "${'${var.project_name}-${var.environment}-lambda-trigger'}"
+    Name = "\${var.project_name}-\${var.environment}-lambda-trigger"
   }
 }
 
@@ -225,30 +226,38 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   if (cfg.api_gateway_trigger === true) {
     content += `# API Gateway
 resource "aws_api_gateway_rest_api" "main" {
-  name        = "${'${var.project_name}-${var.environment}-api'}"
-  description = "API Gateway for Lambda function"
+  name        = "\${var.project_name}-\${var.environment}-api"
+  description = "API Gateway for ${projectName}"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 
   tags = {
-    Name = "${'${var.project_name}-${var.environment}-api'}"
+    Name = "\${var.project_name}-\${var.environment}-api"
+    Environment = "\${var.environment}"
   }
 }
 
+# API Gateway Resource
 resource "aws_api_gateway_resource" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
   parent_id   = aws_api_gateway_rest_api.main.root_resource_id
   path_part   = "{proxy+}"
 }
 
+# API Gateway Method (ANY for proxy)
 resource "aws_api_gateway_method" "main" {
   rest_api_id   = aws_api_gateway_rest_api.main.id
   resource_id   = aws_api_gateway_resource.main.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorizationType = "NONE"
 }
 
+# API Gateway Integration
 resource "aws_api_gateway_integration" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.main.id
+  resource_id   = aws_api_gateway_resource.main.id
   http_method = aws_api_gateway_method.main.http_method
 
   integration_http_method = "POST"
@@ -256,6 +265,7 @@ resource "aws_api_gateway_integration" "main" {
   uri                     = aws_lambda_function.main.invoke_arn
 }
 
+# API Gateway Deployment
 resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
 
@@ -272,24 +282,35 @@ resource "aws_api_gateway_deployment" "main" {
   }
 }
 
+# API Gateway Stage
 resource "aws_api_gateway_stage" "main" {
   deployment_id = aws_api_gateway_deployment.main.id
   rest_api_id   = aws_api_gateway_rest_api.main.id
-  stage_name    = "${environment}"
-
-  tags = {
-    Name = "${'${var.project_name}-${var.environment}-api-stage'}"
-  }
+  stage_name    = "\${var.environment}"
 }
 
+# Lambda Permission for API Gateway
 resource "aws_lambda_permission" "allow_api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.main.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.main.execution_arn}/*/*/*"
+  source_arn    = "\${aws_api_gateway_rest_api.main.execution_arn}/*/*/*"
 }
+`;
+  }
 
+  // Add CloudWatch Log Group for API Gateway
+  if (cfg.enable_logging === true) {
+    content += `# CloudWatch Log Group for API Gateway
+resource "aws_cloudwatch_log_group" "api" {
+  name              = "/aws/apigateway/\${var.project_name}-\${var.environment}-api"
+  retention_in_days = ${cfg.log_retention_days || 14}
+
+  tags = {
+    Name = "\${var.project_name}-\${var.environment}-api-logs"
+  }
+}
 `;
   }
 
@@ -297,7 +318,7 @@ resource "aws_lambda_permission" "allow_api_gateway" {
   if (enableMonitoring) {
     content += `# CloudWatch alarms for Lambda
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  alarm_name          = "${'${var.project_name}-${var.environment}-lambda-errors'}"
+  alarm_name          = "\${var.project_name}-\${var.environment}-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "Errors"
@@ -314,14 +335,14 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
-  alarm_name          = "${'${var.project_name}-${var.environment}-lambda-duration'}"
+  alarm_name          = "\${var.project_name}-\${var.environment}-lambda-duration"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "Duration"
   namespace           = "AWS/Lambda"
   period              = "300"
   statistic           = "Average"
-  threshold           = ${timeout * 1000 * 0.8}  # 80% of timeout
+  threshold           = ${timeout * 1000 * 0.8}  // 80% of timeout
   alarm_description   = "Lambda function duration is too high"
   alarm_actions       = [aws_sns_topic.main.arn]
 
@@ -331,7 +352,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
-  alarm_name          = "${'${var.project_name}-${var.environment}-lambda-throttles'}"
+  alarm_name          = "\${var.project_name}-\${var.environment}-lambda-throttles"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "2"
   metric_name         = "Throttles"
