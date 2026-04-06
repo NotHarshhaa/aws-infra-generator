@@ -61,42 +61,42 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
   }, []);
 
   return (
-    <div className="space-y-12 sm:space-y-16 py-6 sm:py-8">
+    <div className="space-y-8 sm:space-y-16 py-4 sm:py-8">
       {/* Hero */}
-      <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 px-3 overflow-x-hidden">
-        <div className="mb-4 sm:mb-6">
-          <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-orange-500 shadow-lg dark:shadow-orange-500/20 mx-auto">
+      <section className="text-center space-y-3 sm:space-y-6 py-6 sm:py-12 px-3 overflow-x-hidden">
+        <div className="mb-3 sm:mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-orange-500 shadow-lg dark:shadow-orange-500/20 mx-auto">
             <img 
               src={dark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
               alt="AWS Logo" 
-              className="h-14 sm:h-16 md:h-18 w-auto"
+              className="h-12 sm:h-16 md:h-18 w-auto"
             />
           </div>
         </div>
-        <Badge variant="secondary" className="text-sm px-4 py-1">
+        <Badge variant="secondary" className="text-xs px-3 py-1">
           Platform Engineering Tool
         </Badge>
-        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold tracking-tight leading-tight">
           Design AWS Infrastructure
           <br />
           <span className="text-primary">Generate IaC Templates</span>
         </h1>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+        <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
           Select AWS services, configure parameters, and instantly generate
           production-ready Terraform or CloudFormation templates. No manual
           coding required.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
-          <Button size="lg" onClick={onGetStarted} className="text-base px-8 h-12 w-full sm:w-auto" id="get-started">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 pt-3 sm:pt-4">
+          <Button size="lg" onClick={onGetStarted} className="text-sm sm:text-base px-6 sm:px-8 h-10 sm:h-12 w-full sm:w-auto" id="get-started">
             Get Started
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
           <a
             href="https://github.com/NotHarshhaa/aws-infra-generator"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button variant="outline" size="lg" className="text-base px-8 h-12 w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="text-sm sm:text-base px-6 sm:px-8 h-10 sm:h-12 w-full sm:w-auto">
               View on GitHub
             </Button>
           </a>
@@ -456,24 +456,24 @@ export default function Home() {
           <>
             <LandingHero onGetStarted={handleGetStarted} />
             {/* Preset Templates */}
-            <section className="space-y-6 px-3" id="templates">
+            <section className="space-y-4 sm:space-y-6 px-3" id="templates">
               <PresetTemplates onTemplateSelect={handleTemplateSelect} />
             </section>
             {/* Supported Services Section */}
-            <section className="space-y-8 px-3 py-8 sm:py-12 overflow-x-hidden" id="services">
-              <div className="text-center space-y-4">
-                <Badge variant="secondary" className="text-sm px-4 py-1">
+            <section className="space-y-6 sm:space-y-8 px-3 py-6 sm:py-12 overflow-x-hidden" id="services">
+              <div className="text-center space-y-3 sm:space-y-4">
+                <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1">
                   Services
                 </Badge>
-                <h2 className="text-2xl sm:text-3xl font-bold">Supported AWS Services</h2>
-                <p className="text-muted-foreground max-w-3xl mx-auto text-lg">
+                <h2 className="text-xl sm:text-3xl font-bold">Supported AWS Services</h2>
+                <p className="text-muted-foreground max-w-3xl mx-auto text-sm sm:text-lg">
                   Generate infrastructure for 20+ AWS services with comprehensive configuration options and best practices
                 </p>
               </div>
 
               <div className="max-w-7xl mx-auto">
                 {/* Services Overview Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12">
                   {[
                     { icon: Server, name: "EC2", category: "compute", count: 4 },
                     { icon: Zap, name: "Lambda", category: "compute", count: 8 },
@@ -495,15 +495,15 @@ export default function Home() {
                     { icon: Activity, name: "CloudWatch", category: "management", count: 4 },
                   ].map((service, idx) => (
                     <div key={idx} className="group relative">
-                      <div className="flex items-center gap-3 p-4 rounded-xl border bg-card hover:bg-accent/50 transition-all duration-200 hover:shadow-md hover:border-primary/30">
+                      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border bg-card hover:bg-accent/50 transition-all duration-200 hover:shadow-md hover:border-primary/30">
                         <div className="flex-shrink-0">
-                          <service.icon className="h-8 w-8 text-primary group-hover:scale-110 transition-transform" />
+                          <service.icon className="h-6 w-6 sm:h-8 sm:w-8 text-primary group-hover:scale-110 transition-transform" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm truncate">{service.name}</div>
+                          <div className="font-semibold text-xs sm:text-sm truncate">{service.name}</div>
                           <div className="text-xs text-muted-foreground capitalize">{service.category}</div>
                         </div>
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 hidden sm:block">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         </div>
                       </div>
@@ -512,10 +512,10 @@ export default function Home() {
                 </div>
 
                 {/* Detailed Categories */}
-                <div className="space-y-10">
+                <div className="space-y-6 sm:space-y-10">
                   {/* Compute Services */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                       <div className="flex items-center gap-2">
                         <Server className="h-5 w-5 text-primary" />
                         <h3 className="text-xl font-bold">Compute Services</h3>
@@ -567,19 +567,20 @@ export default function Home() {
                         { icon: HardDrive, name: "EFS", desc: "File system for EC2", features: ["Shared storage", "High availability", "Performance modes"] },
                       ].map((service, idx) => (
                         <Card key={idx} className="hover:shadow-lg transition-shadow">
-                          <CardContent className="p-4 space-y-3">
-                            <div className="flex items-center gap-3">
-                              <service.icon className="h-10 w-10 text-primary flex-shrink-0" />
+                          <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <service.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
                               <div>
-                                <div className="font-bold text-lg">{service.name}</div>
-                                <div className="text-sm text-muted-foreground">{service.desc}</div>
+                                <div className="font-bold text-sm sm:text-lg">{service.name}</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground">{service.desc}</div>
                               </div>
                             </div>
                             <div className="space-y-1">
                               {service.features.map((feature, fidx) => (
                                 <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                  {feature}
+                                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
+                                  <span className="hidden sm:inline">{feature}</span>
+                                  <span className="sm:hidden">{feature.length > 12 ? feature.substring(0, 10) + "..." : feature}</span>
                                 </div>
                               ))}
                             </div>
@@ -590,34 +591,35 @@ export default function Home() {
                   </div>
 
                   {/* Database Services */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                       <div className="flex items-center gap-2">
-                        <Database className="h-5 w-5 text-primary" />
-                        <h3 className="text-xl font-bold">Database Services</h3>
+                        <Database className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <h3 className="text-lg sm:text-xl font-bold">Database Services</h3>
                       </div>
                       <Badge variant="outline" className="text-xs">3 Services</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                       {[
                         { icon: Database, name: "RDS", desc: "Managed relational databases", features: ["Multiple engines", "Backups", "High availability"] },
                         { icon: Database, name: "DynamoDB", desc: "NoSQL database service", features: ["Auto-scaling", "Global tables", "Streams"] },
                         { icon: Database, name: "ElastiCache", desc: "In-memory caching", features: ["Redis/Memcached", "Clustering", "High performance"] },
                       ].map((service, idx) => (
                         <Card key={idx} className="hover:shadow-lg transition-shadow">
-                          <CardContent className="p-4 space-y-3">
-                            <div className="flex items-center gap-3">
-                              <service.icon className="h-10 w-10 text-primary flex-shrink-0" />
+                          <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <service.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
                               <div>
-                                <div className="font-bold text-lg">{service.name}</div>
-                                <div className="text-sm text-muted-foreground">{service.desc}</div>
+                                <div className="font-bold text-sm sm:text-lg">{service.name}</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground">{service.desc}</div>
                               </div>
                             </div>
                             <div className="space-y-1">
                               {service.features.map((feature, fidx) => (
                                 <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                  {feature}
+                                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
+                                  <span className="hidden sm:inline">{feature}</span>
+                                  <span className="sm:hidden">{feature.length > 15 ? feature.substring(0, 12) + "..." : feature}</span>
                                 </div>
                               ))}
                             </div>
@@ -628,15 +630,15 @@ export default function Home() {
                   </div>
 
                   {/* Networking Services */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                       <div className="flex items-center gap-2">
-                        <Network className="h-5 w-5 text-primary" />
-                        <h3 className="text-xl font-bold">Networking Services</h3>
+                        <Network className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <h3 className="text-lg sm:text-xl font-bold">Networking Services</h3>
                       </div>
                       <Badge variant="outline" className="text-xs">5 Services</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                       {[
                         { icon: Network, name: "VPC", desc: "Virtual Private Cloud", features: ["Isolated networks", "Subnets", "Route tables"] },
                         { icon: GitFork, name: "ALB", desc: "Application Load Balancer", features: ["Health checks", "SSL termination", "Path routing"] },
@@ -645,19 +647,20 @@ export default function Home() {
                         { icon: Globe, name: "Route 53", desc: "DNS service", features: ["Domain registration", "Health checks", "Routing policies"] },
                       ].map((service, idx) => (
                         <Card key={idx} className="hover:shadow-lg transition-shadow">
-                          <CardContent className="p-4 space-y-3">
-                            <div className="flex items-center gap-3">
-                              <service.icon className="h-10 w-10 text-primary flex-shrink-0" />
+                          <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <service.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
                               <div>
-                                <div className="font-bold text-lg">{service.name}</div>
-                                <div className="text-sm text-muted-foreground">{service.desc}</div>
+                                <div className="font-bold text-sm sm:text-lg">{service.name}</div>
+                                <div className="text-xs sm:text-sm text-muted-foreground">{service.desc}</div>
                               </div>
                             </div>
                             <div className="space-y-1">
                               {service.features.map((feature, fidx) => (
                                 <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                  {feature}
+                                  <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
+                                  <span className="hidden sm:inline">{feature}</span>
+                                  <span className="sm:hidden">{feature.length > 15 ? feature.substring(0, 12) + "..." : feature}</span>
                                 </div>
                               ))}
                             </div>
@@ -668,30 +671,31 @@ export default function Home() {
                   </div>
 
                   {/* Security & Other Services */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
                     {/* Security Services */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 pb-2 border-b">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                         <div className="flex items-center gap-2">
-                          <ShieldCheck className="h-5 w-5 text-primary" />
-                          <h3 className="text-lg font-bold">Security</h3>
+                          <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                          <h3 className="text-lg sm:text-xl font-bold">Security</h3>
                         </div>
                         <Badge variant="outline" className="text-xs">1 Service</Badge>
                       </div>
                       <Card className="hover:shadow-lg transition-shadow">
-                        <CardContent className="p-4 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <ShieldCheck className="h-10 w-10 text-primary flex-shrink-0" />
+                        <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <ShieldCheck className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
                             <div>
-                              <div className="font-bold text-lg">IAM</div>
-                              <div className="text-sm text-muted-foreground">Access management service</div>
+                              <div className="font-bold text-sm sm:text-lg">IAM</div>
+                              <div className="text-xs sm:text-sm text-muted-foreground">Access management service</div>
                             </div>
                           </div>
                           <div className="space-y-1">
                             {["Roles & policies", "Fine-grained access", "Multi-factor auth"].map((feature, fidx) => (
                               <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                {feature}
+                                <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
+                                <span className="hidden sm:inline">{feature}</span>
+                                <span className="sm:hidden">{feature.length > 15 ? feature.substring(0, 12) + "..." : feature}</span>
                               </div>
                             ))}
                           </div>
@@ -700,32 +704,33 @@ export default function Home() {
                     </div>
 
                     {/* Messaging Services */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 pb-2 border-b">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                         <div className="flex items-center gap-2">
-                          <MessageSquare className="h-5 w-5 text-primary" />
-                          <h3 className="text-lg font-bold">Messaging</h3>
+                          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                          <h3 className="text-lg sm:text-xl font-bold">Messaging</h3>
                         </div>
                         <Badge variant="outline" className="text-xs">2 Services</Badge>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         {[
                           { icon: MessageSquare, name: "SQS", desc: "Message queue service", features: ["Standard/FIFO", "Dead letter queues"] },
                           { icon: Bell, name: "SNS", desc: "Pub/sub messaging", features: ["Topics", "Multi-protocol", "Fan-out"] },
                         ].map((service, idx) => (
                           <Card key={idx} className="hover:shadow-lg transition-shadow">
                             <CardContent className="p-3 space-y-2">
-                              <div className="flex items-center gap-3">
-                                <service.icon className="h-8 w-8 text-primary flex-shrink-0" />
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <service.icon className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
                                 <div>
-                                  <div className="font-bold">{service.name}</div>
+                                  <div className="font-bold text-sm sm:text-base">{service.name}</div>
                                   <div className="text-xs text-muted-foreground">{service.desc}</div>
                                 </div>
                               </div>
-                              <div className="flex gap-2">
+                              <div className="flex flex-wrap gap-1 sm:gap-2">
                                 {service.features.map((feature, fidx) => (
                                   <Badge key={fidx} variant="secondary" className="text-xs">
-                                    {feature}
+                                    <span className="hidden sm:inline">{feature}</span>
+                                    <span className="sm:hidden">{feature.length > 10 ? feature.substring(0, 8) + "..." : feature}</span>
                                   </Badge>
                                 ))}
                               </div>
@@ -737,28 +742,29 @@ export default function Home() {
                   </div>
 
                   {/* Management Services */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 pb-2 border-b">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
                       <div className="flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-primary" />
-                        <h3 className="text-lg font-bold">Management & Monitoring</h3>
+                        <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <h3 className="text-lg sm:text-xl font-bold">Management & Monitoring</h3>
                       </div>
                       <Badge variant="outline" className="text-xs">1 Service</Badge>
                     </div>
                     <Card className="hover:shadow-lg transition-shadow max-w-md">
-                      <CardContent className="p-4 space-y-3">
-                        <div className="flex items-center gap-3">
-                          <Activity className="h-10 w-10 text-primary flex-shrink-0" />
+                      <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
                           <div>
-                            <div className="font-bold text-lg">CloudWatch</div>
-                            <div className="text-sm text-muted-foreground">Monitoring and observability</div>
+                            <div className="font-bold text-sm sm:text-lg">CloudWatch</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground">Monitoring and observability</div>
                           </div>
                         </div>
                         <div className="space-y-1">
                           {["Metrics", "Logs", "Alarms", "Dashboards"].map((feature, fidx) => (
                             <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <CheckCircle2 className="h-3 w-3 text-green-600" />
-                              {feature}
+                              <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
+                              <span className="hidden sm:inline">{feature}</span>
+                              <span className="sm:hidden">{feature.length > 8 ? feature.substring(0, 6) + "..." : feature}</span>
                             </div>
                           ))}
                         </div>
@@ -781,51 +787,51 @@ export default function Home() {
             </section>
             
             {/* Creator Section */}
-            <section className="space-y-6 px-3 py-8 sm:py-12">
-              <div className="text-center space-y-4">
-                <Badge variant="secondary" className="text-sm px-4 py-1">
+            <section className="space-y-4 sm:space-y-6 px-3 py-6 sm:py-12">
+              <div className="text-center space-y-3 sm:space-y-4">
+                <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1">
                   Creator
                 </Badge>
-                <h2 className="text-2xl sm:text-3xl font-bold">Meet the Creator</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
+                <h2 className="text-xl sm:text-3xl font-bold">Meet the Creator</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
                   Built by a passionate engineer focused on cloud automation and platform engineering
                 </p>
               </div>
 
               <Card className="max-w-4xl mx-auto border-primary/20 bg-gradient-to-br from-background to-primary/5">
-                <CardContent className="p-6 sm:p-8">
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                <CardContent className="p-4 sm:p-6 sm:p-8">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                       <div className="relative">
                         <img
                           src="https://github.com/NotHarshhaa.png"
                           alt="H A R S H H A A"
-                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-lg border-2 border-primary/20"
+                          className="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover shadow-lg border-2 border-primary/20"
                         />
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
-                          <Code className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-8 sm:h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
+                          <Code className="w-2 h-2 sm:w-4 sm:h-4 text-white" />
                         </div>
                       </div>
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 text-center sm:text-left space-y-3">
+                    <div className="flex-1 text-center sm:text-left space-y-2 sm:space-y-3">
                       <div>
                         <div className="flex items-center justify-center sm:justify-start gap-2">
-                          <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
+                          <h3 className="text-lg sm:text-2xl font-bold tracking-tight">
                             H A R S H H A A
                           </h3>
-                          <Verified className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                          <Verified className="w-3 h-3 sm:w-5 sm:h-5 text-blue-500" />
                         </div>
-                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                        <p className="text-xs sm:text-base text-muted-foreground leading-relaxed">
                           Development Platform & Automation Enthusiast
                         </p>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2">
                         <Badge variant="outline" className="text-xs">
-                          <CloudCog className="w-3 h-3 mr-1" />
+                          <CloudCog className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
                           Cloud Engineer
                         </Badge>
                         <Badge variant="outline" className="text-xs">
