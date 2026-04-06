@@ -646,8 +646,8 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
                 </div>
               </div>
               
-              <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-                <Button variant="outline" size="sm" onClick={onBackToHome} className="h-8 sm:h-9">
+              <div className="flex gap-2 sm:flex-row sm:gap-2">
+                <Button variant="outline" size="sm" onClick={onBackToHome} className="flex-1 h-8 sm:h-9">
                   <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Back to Home</span>
                   <span className="sm:hidden">Home</span>
@@ -656,7 +656,7 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
                   onClick={handleNext}
                   disabled={selectedServices.length === 0}
                   size="sm"
-                  className="w-full sm:w-auto h-8 sm:h-9"
+                  className="flex-1 h-8 sm:h-9"
                 >
                   Configure
                   <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />

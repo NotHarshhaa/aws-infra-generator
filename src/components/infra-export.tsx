@@ -252,50 +252,62 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         ];
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-4 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-xl sm:text-2xl font-bold">Export Infrastructure</h2>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
+        <h2 className="text-lg sm:text-2xl font-bold">Export Infrastructure</h2>
+        <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Download your generated infrastructure templates and deploy them.
         </p>
       </div>
 
       {/* Export Statistics */}
       <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-lg">Export Summary</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="text-sm sm:text-lg">Export Summary</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Overview of your generated infrastructure package
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.totalFiles}</div>
+              <div className="text-lg sm:text-2xl font-bold">{stats.totalFiles}</div>
               <div className="text-xs text-muted-foreground">Files</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.totalSize}</div>
+              <div className="text-lg sm:text-2xl font-bold">{stats.totalSize}</div>
               <div className="text-xs text-muted-foreground">Size</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.totalLines}</div>
+              <div className="text-lg sm:text-2xl font-bold">{stats.totalLines}</div>
               <div className="text-xs text-muted-foreground">Lines</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{stats.securityScore}%</div>
-              <div className="text-xs text-muted-foreground">Security Score</div>
+            <div className="text-center hidden md:block">
+              <div className="text-lg sm:text-2xl font-bold">{stats.securityScore}%</div>
+              <div className="text-xs text-muted-foreground">Security</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{stats.estimatedDeployTime}</div>
-              <div className="text-xs text-muted-foreground">Deploy Time</div>
+            <div className="text-center hidden md:block">
+              <div className="text-lg sm:text-2xl font-bold">{stats.estimatedDeployTime}</div>
+              <div className="text-xs text-muted-foreground">Deploy</div>
             </div>
           </div>
           
-          <div className="mt-4 space-y-2">
+          {/* Mobile-only additional stats */}
+          <div className="grid grid-cols-2 gap-2 mt-2 md:hidden">
+            <div className="text-center">
+              <div className="text-lg font-bold">{stats.securityScore}%</div>
+              <div className="text-xs text-muted-foreground">Security</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold">{stats.estimatedDeployTime}</div>
+              <div className="text-xs text-muted-foreground">Deploy</div>
+            </div>
+          </div>
+          
+          <div className="mt-3 sm:mt-4 space-y-2">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span className="text-sm text-green-700">Infrastructure generated successfully!</span>
+              <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+              <span className="text-xs sm:text-sm text-green-700">Infrastructure generated successfully!</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-blue-500" />
@@ -307,54 +319,56 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
 
       {/* Enhanced Download Card */}
       <Card className="border-primary/20">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-lg">
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
             <FileArchive className="h-4 w-4 sm:h-5 sm:w-5" />
             Download Package
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Download all generated files as a ZIP archive
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <CardContent className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex-1 space-y-2">
-              <p className="font-medium">
+              <p className="text-sm sm:font-medium truncate">
                 {projectName}-{outputFormat}.zip
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 {generatedFiles.length} files &bull; {outputFormat === "terraform" ? "Terraform" : "CloudFormation"} &bull; {environment}
               </p>
               
               {/* Download Options */}
-              <div className="space-y-2">
+              <div className="space-y-1 sm:space-y-2">
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={includeReadme}
                     onCheckedChange={setIncludeReadme}
+                    className="scale-75 sm:scale-100"
                   />
-                  <Label className="text-sm">Include README.md</Label>
+                  <Label className="text-xs sm:text-sm">Include README.md</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={includeGitignore}
                     onCheckedChange={setIncludeGitignore}
+                    className="scale-75 sm:scale-100"
                   />
-                  <Label className="text-sm">Include .gitignore</Label>
+                  <Label className="text-xs sm:text-sm">Include .gitignore</Label>
                 </div>
               </div>
             </div>
             
             <div className="flex flex-col gap-2">
               <Button
-                size="lg"
+                size="sm"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
               >
                 {isDownloading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
                     Downloading... {downloadProgress}%
                   </>
                 ) : (
@@ -366,7 +380,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               </Button>
               
               {isDownloading && (
-                <Progress value={downloadProgress} className="w-full" />
+                <Progress value={downloadProgress} className="w-full h-1 sm:h-2" />
               )}
               
               {shareUrl && (
@@ -376,7 +390,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                       variant="outline"
                       size="sm"
                       onClick={handleShare}
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
                     >
                       {copiedFile === 'share-url' ? (
                         <>
@@ -403,14 +417,14 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
 
       {/* Enhanced File Preview */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2 sm:pb-6">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileCode2 className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
+                <FileCode2 className="h-4 w-4 sm:h-5 sm:w-5" />
                 Generated Files
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 Preview and copy individual files
               </CardDescription>
             </div>
@@ -683,20 +697,23 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
       <Separator />
 
       {/* Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button variant="outline" size="sm" onClick={onBackToHome}>
-            <Home className="mr-2 h-4 w-4" />
-            Back to Home
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex gap-2 sm:flex-row sm:gap-2">
+          <Button variant="outline" size="sm" onClick={onBackToHome} className="flex-1 h-8 sm:h-9">
+            <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Back to Home</span>
+            <span className="sm:hidden">Home</span>
           </Button>
-          <Button variant="outline" onClick={() => setStep("generate")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Generate
+          <Button variant="outline" onClick={() => setStep("generate")} className="flex-1 h-8 sm:h-9">
+            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Back to Generate</span>
+            <span className="sm:hidden">Generate</span>
           </Button>
         </div>
-        <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto">
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Start Over
+        <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm">
+          <RotateCcw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">Start Over</span>
+          <span className="sm:hidden">Reset</span>
         </Button>
       </div>
     </div>

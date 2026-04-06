@@ -200,26 +200,26 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-4 sm:space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-xl sm:text-2xl font-bold">Configure Infrastructure</h2>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
+        <h2 className="text-lg sm:text-2xl font-bold">Configure Infrastructure</h2>
+        <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
           Set project-level options and fine-tune each service configuration.
         </p>
       </div>
 
       {/* Global Configuration */}
       <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-lg">Project Settings</CardTitle>
-          <CardDescription className="text-sm">
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="text-sm sm:text-lg">Project Settings</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             General settings for your infrastructure project
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="projectName" className="text-sm">Project Name</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-6">
+            <div className="space-y-1 sm:space-y-2">
+              <Label htmlFor="projectName" className="text-xs sm:text-sm">Project Name</Label>
               <Input
                 id="projectName"
                 value={projectName}
@@ -245,16 +245,16 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                   }
                 }}
                 placeholder="my-infra"
-                className={`h-9 sm:h-10 ${fieldErrors.project?.projectName ? "border-red-500" : ""}`}
+                className={`h-8 sm:h-10 text-sm ${fieldErrors.project?.projectName ? "border-red-500" : ""}`}
               />
               {fieldErrors.project?.projectName && (
                 <p className="text-xs text-red-500">{fieldErrors.project.projectName}</p>
               )}
             </div>
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="region" className="text-sm">AWS Region</Label>
+            <div className="space-y-1 sm:space-y-2">
+              <Label htmlFor="region" className="text-xs sm:text-sm">AWS Region</Label>
               <Select value={region} onValueChange={(v) => v && setRegion(v)}>
-                <SelectTrigger id="region" className="h-9 sm:h-10">
+                <SelectTrigger id="region" className="h-8 sm:h-10 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,15 +266,15 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="environment" className="text-sm">Environment</Label>
+            <div className="space-y-1 sm:space-y-2">
+              <Label htmlFor="environment" className="text-xs sm:text-sm">Environment</Label>
               <Select
                 value={environment}
                 onValueChange={(v) =>
                   v && setEnvironment(v as "development" | "staging" | "production")
                 }
               >
-                <SelectTrigger id="environment" className="h-9 sm:h-10">
+                <SelectTrigger id="environment" className="h-8 sm:h-10 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -284,15 +284,15 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="format" className="text-sm">Output Format</Label>
+            <div className="space-y-1 sm:space-y-2">
+              <Label htmlFor="format" className="text-xs sm:text-sm">Output Format</Label>
               <Select
                 value={outputFormat}
                 onValueChange={(v) =>
                   v && setOutputFormat(v as "terraform" | "cloudformation")
                 }
               >
-                <SelectTrigger id="format" className="h-9 sm:h-10">
+                <SelectTrigger id="format" className="h-8 sm:h-10 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -309,32 +309,32 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
 
       {/* Configuration Summary */}
       <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-lg">Configuration Summary</CardTitle>
-          <CardDescription className="text-sm">
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="text-sm sm:text-lg">Configuration Summary</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Overview of your infrastructure configuration
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="text-center p-4 rounded-lg bg-muted/50">
-              <div className="text-2xl font-bold text-primary">{selectedServices.length}</div>
-              <div className="text-sm text-muted-foreground">Services Selected</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="text-center p-3 sm:p-4 rounded-lg bg-muted/50">
+              <div className="text-xl sm:text-2xl font-bold text-primary">{selectedServices.length}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Services</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-muted/50">
-              <div className="text-2xl font-bold text-primary">{environment}</div>
-              <div className="text-sm text-muted-foreground">Environment</div>
+            <div className="text-center p-3 sm:p-4 rounded-lg bg-muted/50">
+              <div className="text-xl sm:text-2xl font-bold text-primary">{environment}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Environment</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-muted/50">
-              <div className="text-2xl font-bold text-primary">{region.split('-')[1]?.toUpperCase() || region}</div>
-              <div className="text-sm text-muted-foreground">AWS Region</div>
+            <div className="text-center p-3 sm:p-4 rounded-lg bg-muted/50">
+              <div className="text-xl sm:text-2xl font-bold text-primary">{region.split('-')[1]?.toUpperCase() || region}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Region</div>
             </div>
           </div>
           {Object.keys(fieldErrors).some(serviceId => 
             Object.values(fieldErrors[serviceId]).some(error => error)
           ) && (
-            <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200">
-              <p className="text-sm text-red-700">
+            <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg bg-red-50 border border-red-200">
+              <p className="text-xs sm:text-sm text-red-700">
                 ⚠️ Please fix validation errors before generating infrastructure
               </p>
             </div>
@@ -344,9 +344,9 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
 
       {/* Per-Service Configuration */}
       <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="text-lg">Service Configuration</CardTitle>
-          <CardDescription className="text-sm">
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="text-sm sm:text-lg">Service Configuration</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Configure each selected AWS service
           </CardDescription>
         </CardHeader>
@@ -362,192 +362,191 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
               const config = serviceConfig[serviceId]?.config || {};
 
               return (
-                <AccordionItem
-                  key={serviceId}
-                  value={serviceId}
-                  className="px-6"
-                >
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
-                        {Icon && <Icon className="h-4 w-4" />}
-                      </div>
-                      <div className="text-left">
-                        <p className="font-semibold">{service.name}</p>
-                        <p className="text-xs text-muted-foreground font-normal">
-                          {service.configFields.length} configurable options
-                        </p>
-                      </div>
+              <AccordionItem
+                key={serviceId}
+                value={serviceId}
+                className="px-3 sm:px-6"
+              >
+                <AccordionTrigger className="hover:no-underline py-3 sm:py-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4" />}
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
-                      {service.configFields.map((field) => {
-                        const value =
-                          config[field.name] !== undefined
-                            ? config[field.name]
-                            : field.default;
+                    <div className="text-left">
+                      <p className="text-sm sm:font-semibold">{service.name}</p>
+                      <p className="text-xs text-muted-foreground font-normal hidden sm:block">
+                        {service.configFields.length} configurable options
+                      </p>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pb-4 px-1 sm:px-0">
+                    {service.configFields.map((field) => {
+                      const value =
+                        config[field.name] !== undefined
+                          ? config[field.name]
+                          : field.default;
 
-                        if (field.type === "boolean") {
-                          return (
-                            <div
-                              key={field.name}
-                              className={`flex items-center justify-between rounded-lg border p-3 ${fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}`}
-                            >
-                              <div className="space-y-0.5">
-                                <Label className="text-sm">{field.label}</Label>
-                                {field.description && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {field.description}
-                                  </p>
-                                )}
-                              </div>
-                              <Switch
-                                checked={value as boolean}
-                                onCheckedChange={(checked) =>
-                                  handleFieldChange(serviceId, field.name, checked)
-                                }
-                              />
-                            </div>
-                          );
-                        }
-
-                        if (field.type === "select") {
-                          return (
-                            <div key={field.name} className="space-y-2">
-                              <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
-                                {field.label}
-                                {field.required && <span className="text-red-500 ml-1">*</span>}
-                              </Label>
-                              <Select
-                                value={String(value)}
-                                onValueChange={(v) =>
-                                  v && handleFieldChange(serviceId, field.name, v)
-                                }
-                              >
-                                <SelectTrigger className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {field.options?.map((opt) => (
-                                    <SelectItem
-                                      key={opt.value}
-                                      value={opt.value}
-                                    >
-                                      {opt.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              {field.description && (
-                                <p className="text-xs text-muted-foreground">
-                                  {field.description}
-                                </p>
-                              )}
-                              {fieldErrors[serviceId]?.[field.name] && (
-                                <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
-                              )}
-                            </div>
-                          );
-                        }
-
-                        if (field.type === "number") {
-                          return (
-                            <div key={field.name} className="space-y-2">
-                              <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
-                                {field.label}
-                                {field.required && <span className="text-red-500 ml-1">*</span>}
-                              </Label>
-                              <Input
-                                type="number"
-                                value={value as number}
-                                onChange={(e) => {
-                                  const inputValue = e.target.value;
-                                  if (inputValue === "") {
-                                    handleFieldChange(serviceId, field.name, 0);
-                                  } else {
-                                    const numValue = parseFloat(inputValue);
-                                    if (!isNaN(numValue)) {
-                                      handleFieldChange(serviceId, field.name, numValue);
-                                    }
-                                  }
-                                }}
-                                className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}
-                              />
-                              {field.description && (
-                                <p className="text-xs text-muted-foreground">
-                                  {field.description}
-                                </p>
-                              )}
-                              {fieldErrors[serviceId]?.[field.name] && (
-                                <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
-                              )}
-                            </div>
-                          );
-                        }
-
+                      if (field.type === "boolean") {
                         return (
-                          <div key={field.name} className="space-y-2">
-                            <Label className={fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}>
-                              {field.label}
-                              {field.required && <span className="text-red-500 ml-1">*</span>}
-                            </Label>
-                            <Input
-                              value={String(value)}
-                              onChange={(e) =>
-                                handleFieldChange(serviceId, field.name, e.target.value)
+                          <div
+                            key={field.name}
+                            className={`flex items-center justify-between rounded-lg border p-2 sm:p-3 ${fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}`}
+                          >
+                            <div className="space-y-0.5 flex-1 min-w-0">
+                              <Label className="text-xs sm:text-sm">{field.label}</Label>
+                              {field.description && (
+                                <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block">
+                                  {field.description}
+                                </p>
+                              )}
+                            </div>
+                            <Switch
+                              checked={value as boolean}
+                              onCheckedChange={(checked) =>
+                                handleFieldChange(serviceId, field.name, checked)
                               }
-                              className={fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}
-                              placeholder=""
+                              className="scale-75 sm:scale-100"
                             />
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "select") {
+                        return (
+                          <div key={field.name} className="space-y-1 sm:space-y-2">
+                            <Label className={`text-xs sm:text-sm ${fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}`}>
+                              {field.label}
+                            </Label>
+                            <Select
+                              value={value as string}
+                              onValueChange={(v) =>
+                                handleFieldChange(serviceId, field.name, v)
+                              }
+                            >
+                              <SelectTrigger className="h-8 sm:h-10 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {field.options?.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {fieldErrors[serviceId]?.[field.name] && (
+                              <p className="text-xs text-red-500">
+                                {fieldErrors[serviceId][field.name]}
+                              </p>
+                            )}
                             {field.description && (
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-xs text-muted-foreground hidden sm:block">
                                 {field.description}
                               </p>
                             )}
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "number") {
+                        return (
+                          <div key={field.name} className="space-y-1 sm:space-y-2">
+                            <Label className={`text-xs sm:text-sm ${fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}`}>
+                              {field.label}
+                            </Label>
+                            <Input
+                              type="number"
+                              value={value as string}
+                              onChange={(e) =>
+                                handleFieldChange(serviceId, field.name, e.target.value)
+                              }
+                              placeholder={field.default?.toString()}
+                              className={`h-8 sm:h-10 text-sm ${fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}`}
+                            />
                             {fieldErrors[serviceId]?.[field.name] && (
-                              <p className="text-xs text-red-500">{fieldErrors[serviceId][field.name]}</p>
+                              <p className="text-xs text-red-500">
+                                {fieldErrors[serviceId][field.name]}
+                              </p>
+                            )}
+                            {field.description && (
+                              <p className="text-xs text-muted-foreground hidden sm:block">
+                                {field.description}
+                              </p>
                             )}
                           </div>
                         );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
+                      }
+
+                      if (field.type === "text") {
+                        return (
+                          <div key={field.name} className="space-y-1 sm:space-y-2">
+                            <Label className={`text-xs sm:text-sm ${fieldErrors[serviceId]?.[field.name] ? "text-red-500" : ""}`}>
+                              {field.label}
+                            </Label>
+                            <Input
+                              value={value as string}
+                              onChange={(e) =>
+                                handleFieldChange(serviceId, field.name, e.target.value)
+                              }
+                              placeholder={field.default?.toString()}
+                              className={`h-8 sm:h-10 text-sm ${fieldErrors[serviceId]?.[field.name] ? "border-red-500" : ""}`}
+                            />
+                            {fieldErrors[serviceId]?.[field.name] && (
+                              <p className="text-xs text-red-500">
+                                {fieldErrors[serviceId][field.name]}
+                              </p>
+                            )}
+                            {field.description && (
+                              <p className="text-xs text-muted-foreground hidden sm:block">
+                                {field.description}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
         </CardContent>
       </Card>
 
       <Separator />
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button variant="outline" size="sm" onClick={onBackToHome}>
-              <Home className="mr-2 h-4 w-4" />
-              Back to Home
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex gap-2 sm:flex-row sm:gap-2">
+          <Button variant="outline" size="sm" onClick={onBackToHome} className="flex-1 h-8 sm:h-9">
+              <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Home</span>
             </Button>
-          <Button variant="outline" onClick={() => setStep("services")}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Services
+          <Button variant="outline" onClick={() => setStep("services")} className="flex-1 h-8 sm:h-9">
+            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Back to Services</span>
+            <span className="sm:hidden">Services</span>
           </Button>
         </div>
         <Button 
           onClick={handleGenerate} 
-          size="lg" 
-          className="w-full sm:w-auto"
+          size="sm" 
+          className="w-full sm:w-auto h-8 sm:h-9"
           disabled={isGenerating}
         >
           {isGenerating ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
               Generating...
             </>
           ) : (
             <>
-              Generate Infrastructure
-              <ArrowRight className="ml-2 h-4 w-4" />
+              Generate
+              <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </>
           )}
         </Button>
