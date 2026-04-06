@@ -2,7 +2,6 @@
 
 import { Github, Moon, Sun, ExternalLink, Sparkles, Package, Server, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface HeaderProps {
@@ -59,10 +58,10 @@ export function Header({ onBackToHome }: HeaderProps) {
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
         scrolled 
-          ? "border-b bg-background/95 backdrop-blur-lg shadow-sm supports-[backdrop-filter]:bg-background/80" 
-          : "bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60"
+          ? "border-b bg-background/90 backdrop-blur-xl shadow-lg supports-[backdrop-filter]:bg-background/85" 
+          : "bg-background/70 backdrop-blur-lg supports-[backdrop-filter]:bg-background/50"
       }`}>
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           {/* Logo and Title */}
@@ -205,24 +204,8 @@ export function Header({ onBackToHome }: HeaderProps) {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-gradient-to-b from-background via-background/95 to-background/90 backdrop-blur-xl border-b shadow-2xl">
+        <div className="md:hidden fixed top-16 left-4 right-4 z-40 bg-gradient-to-b from-background via-background/95 to-background/90 backdrop-blur-xl rounded-2xl border border-border shadow-2xl shadow-black/20 dark:shadow-black/40 dark:border-border/80">
           <div className="container mx-auto px-4 py-6 space-y-3">
-            {/* Menu Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-border/50">
-              <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Navigation
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMobileMenu}
-                className="h-8 w-8 rounded-lg transition-all duration-200 hover:bg-accent/50"
-                title="Close menu"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
             {/* Navigation Links */}
             <div className="space-y-1">
               <Button 
@@ -320,7 +303,7 @@ export function Header({ onBackToHome }: HeaderProps) {
             </div>
 
             {/* Footer */}
-            <div className="pt-3 border-t border-border/50">
+            <div className="pt-3 border-t border-border/50 dark:border-border/30">
               <div className="text-center text-xs text-muted-foreground">
                 AWS Infrastructure Generator
               </div>

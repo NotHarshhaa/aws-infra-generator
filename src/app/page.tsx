@@ -451,7 +451,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Header onBackToHome={handleBackToHome} />
-      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12 overflow-x-hidden">
+      <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12 pt-16 sm:pt-16 overflow-x-hidden">
         {!showWizard ? (
           <>
             <LandingHero onGetStarted={handleGetStarted} />
