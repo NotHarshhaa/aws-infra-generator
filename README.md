@@ -1,10 +1,18 @@
-# 🚀 AWS Infra Generator
+<p align="center">
+  <h1>🚀 AWS Infra Generator</h1>
+</p>
 
-![AWS Infra Generator](https://i.postimg.cc/9XbpcN51/image-(4).png)
+<p align="center">
+  <img src="public/banner.png" alt="AWS Infra Generator Banner" width="800" />
+</p>
 
-**aws-infra-generator** is a comprehensive platform engineering tool that allows users to design AWS infrastructure through an intuitive interface and automatically generate **Infrastructure as Code (IaC)** templates using **Terraform** or **AWS CloudFormation**.
+<p align="center">
+  <strong>A comprehensive platform engineering tool that allows users to design AWS infrastructure through an intuitive interface and automatically generate <strong>Infrastructure as Code (IaC)</strong> templates using <strong>Terraform</strong> or <strong>AWS CloudFormation</strong>.</strong>
+</p>
 
-Instead of manually writing infrastructure code, users can select the AWS services they need, visualize their architecture, estimate costs, and instantly generate production-ready infrastructure templates.
+<p align="center">
+  Instead of manually writing infrastructure code, users can select the AWS services they need, visualize their architecture, estimate costs, and instantly generate production-ready infrastructure templates.
+</p>
 
 ---
 
