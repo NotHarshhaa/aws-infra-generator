@@ -24,6 +24,7 @@ interface InfraStore {
   selectedServices: string[];
   toggleService: (serviceId: string) => void;
   setSelectedServices: (services: string[]) => void;
+  clearAllServices: () => void;
 
   // Service config
   serviceConfig: ServiceConfig;
@@ -125,6 +126,14 @@ export const useInfraStore = create<InfraStore>((set, get) => ({
   },
 
   setSelectedServices: (services) => set({ selectedServices: services }),
+
+  clearAllServices: () => {
+    set({ 
+      selectedServices: [],
+      selectedTemplate: null, // Also clear the template when clearing all services
+      serviceConfig: {} // Clear service config as well
+    });
+  },
 
   updateServiceConfig: (serviceId, key, value) => {
     const { serviceConfig } = get();

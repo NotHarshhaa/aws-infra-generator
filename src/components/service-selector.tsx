@@ -9,7 +9,6 @@ import {
   Database,
   Shield,
   GitFork,
-  Info,
   ArrowRight,
   Home,
   Zap,
@@ -20,13 +19,14 @@ import {
   Activity,
   Cloud,
   Search,
-  Filter,
   Star,
-  TrendingUp,
-  Users,
   Clock,
   CheckCircle2,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  X,
+  RotateCcw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +35,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Tooltip,
   TooltipContent,
@@ -79,17 +78,66 @@ interface ServiceStats {
 }
 
 export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
-  const { selectedServices, toggleService, setStep, applyPresetTemplate } = useInfraStore();
+  const { selectedServices, toggleService, setStep, applyPresetTemplate, clearAllServices } = useInfraStore();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showPopularOnly, setShowPopularOnly] = useState(false);
   const [selectionMode, setSelectionMode] = useState<"manual" | "templates">("manual");
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handlePresetTemplateSelect = (template: PresetTemplate) => {
     applyPresetTemplate(template);
     setStep("configure");
   };
+
+  const handleClearAll = () => {
+    if (selectedServices.length === 0) return;
+    
+    // Show confirmation dialog if there are services selected
+    if (selectedServices.length > 0) {
+      setShowClearConfirm(true);
+    }
+  };
+
+  const confirmClearAll = () => {
+    clearAllServices();
+    setShowClearConfirm(false);
+    // Reset search and filters when clearing all
+    setSearchQuery("");
+    setSelectedCategory(null);
+    setShowPopularOnly(false);
+  };
+
+  const cancelClearAll = () => {
+    setShowClearConfirm(false);
+  };
+
+  const toggleCategoryCollapse = (categoryId: string) => {
+    setCollapsedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  // Group templates by category
+  const templatesByCategory = useMemo(() => {
+    const grouped = PRESET_TEMPLATES.reduce((acc, template) => {
+      if (!acc[template.category]) {
+        acc[template.category] = [];
+      }
+      acc[template.category].push(template);
+      return acc;
+    }, {} as Record<string, PresetTemplate[]>);
+    
+    return grouped;
+  }, []);
 
   // Memoize expensive calculations
   const calculateStats = useCallback((): ServiceStats => {
@@ -216,6 +264,9 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
                       <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
                         {template.difficulty}
                       </Badge>
+                      <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-200">
+                        {template.globalConfig.outputFormat === "terraform" ? "Terraform" : "CloudFormation"}
+                      </Badge>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2 sm:mb-3 hidden sm:flex">
@@ -271,7 +322,22 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
       {/* Statistics Summary */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Infrastructure Overview</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Infrastructure Overview</CardTitle>
+            {selectedServices.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearAll}
+                className="text-xs h-8 px-2 sm:px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+                title="Clear all selected services and start over"
+              >
+                <RotateCcw className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Clear All</span>
+                <span className="sm:hidden">Clear</span>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -305,7 +371,7 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
 
       {/* Service Selection or Templates */}
       {selectionMode === "templates" ? (
-        /* All Templates View */
+        /* All Templates View - Categorized */
         <Card>
           <CardHeader className="pb-3 sm:pb-4">
             <div className="flex items-center gap-2">
@@ -318,90 +384,116 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
               Choose from our complete library of pre-configured infrastructure templates.
             </p>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {PRESET_TEMPLATES.map((template) => {
-                const Icon = iconMap[template.icon];
-                const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
-                
-                return (
-                  <Card
-                    key={template.id}
-                    className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border hover:border-primary/50 bg-background"
-                    onClick={() => handlePresetTemplateSelect(template)}
+          <CardContent className="space-y-4 sm:space-y-6">
+            {Object.entries(templatesByCategory).map(([category, templates]) => {
+              const categoryInfo = SERVICE_CATEGORIES.find(cat => cat.id === category);
+              const CategoryIcon = categoryInfo ? iconMap[categoryInfo.icon] : Package;
+              const isCollapsed = collapsedCategories.has(category);
+              const templateCount = templates.length;
+              
+              return (
+                <Card key={category} className="border border-border/50">
+                  <CardHeader 
+                    className="pb-2 sm:pb-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => toggleCategoryCollapse(category)}
                   >
-                    <CardHeader className="pb-2 sm:pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0">
-                            {Icon && <Icon className="h-4 w-4 sm:h-5 sm:w-5" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <CardTitle className="text-sm sm:text-lg truncate">
-                                {template.name}
-                              </CardTitle>
-                              {isPopular && (
-                                <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                              )}
-                            </div>
-                            <CardDescription className="text-xs sm:text-sm mt-1 line-clamp-2">
-                              {template.description}
-                            </CardDescription>
-                          </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          {CategoryIcon && <CategoryIcon className="h-3 w-3 sm:h-4 sm:w-4" />}
+                        </div>
+                        <div>
+                          <CardTitle className="text-sm sm:text-base capitalize">
+                            {category} Templates
+                          </CardTitle>
+                          <CardDescription className="text-xs">
+                            {templateCount} template{templateCount !== 1 ? 's' : ''} available
+                          </CardDescription>
                         </div>
                       </div>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0 space-y-3 sm:space-y-4">
-                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                        <Badge className={`text-xs ${template.difficulty === "Beginner" ? "bg-green-100 text-green-800 border-green-200" : template.difficulty === "Intermediate" ? "bg-yellow-100 text-yellow-800 border-yellow-200" : "bg-red-100 text-red-800 border-red-200"}`}>
-                          {template.difficulty}
-                        </Badge>
-                        <Badge variant="outline" className={`text-xs ${template.estimatedCost === "Low" ? "text-green-600" : template.estimatedCost === "Medium" ? "text-yellow-600" : "text-red-600"}`}>
-                          {template.estimatedCost} Cost
-                        </Badge>
+                      <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-xs">
-                          {template.estimatedServices} Services
+                          {templateCount}
                         </Badge>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 hidden sm:flex">
-                        {template.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="text-xs sm:text-sm font-medium">Included Services:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {template.services.slice(0, 3).map(service => {
-                            const serviceName = service.serviceId.toUpperCase();
-                            return (
-                              <Badge key={service.serviceId} variant="secondary" className="text-xs">
-                                {serviceName}
-                              </Badge>
-                            );
-                          })}
-                          {template.services.length > 3 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{template.services.length - 3} more
-                            </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                        >
+                          {isCollapsed ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronUp className="h-4 w-4" />
                           )}
-                        </div>
+                        </Button>
                       </div>
+                    </div>
+                  </CardHeader>
+                  
+                  {!isCollapsed && (
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        {templates.map((template) => {
+                          const Icon = iconMap[template.icon];
+                          const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
+                          
+                          return (
+                            <Card
+                              key={template.id}
+                              className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border hover:border-primary/50 bg-background"
+                              onClick={() => handlePresetTemplateSelect(template)}
+                            >
+                              <CardHeader className="pb-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                                      {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1">
+                                        <CardTitle className="text-xs sm:text-sm font-medium truncate">
+                                          {template.name}
+                                        </CardTitle>
+                                        {isPopular && (
+                                          <Star className="h-2 w-2 sm:h-3 sm:w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                              
+                              <CardContent className="pt-0 space-y-2">
+                                <p className="text-xs text-muted-foreground line-clamp-2 hidden sm:block">
+                                  {template.description}
+                                </p>
+                                
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-200">
+                                    {template.globalConfig.outputFormat === "terraform" ? "Terraform" : "CloudFormation"}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs">
+                                    {template.estimatedServices}
+                                  </Badge>
+                                  <Badge variant="secondary" className="text-xs">
+                                    {template.difficulty.slice(0, 3)}
+                                  </Badge>
+                                </div>
 
-                      <Button className="w-full text-xs sm:text-sm h-8 sm:h-10">
-                        <ArrowRight className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                        Use This Template
-                      </Button>
+                                <Button size="sm" className="w-full text-xs h-7 sm:h-8">
+                                  <ArrowRight className="mr-1 h-3 w-3" />
+                                  Use
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
                     </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                  )}
+                </Card>
+              );
+            })}
           </CardContent>
         </Card>
       ) : (
@@ -697,6 +789,53 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
             )}
           </CardContent>
         </Card>
+        </div>
+      )}
+
+      {/* Clear All Confirmation Dialog */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-background">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                Clear All Services?
+              </CardTitle>
+              <CardDescription>
+                This will remove all {selectedServices.length} selected service{selectedServices.length !== 1 ? 's' : ''} 
+                and reset your configuration. This action cannot be undone.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="text-sm font-medium">This will also clear:</div>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• All selected services and their dependencies</li>
+                  <li>• Any applied preset template</li>
+                  <li>• Service configurations</li>
+                  <li>• Search and filter settings</li>
+                </ul>
+              </div>
+              
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={cancelClearAll}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmClearAll}
+                  className="flex-1"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Clear All
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
