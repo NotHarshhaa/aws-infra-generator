@@ -40,8 +40,10 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           cidr_block: "10.0.0.0/16",
-          enable_dns_hostnames: true,
-          enable_dns_support: true,
+          enable_dns: true,
+          public_subnets: "2",
+          private_subnets: "2",
+          enable_nat: false,
         },
       },
       {
@@ -49,20 +51,20 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           instance_type: "t3.micro",
-          ami_id: "ami-0c02fb55956c7d316",
-          key_pair_name: "",
-          security_groups: ["web-sg"],
-          user_data: "",
+          ami_type: "amazon-linux-2023",
+          instance_count: 1,
+          root_volume_size: 20,
+          enable_public_ip: true,
         },
       },
       {
         serviceId: "alb",
         enabled: true,
         config: {
-          load_balancer_type: "application",
-          scheme: "internet-facing",
-          security_groups: ["alb-sg"],
-          target_groups: ["web-target"],
+          internal: false,
+          health_check_path: "/",
+          listener_port: "80",
+          target_port: 80,
         },
       },
       {
@@ -70,11 +72,11 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           engine: "mysql",
+          engine_version: "8.0",
           instance_class: "db.t3.micro",
           allocated_storage: 20,
-          username: "admin",
-          password: "changeme123!",
-          database_name: "webapp_db",
+          multi_az: false,
+          backup_retention: 7,
         },
       },
     ],
@@ -100,8 +102,10 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         serviceId: "iam",
         enabled: true,
         config: {
-          role_name: "lambda-execution-role",
-          policy_arns: ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"],
+          create_admin_role: false,
+          create_ec2_role: true,
+          create_s3_policy: false,
+          create_rds_policy: false,
         },
       },
       {
@@ -124,10 +128,11 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           api_name: "serverless-api",
-          api_type: "REST",
+          api_type: "rest",
           stage_name: "prod",
           enable_cors: true,
           enable_logging: true,
+          enable_throttling: false,
         },
       },
       {
@@ -136,10 +141,10 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         config: {
           table_name: "api-data",
           billing_mode: "PAY_PER_REQUEST",
-          hash_key_name: "id",
-          hash_key_type: "S",
+          read_capacity: 5,
+          write_capacity: 5,
           enable_streams: false,
-          enable_ttl: false,
+          enable_encryption: true,
         },
       },
     ],
@@ -166,8 +171,10 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           cidr_block: "10.0.0.0/16",
-          enable_dns_hostnames: true,
-          enable_dns_support: true,
+          enable_dns: true,
+          public_subnets: "2",
+          private_subnets: "2",
+          enable_nat: false,
         },
       },
       {
@@ -188,11 +195,11 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           engine: "postgres",
+          engine_version: "16",
           instance_class: "db.t3.medium",
           allocated_storage: 100,
-          username: "postgres",
-          password: "changeme123!",
-          database_name: "microservices_db",
+          multi_az: false,
+          backup_retention: 7,
         },
       },
       {
@@ -202,8 +209,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           bucket_name: "microservices-storage",
           versioning: true,
           encryption: "AES256",
-          public_read: false,
-          lifecycle_rules: "",
+          block_public_access: true,
         },
       },
       {
@@ -253,8 +259,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           bucket_name: "data-lake-raw",
           versioning: true,
           encryption: "AES256",
-          public_read: false,
-          lifecycle_rules: "glacier-transition",
+          block_public_access: true,
         },
       },
       {
@@ -277,11 +282,11 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           engine: "postgres",
+          engine_version: "16",
           instance_class: "db.r5.large",
           allocated_storage: 500,
-          username: "dataadmin",
-          password: "changeme123!",
-          database_name: "analytics_db",
+          multi_az: true,
+          backup_retention: 30,
         },
       },
       {
@@ -333,8 +338,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           bucket_name: "ml-data-storage",
           versioning: true,
           encryption: "AES256",
-          public_read: false,
-          lifecycle_rules: "intelligent-tiering",
+          block_public_access: true,
         },
       },
       {
@@ -357,21 +361,21 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           api_name: "ml-inference-api",
-          api_type: "REST",
+          api_type: "rest",
           stage_name: "prod",
           enable_cors: true,
           enable_logging: true,
+          enable_throttling: false,
         },
       },
       {
         serviceId: "iam",
         enabled: true,
         config: {
-          role_name: "ml-execution-role",
-          policy_arns: [
-            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-            "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-          ],
+          create_admin_role: false,
+          create_ec2_role: true,
+          create_s3_policy: true,
+          create_rds_policy: false,
         },
       },
     ],
@@ -400,8 +404,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           bucket_name: "static-website-hosting",
           versioning: true,
           encryption: "AES256",
-          public_read: true,
-          lifecycle_rules: "",
+          block_public_access: false,
         },
       },
       {
