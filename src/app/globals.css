@@ -127,3 +127,48 @@
     @apply font-sans;
   }
 }
+
+/* Custom scrollbar styling for dark mode */
+@layer base {
+  /* Light mode scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.922 0 0) oklch(0.97 0 0);
+  }
+  
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: oklch(0.97 0 0);
+    border-radius: 4px;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: oklch(0.922 0 0);
+    border-radius: 4px;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.85 0 0);
+  }
+
+  /* Dark mode scrollbar overrides */
+  .dark * {
+    scrollbar-color: oklch(0.371 0 0) oklch(0.269 0 0);
+  }
+  
+  .dark *::-webkit-scrollbar-track {
+    background: oklch(0.269 0 0);
+  }
+  
+  .dark *::-webkit-scrollbar-thumb {
+    background: oklch(0.371 0 0);
+  }
+  
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.45 0 0);
+  }
+}
