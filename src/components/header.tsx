@@ -3,48 +3,45 @@
 import { Github, Moon, Sun, ExternalLink, Sparkles, Package, Server, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 interface HeaderProps {
   onBackToHome?: () => void;
 }
 
 export function Header({ onBackToHome }: HeaderProps) {
-  const [dark, setDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setDark(isDark);
-    };
+    setMounted(true);
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
 
-    checkTheme();
     handleScroll();
-    
-    // Listen for theme changes
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"]
-    });
-
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      observer.disconnect();
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setDark(!dark);
+    if (theme === "light") {
+      setTheme("dark");
+    } else if (theme === "dark") {
+      setTheme("system");
+    } else {
+      setTheme("light");
+    }
   };
+
+  // Show system icon when theme is system and resolved theme is being determined
+  const isDark = mounted ? (theme === "system" ? resolvedTheme === "dark" : theme === "dark") : false;
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -71,7 +68,7 @@ export function Header({ onBackToHome }: HeaderProps) {
           >
             <div className="relative">
               <img 
-                src={dark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
+                src={isDark ? "/AWS-Dark.svg" : "/AWS-Light.svg"} 
                 alt="AWS Logo" 
                 className="h-7 w-7 transition-transform duration-200 group-hover:scale-110"
               />
@@ -138,10 +135,21 @@ export function Header({ onBackToHome }: HeaderProps) {
               size="icon" 
               onClick={toggleTheme}
               className="h-9 w-9 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-accent/50"
-              title={dark ? "Switch to light mode" : "Switch to dark mode"}
+              title={
+                theme === "system" 
+                  ? `System theme (${resolvedTheme}) - Click to toggle` 
+                  : theme === "dark" 
+                    ? "Switch to system theme" 
+                    : "Switch to dark mode"
+              }
             >
               <div className="relative">
-                {dark ? (
+                {theme === "system" ? (
+                  <div className="relative">
+                    <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-200" />
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  </div>
+                ) : isDark ? (
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-200" />
                 ) : (
                   <Moon className="h-4 w-4 rotate-0 scale-100 transition-all duration-200" />
@@ -175,9 +183,20 @@ export function Header({ onBackToHome }: HeaderProps) {
               size="icon" 
               onClick={toggleTheme}
               className="h-8 w-8 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-accent/50"
-              title={dark ? "Switch to light mode" : "Switch to dark mode"}
+              title={
+                theme === "system" 
+                  ? `System theme (${resolvedTheme}) - Click to toggle` 
+                  : theme === "dark" 
+                    ? "Switch to system theme" 
+                    : "Switch to dark mode"
+              }
             >
-              {dark ? (
+              {theme === "system" ? (
+                <div className="relative">
+                  <Sun className="h-4 w-4" />
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                </div>
+              ) : isDark ? (
                 <Sun className="h-4 w-4" />
               ) : (
                 <Moon className="h-4 w-4" />
