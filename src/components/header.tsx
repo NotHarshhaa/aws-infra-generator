@@ -42,6 +42,19 @@ export function Header({ onBackToHome }: HeaderProps) {
 
   // Show system icon when theme is system and resolved theme is being determined
   const isDark = mounted ? (theme === "system" ? resolvedTheme === "dark" : theme === "dark") : false;
+  
+  // Prevent hydration mismatch by not rendering dynamic tooltips during SSR
+  const getTooltipText = () => {
+    if (!mounted) return "Toggle theme";
+    
+    if (theme === "system") {
+      return `System theme (${resolvedTheme}) - Click to toggle`;
+    } else if (theme === "dark") {
+      return "Switch to system theme";
+    } else {
+      return "Switch to dark mode";
+    }
+  };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -135,13 +148,7 @@ export function Header({ onBackToHome }: HeaderProps) {
               size="icon" 
               onClick={toggleTheme}
               className="h-9 w-9 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-accent/50"
-              title={
-                theme === "system" 
-                  ? `System theme (${resolvedTheme}) - Click to toggle` 
-                  : theme === "dark" 
-                    ? "Switch to system theme" 
-                    : "Switch to dark mode"
-              }
+              title={getTooltipText()}
             >
               <div className="relative">
                 {theme === "system" ? (
@@ -183,13 +190,7 @@ export function Header({ onBackToHome }: HeaderProps) {
               size="icon" 
               onClick={toggleTheme}
               className="h-8 w-8 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-accent/50"
-              title={
-                theme === "system" 
-                  ? `System theme (${resolvedTheme}) - Click to toggle` 
-                  : theme === "dark" 
-                    ? "Switch to system theme" 
-                    : "Switch to dark mode"
-              }
+              title={getTooltipText()}
             >
               {theme === "system" ? (
                 <div className="relative">
