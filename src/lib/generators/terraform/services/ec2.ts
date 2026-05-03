@@ -175,8 +175,8 @@ resource "aws_instance" "main" {
   subnet_id                   = aws_subnet.public_0.id
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2.name
-  associate_public_ip_address = ${publicIp}
-  monitoring                  = ${enableMonitoring}
+  associate_public_ip_address = var.enable_public_ip
+  monitoring                  = var.enable_monitoring
   
   # Root block device with encryption and optimized performance
   root_block_device {

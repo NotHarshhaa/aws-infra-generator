@@ -67,6 +67,12 @@
 
 > See [NEW_FEATURES.md](NEW_FEATURES.md) for detailed documentation on the new features.
 
+### 🛠️ Recent Improvements (v1.1.1)
+- **Complete Service Coverage** — All 20+ AWS services now have fully functional generators
+- **Bug Fixes** — Resolved missing service generators for CloudFront, ECS, EKS, and DynamoDB
+- **Enhanced Validation** — Improved configuration validation and error handling
+- **Template Quality** — Production-ready Terraform and CloudFormation templates
+
 ---
 
 ## 🛠️ Supported AWS Services

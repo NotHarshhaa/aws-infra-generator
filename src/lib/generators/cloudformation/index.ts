@@ -14,6 +14,10 @@ import { generateLambda } from './services/lambda';
 import { generateElastiCache } from './services/elasticache';
 import { generateApiGateway } from './services/api-gateway';
 import { generateCloudWatch } from './services/cloudwatch';
+import { buildCloudFront } from './services/cloudfront';
+import { buildEcs } from './services/ecs';
+import { buildEks } from './services/eks';
+import { buildDynamoDB } from './services/dynamodb';
 
 export type { 
   ServiceConfig, 
@@ -58,6 +62,10 @@ export class CloudFormationGenerator {
       'elasticache': generateElastiCache,
       'api-gateway': generateApiGateway,
       'cloudwatch': generateCloudWatch,
+      'cloudfront': buildCloudFront,
+      'ecs': buildEcs,
+      'eks': buildEks,
+      'dynamodb': buildDynamoDB,
     };
 
     // Build resources and outputs for each service

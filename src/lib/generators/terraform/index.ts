@@ -16,6 +16,10 @@ import { generateLambda } from './services/lambda';
 import { generateElastiCache } from './services/elasticache';
 import { generateApiGateway } from './services/api-gateway';
 import { generateCloudWatch } from './services/cloudwatch';
+import { generateCloudFront } from './services/cloudfront';
+import { generateEcs } from './services/ecs';
+import { generateEks } from './services/eks';
+import { generateDynamoDB } from './services/dynamodb';
 
 export type { 
   ServiceConfig, 
@@ -58,6 +62,10 @@ export class TerraformGenerator {
       'elasticache': generateElastiCache,
       'api-gateway': generateApiGateway,
       'cloudwatch': generateCloudWatch,
+      'cloudfront': generateCloudFront,
+      'ecs': generateEcs,
+      'eks': generateEks,
+      'dynamodb': generateDynamoDB,
     };
 
     for (const svc of services) {
