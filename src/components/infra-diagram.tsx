@@ -20,6 +20,14 @@ import {
   Download,
   Layers,
   Info,
+  Workflow,
+  Lock,
+  Key,
+  FileCheck,
+  Users,
+  Hammer,
+  GitBranch,
+  Rocket,
 } from "lucide-react";
 import {
   Card,
@@ -76,6 +84,18 @@ export function InfraDiagram() {
       sqs: MessageSquare,
       sns: MessageSquare,
       cloudwatch: Activity,
+      "step-functions": Workflow,
+      eventbridge: Zap,
+      kinesis: Activity,
+      "secrets-manager": Lock,
+      kms: Key,
+      "aws-config": FileCheck,
+      "aws-backup": Shield,
+      cognito: Users,
+      codebuild: Hammer,
+      codepipeline: GitBranch,
+      codedeploy: Rocket,
+      "cloudformation-stacksets": Layers,
     };
     return iconMap[serviceId] || Server;
   };

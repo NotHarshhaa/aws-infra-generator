@@ -33,6 +33,15 @@ import {
   MessageSquare,
   Bell,
   Activity,
+  Workflow,
+  Lock,
+  Key,
+  FileCheck,
+  Users,
+  Hammer,
+  GitBranch,
+  Rocket,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -160,7 +169,7 @@ function LandingHero({ onGetStarted }: { onGetStarted: () => void }) {
                 title: "Select Services",
                 desc: "Choose the AWS services you need from our comprehensive catalog. Dependencies are automatically resolved and included.",
                 icon: Server,
-                features: ["20+ AWS Services", "Visual Selection", "Auto Dependencies"],
+                features: ["32+ AWS Services", "Visual Selection", "Auto Dependencies"],
               },
               {
                 step: "2", 
@@ -467,7 +476,7 @@ export default function Home() {
                 </Badge>
                 <h2 className="text-xl sm:text-3xl font-bold">Supported AWS Services</h2>
                 <p className="text-muted-foreground max-w-3xl mx-auto text-sm sm:text-lg">
-                  Generate infrastructure for 20+ AWS services with comprehensive configuration options and best practices
+                  Generate infrastructure for 32+ AWS services with comprehensive configuration options and best practices
                 </p>
               </div>
 
@@ -493,6 +502,18 @@ export default function Home() {
                     { icon: MessageSquare, name: "SQS", category: "messaging", count: 7 },
                     { icon: Bell, name: "SNS", category: "messaging", count: 6 },
                     { icon: Activity, name: "CloudWatch", category: "management", count: 4 },
+                    { icon: Workflow, name: "Step Functions", category: "devops", count: 5 },
+                    { icon: Zap, name: "EventBridge", category: "devops", count: 6 },
+                    { icon: Activity, name: "Kinesis", category: "devops", count: 4 },
+                    { icon: Lock, name: "Secrets Manager", category: "devops", count: 3 },
+                    { icon: Key, name: "KMS", category: "devops", count: 3 },
+                    { icon: FileCheck, name: "AWS Config", category: "devops", count: 4 },
+                    { icon: ShieldCheck, name: "AWS Backup", category: "devops", count: 3 },
+                    { icon: Users, name: "Cognito", category: "devops", count: 5 },
+                    { icon: Hammer, name: "CodeBuild", category: "devops", count: 4 },
+                    { icon: GitBranch, name: "CodePipeline", category: "devops", count: 5 },
+                    { icon: Rocket, name: "CodeDeploy", category: "devops", count: 4 },
+                    { icon: Layers, name: "StackSets", category: "devops", count: 3 },
                   ].map((service, idx) => (
                     <div key={idx} className="group relative">
                       <div className="flex items-center gap-1.5 sm:gap-2 sm:gap-3 p-2 sm:p-3 sm:p-4 rounded-xl border bg-card hover:bg-accent/50 transition-all duration-200 hover:shadow-md hover:border-primary/30">
@@ -765,13 +786,60 @@ export default function Home() {
                       </CardContent>
                     </Card>
                   </div>
+
+                  {/* DevOps & CI/CD Services */}
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
+                      <div className="flex items-center gap-2">
+                        <Workflow className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <h3 className="text-lg sm:text-xl font-bold">DevOps & CI/CD</h3>
+                      </div>
+                      <Badge variant="outline" className="text-xs">12 Services</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      {[
+                        { icon: Workflow, name: "Step Functions", desc: "Workflow orchestration", features: ["Serverless", "State machines", "Visual workflows"] },
+                        { icon: Zap, name: "EventBridge", desc: "Event-driven architecture", features: ["Event bus", "Rules", "Targets"] },
+                        { icon: Activity, name: "Kinesis", desc: "Real-time data streaming", features: ["Data streams", "Analytics", "Real-time"] },
+                        { icon: Lock, name: "Secrets Manager", desc: "Secure secrets storage", features: ["Rotation", "Encryption", "API access"] },
+                        { icon: Key, name: "KMS", desc: "Key management", features: ["Encryption keys", "Key rotation", "Policies"] },
+                        { icon: FileCheck, name: "AWS Config", desc: "Configuration compliance", features: ["Rules", "Compliance", "Auditing"] },
+                        { icon: ShieldCheck, name: "AWS Backup", desc: "Centralized backup", features: ["Backup plans", "Policies", "Cross-account"] },
+                        { icon: Users, name: "Cognito", desc: "User authentication", features: ["User pools", "Social login", "MFA"] },
+                        { icon: Hammer, name: "CodeBuild", desc: "Continuous integration", features: ["Build projects", "Custom images", "Artifacts"] },
+                        { icon: GitBranch, name: "CodePipeline", desc: "Continuous delivery", features: ["Pipelines", "Stages", "Actions"] },
+                        { icon: Rocket, name: "CodeDeploy", desc: "Automated deployment", features: ["Deployment groups", "Strategies", "Rollbacks"] },
+                        { icon: Layers, name: "StackSets", desc: "Multi-account infra", features: ["Stack sets", "Multi-region", "Governance"] },
+                      ].map((service, idx) => (
+                        <Card key={idx} className="hover:shadow-lg transition-shadow">
+                          <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <service.icon className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
+                              <div>
+                                <div className="font-bold text-lg">{service.name}</div>
+                                <div className="text-sm text-muted-foreground">{service.desc}</div>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              {service.features.map((feature, fidx) => (
+                                <div key={fidx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                  {feature}
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Service Count Summary */}
                 <div className="mt-12 text-center">
                   <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full border border-primary/20">
                     <Package className="h-5 w-5 text-primary" />
-                    <span className="text-base font-semibold text-primary">20+ AWS Services Across 7 Categories</span>
+                    <span className="text-base font-semibold text-primary">32+ AWS Services Across 8 Categories</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-3">
                     Production-ready templates with best practices, security configurations, and comprehensive documentation

@@ -112,6 +112,54 @@ const AWS_PRICING = {
   sns: {
     requests: 0.50, // per million requests
   },
+  stepFunctions: {
+    stateTransition: 0.000025, // per state transition
+    express: 0.0000025, // per request (Express workflows)
+  },
+  eventBridge: {
+    events: 1.00, // per million events
+    customBus: 0.01, // per day
+  },
+  kinesis: {
+    shardHour: 0.012, // per shard-hour
+    dataIngested: 0.015, // per GB
+  },
+  secretsManager: {
+    secret: 0.40, // per secret per month
+    apiCalls: 0.05, // per 10,000 API calls
+  },
+  kms: {
+    key: 1.00, // per key per month
+    apiCalls: 0.03, // per 10,000 API calls (Cryptographic operations)
+  },
+  awsConfig: {
+    recorder: 0.003, // per configuration item recorded
+    rules: 0.002, // per rule evaluation
+  },
+  awsBackup: {
+    vault: 0.10, // per vault per month
+    backup: 0.01, // per GB-month
+  },
+  cognito: {
+    userPool: 0.0055, // per MAU (Monthly Active User) - first 50k free
+  },
+  codeBuild: {
+    buildGeneralSmall: 0.005, // per minute
+    buildGeneralMedium: 0.01, // per minute
+    buildGeneralLarge: 0.02, // per minute
+    buildGeneral2XLarge: 0.05, // per minute
+  },
+  codePipeline: {
+    pipeline: 1.00, // per pipeline per month
+    activePipeline: 0.80, // per active pipeline per month
+  },
+  codedeploy: {
+    deployment: 0.002, // per deployment (first 10k free)
+  },
+  cloudFormationStackSets: {
+    stackSet: 0.00, // free
+    stackInstance: 0.00, // free
+  },
 };
 
 export function estimateInfrastructureCost(
@@ -529,6 +577,216 @@ function estimateServiceCost(
         monthlyCost: 0,
         breakdown: [{ item: "IAM roles and policies", cost: 0, unit: "free" }],
         notes: ["IAM is free to use"],
+      };
+    }
+
+    case "step-functions": {
+      const type = config.type || 'STANDARD';
+      const estimatedTransitions = environment === "production" ? 1000000 : 100000;
+      const transitionCost = (estimatedTransitions * AWS_PRICING.stepFunctions.stateTransition);
+      const monthlyCost = transitionCost;
+
+      return {
+        service: serviceId,
+        serviceName: "Step Functions",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${(estimatedTransitions / 1000000).toFixed(1)}M state transitions`, cost: Math.round(transitionCost * 100) / 100, unit: "month" },
+        ],
+        notes: [`${type} workflow type`, "Estimated usage"],
+      };
+    }
+
+    case "eventbridge": {
+      const createCustomBus = config.create_custom_bus === true;
+      const estimatedEvents = environment === "production" ? 5000000 : 500000;
+      const eventCost = (estimatedEvents / 1000000) * AWS_PRICING.eventBridge.events;
+      const busCost = createCustomBus ? AWS_PRICING.eventBridge.customBus * 30 : 0;
+      const monthlyCost = eventCost + busCost;
+
+      return {
+        service: serviceId,
+        serviceName: "EventBridge",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${(estimatedEvents / 1000000).toFixed(1)}M events`, cost: Math.round(eventCost * 100) / 100, unit: "month" },
+          ...(createCustomBus ? [{ item: "Custom event bus", cost: Math.round(busCost * 100) / 100, unit: "month" }] : []),
+        ],
+        notes: ["Estimated usage based on environment"],
+      };
+    }
+
+    case "kinesis": {
+      const shardCount = config.shard_count || 1;
+      const estimatedDataGB = environment === "production" ? 100 : 50;
+      const shardCost = shardCount * AWS_PRICING.kinesis.shardHour * hoursPerMonth;
+      const dataCost = estimatedDataGB * AWS_PRICING.kinesis.dataIngested;
+      const monthlyCost = shardCost + dataCost;
+
+      return {
+        service: serviceId,
+        serviceName: "Kinesis",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `${shardCount}x shards`, cost: Math.round(shardCost * 100) / 100, unit: "month" },
+          { item: `~${estimatedDataGB} GB data ingested`, cost: Math.round(dataCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage", "Data Stream pricing"],
+      };
+    }
+
+    case "secrets-manager": {
+      const numSecrets = config.num_secrets || 1;
+      const estimatedApiCalls = environment === "production" ? 100000 : 20000;
+      const secretCost = numSecrets * AWS_PRICING.secretsManager.secret;
+      const apiCost = (estimatedApiCalls / 10000) * AWS_PRICING.secretsManager.apiCalls;
+      const monthlyCost = secretCost + apiCost;
+
+      return {
+        service: serviceId,
+        serviceName: "Secrets Manager",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `${numSecrets}x secrets`, cost: Math.round(secretCost * 100) / 100, unit: "month" },
+          { item: `~${(estimatedApiCalls / 10000).toFixed(0)}K API calls`, cost: Math.round(apiCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage"],
+      };
+    }
+
+    case "kms": {
+      const numKeys = config.num_keys || 1;
+      const estimatedApiCalls = environment === "production" ? 50000 : 10000;
+      const keyCost = numKeys * AWS_PRICING.kms.key;
+      const apiCost = (estimatedApiCalls / 10000) * AWS_PRICING.kms.apiCalls;
+      const monthlyCost = keyCost + apiCost;
+
+      return {
+        service: serviceId,
+        serviceName: "KMS",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `${numKeys}x KMS keys`, cost: Math.round(keyCost * 100) / 100, unit: "month" },
+          { item: `~${(estimatedApiCalls / 10000).toFixed(0)}K API calls`, cost: Math.round(apiCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage", "Symmetric keys"],
+      };
+    }
+
+    case "aws-config": {
+      const estimatedConfigItems = environment === "production" ? 5000 : 1000;
+      const estimatedRuleEvaluations = environment === "production" ? 10000 : 2000;
+      const configCost = estimatedConfigItems * AWS_PRICING.awsConfig.recorder;
+      const ruleCost = estimatedRuleEvaluations * AWS_PRICING.awsConfig.rules;
+      const monthlyCost = configCost + ruleCost;
+
+      return {
+        service: serviceId,
+        serviceName: "AWS Config",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${estimatedConfigItems} config items recorded`, cost: Math.round(configCost * 100) / 100, unit: "month" },
+          { item: `~${estimatedRuleEvaluations} rule evaluations`, cost: Math.round(ruleCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage"],
+      };
+    }
+
+    case "aws-backup": {
+      const estimatedBackupGB = environment === "production" ? 100 : 50;
+      const vaultCost = AWS_PRICING.awsBackup.vault;
+      const backupCost = estimatedBackupGB * AWS_PRICING.awsBackup.backup;
+      const monthlyCost = vaultCost + backupCost;
+
+      return {
+        service: serviceId,
+        serviceName: "AWS Backup",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: "Backup vault", cost: Math.round(vaultCost * 100) / 100, unit: "month" },
+          { item: `~${estimatedBackupGB} GB backup storage`, cost: Math.round(backupCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage"],
+      };
+    }
+
+    case "cognito": {
+      const estimatedMAU = environment === "production" ? 100000 : 10000;
+      const mauCost = Math.max(0, estimatedMAU - 50000) * AWS_PRICING.cognito.userPool;
+      const monthlyCost = mauCost;
+
+      return {
+        service: serviceId,
+        serviceName: "Cognito",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${(estimatedMAU / 1000).toFixed(0)}K MAU`, cost: Math.round(mauCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["First 50k MAU free", "User pool pricing"],
+      };
+    }
+
+    case "codebuild": {
+      const computeType = config.compute_type || 'BUILD_GENERAL1_SMALL';
+      const estimatedBuildMinutes = environment === "production" ? 1000 : 200;
+      const pricePerMinute = computeType === 'BUILD_GENERAL1_SMALL' ? AWS_PRICING.codeBuild.buildGeneralSmall :
+                              computeType === 'BUILD_GENERAL1_MEDIUM' ? AWS_PRICING.codeBuild.buildGeneralMedium :
+                              computeType === 'BUILD_GENERAL1_LARGE' ? AWS_PRICING.codeBuild.buildGeneralLarge :
+                              AWS_PRICING.codeBuild.buildGeneral2XLarge;
+      const buildCost = estimatedBuildMinutes * pricePerMinute;
+      const monthlyCost = buildCost;
+
+      return {
+        service: serviceId,
+        serviceName: "CodeBuild",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${estimatedBuildMinutes} build minutes (${computeType})`, cost: Math.round(buildCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["Estimated usage based on environment"],
+      };
+    }
+
+    case "codepipeline": {
+      const pipelineCost = AWS_PRICING.codePipeline.pipeline;
+      const activePipelineCost = AWS_PRICING.codePipeline.activePipeline;
+      const monthlyCost = pipelineCost + activePipelineCost;
+
+      return {
+        service: serviceId,
+        serviceName: "CodePipeline",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: "Pipeline", cost: Math.round(pipelineCost * 100) / 100, unit: "month" },
+          { item: "Active pipeline", cost: Math.round(activePipelineCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["First 1 pipeline active is free"],
+      };
+    }
+
+    case "codedeploy": {
+      const estimatedDeployments = environment === "production" ? 100 : 20;
+      const deploymentCost = Math.max(0, (estimatedDeployments - 10000) * AWS_PRICING.codedeploy.deployment);
+      const monthlyCost = deploymentCost;
+
+      return {
+        service: serviceId,
+        serviceName: "CodeDeploy",
+        monthlyCost: Math.round(monthlyCost * 100) / 100,
+        breakdown: [
+          { item: `~${estimatedDeployments} deployments`, cost: Math.round(deploymentCost * 100) / 100, unit: "month" },
+        ],
+        notes: ["First 10k deployments free", "Estimated usage"],
+      };
+    }
+
+    case "cloudformation-stacksets": {
+      return {
+        service: serviceId,
+        serviceName: "CloudFormation StackSets",
+        monthlyCost: 0,
+        breakdown: [{ item: "StackSets", cost: 0, unit: "free" }],
+        notes: ["StackSets is free to use"],
       };
     }
 

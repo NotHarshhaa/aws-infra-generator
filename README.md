@@ -20,7 +20,7 @@
 
 ### 🎯 Core Features
 - **Infrastructure Template Generation** — Generate Terraform or CloudFormation templates automatically
-- **20+ AWS Services Support** — VPC, EC2, Lambda, ECS, EKS, S3, EFS, RDS, DynamoDB, ElastiCache, ALB, API Gateway, CloudFront, Route 53, IAM, SQS, SNS, CloudWatch, and more
+- **32+ AWS Services Support** — VPC, EC2, Lambda, ECS, EKS, S3, EFS, RDS, DynamoDB, ElastiCache, ALB, API Gateway, CloudFront, Route 53, IAM, SQS, SNS, CloudWatch, Step Functions, EventBridge, Kinesis, Secrets Manager, KMS, AWS Config, AWS Backup, Cognito, CodeBuild, CodePipeline, CodeDeploy, CloudFormation StackSets, and more
 - **Service Dependency Engine** — Auto-resolves dependencies (e.g., ALB → VPC + Subnets + Security Groups)
 - **Multi-Environment Support** — Generate for development, staging, or production with environment-specific configurations
 - **Infrastructure Validation** — Validates dependencies, config conflicts, and missing resources before generation
@@ -42,7 +42,7 @@
 - **Service-by-service cost analysis** with itemized components
 - **Environment-aware pricing** (development, staging, production)
 - **Cost optimization tips** to reduce AWS spending
-- **15+ services covered** with accurate pricing data
+- **27+ services covered** with accurate pricing data
 - **Interactive expandable cards** to view detailed cost breakdowns
 
 #### 📊 Infrastructure Diagram Visualization
@@ -72,6 +72,24 @@
 - **Bug Fixes** — Resolved missing service generators for CloudFront, ECS, EKS, and DynamoDB
 - **Enhanced Validation** — Improved configuration validation and error handling
 - **Template Quality** — Production-ready Terraform and CloudFormation templates
+
+### 🚀 New DevOps Services (v1.2.0)
+- **12 New DevOps-Focused Services** — Added comprehensive support for modern DevOps workflows:
+  - **Step Functions** — Serverless workflow orchestration
+  - **EventBridge** — Event-driven architecture
+  - **Kinesis** — Real-time data streaming
+  - **Secrets Manager** — Secure secrets management
+  - **KMS** — Encryption key management
+  - **AWS Config** — Configuration compliance
+  - **AWS Backup** — Centralized backup service
+  - **Cognito** — User authentication
+  - **CodeBuild** — Continuous integration
+  - **CodePipeline** — Continuous delivery
+  - **CodeDeploy** — Automated deployments
+  - **CloudFormation StackSets** — Multi-account provisioning
+- **Full Generator Support** — All new services have complete Terraform and CloudFormation generators
+- **Cost Estimation** — Pricing data and cost estimation for all new DevOps services
+- **Icon Support** — New service icons for infrastructure diagrams
 
 ---
 
@@ -108,6 +126,20 @@
 
 ### Management & Monitoring
 - **CloudWatch** — Monitoring with logs, metrics, alarms, and dashboards
+
+### DevOps & CI/CD
+- **Step Functions** — Serverless workflow orchestration for AWS services
+- **EventBridge** — Serverless event bus for building event-driven applications
+- **Kinesis** — Data streaming service for real-time data processing
+- **Secrets Manager** — Secure secrets management for applications
+- **KMS** — Key Management Service for encryption and key management
+- **AWS Config** — Configuration management and compliance monitoring
+- **AWS Backup** — Centralized backup service for AWS resources
+- **Cognito** — User authentication and authorization for web/mobile apps
+- **CodeBuild** — Fully managed continuous integration service
+- **CodePipeline** — Continuous delivery service for release automation
+- **CodeDeploy** — Automated deployment service for applications
+- **CloudFormation StackSets** — Multi-account and multi-region infrastructure provisioning
 
 ---
 
@@ -385,7 +417,7 @@ aws cloudformation deploy \
 5. **🎓 Educational** — Learn AWS architecture while building infrastructure
 6. **💼 Production Ready** — Generated code follows AWS best practices
 7. **🔄 Flexible** — Support for both Terraform and CloudFormation
-8. **🎯 Comprehensive** — 20+ AWS services with detailed configuration options
+8. **🎯 Comprehensive** — 32+ AWS services with detailed configuration options
 
 ---
 

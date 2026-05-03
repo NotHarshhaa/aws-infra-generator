@@ -20,6 +20,18 @@ import { generateCloudFront } from './services/cloudfront';
 import { generateEcs } from './services/ecs';
 import { generateEks } from './services/eks';
 import { generateDynamoDB } from './services/dynamodb';
+import { generateStepFunctions } from './services/step-functions';
+import { generateEventBridge } from './services/eventbridge';
+import { generateKinesis } from './services/kinesis';
+import { generateSecretsManager } from './services/secrets-manager';
+import { generateKMS } from './services/kms';
+import { generateAWSConfig } from './services/aws-config';
+import { generateAWSBackup } from './services/aws-backup';
+import { generateCognito } from './services/cognito';
+import { generateCodeBuild } from './services/codebuild';
+import { generateCodePipeline } from './services/codepipeline';
+import { generateCodeDeploy } from './services/codedeploy';
+import { generateCloudFormationStackSets } from './services/cloudformation-stacksets';
 
 export type { 
   ServiceConfig, 
@@ -66,6 +78,18 @@ export class TerraformGenerator {
       'ecs': generateEcs,
       'eks': generateEks,
       'dynamodb': generateDynamoDB,
+      'step-functions': generateStepFunctions,
+      'eventbridge': generateEventBridge,
+      'kinesis': generateKinesis,
+      'secrets-manager': generateSecretsManager,
+      'kms': generateKMS,
+      'aws-config': generateAWSConfig,
+      'aws-backup': generateAWSBackup,
+      'cognito': generateCognito,
+      'codebuild': generateCodeBuild,
+      'codepipeline': generateCodePipeline,
+      'codedeploy': generateCodeDeploy,
+      'cloudformation-stacksets': generateCloudFormationStackSets,
     };
 
     for (const svc of services) {

@@ -18,6 +18,18 @@ import { buildCloudFront } from './services/cloudfront';
 import { buildEcs } from './services/ecs';
 import { buildEks } from './services/eks';
 import { buildDynamoDB } from './services/dynamodb';
+import { buildStepFunctions } from './services/step-functions';
+import { buildEventBridge } from './services/eventbridge';
+import { buildKinesis } from './services/kinesis';
+import { buildSecretsManager } from './services/secrets-manager';
+import { buildKMS } from './services/kms';
+import { buildAWSConfig } from './services/aws-config';
+import { buildAWSBackup } from './services/aws-backup';
+import { buildCognito } from './services/cognito';
+import { buildCodeBuild } from './services/codebuild';
+import { buildCodePipeline } from './services/codepipeline';
+import { buildCodeDeploy } from './services/codedeploy';
+import { buildCloudFormationStackSets } from './services/cloudformation-stacksets';
 
 export type { 
   ServiceConfig, 
@@ -66,6 +78,18 @@ export class CloudFormationGenerator {
       'ecs': buildEcs,
       'eks': buildEks,
       'dynamodb': buildDynamoDB,
+      'step-functions': buildStepFunctions,
+      'eventbridge': buildEventBridge,
+      'kinesis': buildKinesis,
+      'secrets-manager': buildSecretsManager,
+      'kms': buildKMS,
+      'aws-config': buildAWSConfig,
+      'aws-backup': buildAWSBackup,
+      'cognito': buildCognito,
+      'codebuild': buildCodeBuild,
+      'codepipeline': buildCodePipeline,
+      'codedeploy': buildCodeDeploy,
+      'cloudformation-stacksets': buildCloudFormationStackSets,
     };
 
     // Build resources and outputs for each service
