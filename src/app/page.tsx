@@ -14,7 +14,7 @@ import { useInfraStore } from "@/lib/store";
 import { WizardStep } from "@/lib/types";
 
 export default function Home() {
-  const { currentStep, setStep, selectedServices, generatedFiles, reset } =
+  const { currentStep, setStep, selectedServices, generatedFiles, isGenerationStale, reset } =
     useInfraStore();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -35,9 +35,9 @@ export default function Home() {
     if (currentStep === "generate" || currentStep === "export")
       steps.push("configure");
     if (generatedFiles.length > 0) steps.push("generate");
-    if (currentStep === "export") steps.push("export");
+    if (generatedFiles.length > 0 && !isGenerationStale) steps.push("export");
     return steps;
-  }, [selectedServices, currentStep, generatedFiles]);
+  }, [selectedServices, currentStep, generatedFiles, isGenerationStale]);
 
   const handleGetStarted = () => {
     setShowWizard(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FileCode2,
   Plus,
@@ -13,6 +13,7 @@ import {
   EyeOff,
   ChevronDown,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import {
   Card,
@@ -27,34 +28,70 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useInfraStore } from "@/lib/store";
-import {
-  simulateTerraformPlan,
+import { buildTerraformPlanPreview } from "@/lib/terraform-plan-builder";
+import type {
   TerraformPlanSummary,
   TerraformPlanAction,
 } from "@/lib/terraform-plan-simulator";
 
 export function TerraformPlanPreview() {
-  const { selectedServices, serviceConfig, projectName, region, environment, outputFormat } =
-    useInfraStore();
+  const {
+    selectedServices,
+    serviceConfig,
+    projectName,
+    region,
+    environment,
+    outputFormat,
+    generatedFiles,
+    isGenerationStale,
+  } = useInfraStore();
   const [planSummary, setPlanSummary] = useState<TerraformPlanSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [expandedActions, setExpandedActions] = useState<Set<string>>(new Set());
   const [showSensitive, setShowSensitive] = useState(false);
   const [filterAction, setFilterAction] = useState<string>("all");
 
+  const planInput = useMemo(
+    () => ({
+      selectedServices,
+      serviceConfig,
+      projectName,
+      region,
+      environment,
+      outputFormat,
+      generatedFiles,
+      useGeneratedFiles: generatedFiles.length > 0 && !isGenerationStale,
+    }),
+    [
+      selectedServices,
+      serviceConfig,
+      projectName,
+      region,
+      environment,
+      outputFormat,
+      generatedFiles,
+      isGenerationStale,
+    ]
+  );
+
   useEffect(() => {
-    if (selectedServices.length > 0 && outputFormat === "terraform") {
-      const summary = simulateTerraformPlan(
-        selectedServices,
-        serviceConfig,
-        projectName,
-        region,
-        environment
-      );
-      setPlanSummary(summary);
-    } else {
+    if (outputFormat !== "terraform" || selectedServices.length === 0) {
       setPlanSummary(null);
+      return;
     }
-  }, [selectedServices, serviceConfig, projectName, region, environment, outputFormat]);
+
+    setIsLoading(true);
+    const timer = window.setTimeout(() => {
+      try {
+        const summary = buildTerraformPlanPreview(planInput);
+        setPlanSummary(summary);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [planInput, outputFormat, selectedServices.length]);
 
   const toggleActionExpansion = (index: number) => {
     const key = `${index}`;
@@ -93,20 +130,7 @@ export function TerraformPlanPreview() {
     }
   };
 
-  const getActionSymbol = (action: string) => {
-    switch (action) {
-      case "create":
-        return "+";
-      case "update":
-        return "~";
-      case "destroy":
-        return "-";
-      default:
-        return "→";
-    }
-  };
-
-  const getChangeSymbol = (before: any, after: any) => {
+  const getChangeSymbol = (before: unknown, after: unknown) => {
     if (before === null) return "+";
     if (after === null) return "-";
     return "~";
@@ -125,14 +149,34 @@ export function TerraformPlanPreview() {
     );
   }
 
-  if (!planSummary || selectedServices.length === 0) {
+  if (selectedServices.length === 0) {
     return (
       <Card className="border-dashed">
         <CardContent className="pt-6 text-center">
           <FileCode2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground">
-            Select services to preview terraform plan
-          </p>
+          <p className="text-muted-foreground">Select services to preview terraform plan</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="pt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Building plan from generated Terraform...
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!planSummary) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="pt-6 text-center">
+          <FileCode2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+          <p className="text-muted-foreground">No Terraform resources found for the current selection</p>
         </CardContent>
       </Card>
     );
@@ -143,9 +187,11 @@ export function TerraformPlanPreview() {
       ? planSummary.actions
       : planSummary.actions.filter((a) => a.action === filterAction);
 
+  const planSource =
+    generatedFiles.length > 0 && !isGenerationStale ? "generated files" : "live configuration";
+
   return (
     <div className="space-y-4">
-      {/* Plan Summary */}
       <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
         <CardHeader className="pb-3 sm:pb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -155,7 +201,7 @@ export function TerraformPlanPreview() {
                 Terraform Plan Preview
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Simulated execution plan
+                Parsed from {planSource}
               </CardDescription>
             </div>
             <Badge variant="outline" className="text-xs w-fit">
@@ -205,6 +251,16 @@ export function TerraformPlanPreview() {
             </div>
           </div>
 
+          {isGenerationStale && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="text-xs">Preview may differ from export</AlertTitle>
+              <AlertDescription className="text-xs">
+                Configuration changed after your last generation. This preview reflects current settings.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {planSummary.warnings.length > 0 && (
             <>
               <Separator />
@@ -222,7 +278,6 @@ export function TerraformPlanPreview() {
         </CardContent>
       </Card>
 
-      {/* Filter and Controls */}
       <Card>
         <CardContent className="pt-3 sm:pt-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -246,28 +301,6 @@ export function TerraformPlanPreview() {
                   <span className="hidden sm:inline">Create</span> ({planSummary.toCreate})
                 </Button>
               )}
-              {planSummary.toUpdate > 0 && (
-                <Button
-                  variant={filterAction === "update" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterAction("update")}
-                  className="gap-1 h-8 text-xs"
-                >
-                  <RefreshCw className="h-3 w-3" />
-                  <span className="hidden sm:inline">Update</span> ({planSummary.toUpdate})
-                </Button>
-              )}
-              {planSummary.toDestroy > 0 && (
-                <Button
-                  variant={filterAction === "destroy" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilterAction("destroy")}
-                  className="gap-1 h-8 text-xs"
-                >
-                  <Minus className="h-3 w-3" />
-                  <span className="hidden sm:inline">Destroy</span> ({planSummary.toDestroy})
-                </Button>
-              )}
             </div>
             <Button
               variant="outline"
@@ -278,14 +311,12 @@ export function TerraformPlanPreview() {
               {showSensitive ? (
                 <>
                   <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Hide Sensitive</span>
-                  <span className="sm:hidden">Hide</span>
+                  Hide Sensitive
                 </>
               ) : (
                 <>
                   <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Show Sensitive</span>
-                  <span className="sm:hidden">Show</span>
+                  Show Sensitive
                 </>
               )}
             </Button>
@@ -293,7 +324,6 @@ export function TerraformPlanPreview() {
         </CardContent>
       </Card>
 
-      {/* Plan Actions */}
       <Card>
         <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="text-sm sm:text-base">Resource Changes</CardTitle>
@@ -308,28 +338,27 @@ export function TerraformPlanPreview() {
                 const isExpanded = expandedActions.has(`${idx}`);
                 return (
                   <div
-                    key={idx}
-                    className={`border rounded-lg overflow-hidden ${getActionColor(
-                      action.action
-                    )}`}
+                    key={`${action.resourceType}.${action.resourceName}-${idx}`}
+                    className={`border rounded-lg overflow-hidden ${getActionColor(action.action)}`}
                   >
-                    <div
-                      className="p-3 cursor-pointer hover:opacity-80 transition-opacity"
+                    <button
+                      type="button"
+                      className="w-full p-3 text-left hover:opacity-80 transition-opacity"
                       onClick={() => toggleActionExpansion(idx)}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           {getActionIcon(action.action)}
-                          <div className="flex-1 min-w-0">
+                          <div className="min-w-0">
                             <div className="font-mono text-sm font-semibold truncate">
                               {action.resourceType}.{action.resourceName}
                             </div>
                             <div className="text-xs opacity-75">
-                              {action.changes.length} change(s)
+                              {action.changes.length} attribute(s)
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 shrink-0">
                           <Badge variant="outline" className="text-xs">
                             {action.action}
                           </Badge>
@@ -340,7 +369,7 @@ export function TerraformPlanPreview() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </button>
 
                     {isExpanded && (
                       <div className="border-t bg-background/50 p-3 space-y-2">
@@ -355,35 +384,18 @@ export function TerraformPlanPreview() {
                             const isSensitive = change.sensitive && !showSensitive;
 
                             return (
-                              <div
-                                key={changeIdx}
-                                className="flex items-start gap-2 py-1"
-                              >
-                                <span className="text-muted-foreground mt-0.5">
-                                  {symbol}
-                                </span>
+                              <div key={changeIdx} className="flex items-start gap-2 py-1">
+                                <span className="text-muted-foreground mt-0.5">{symbol}</span>
                                 <div className="flex-1 min-w-0">
                                   <span className="text-primary font-semibold">
                                     {change.attribute}
                                   </span>
-                                  <div className="text-muted-foreground">
-                                    {change.before !== null && (
-                                      <div className="flex items-start gap-1">
-                                        <span className="text-red-600">-</span>
-                                        <span className="break-all">
-                                          {isSensitive
-                                            ? "(sensitive)"
-                                            : JSON.stringify(change.before)}
-                                        </span>
-                                      </div>
-                                    )}
+                                  <div className="text-muted-foreground break-all">
                                     {change.after !== null && (
                                       <div className="flex items-start gap-1">
                                         <span className="text-green-600">+</span>
-                                        <span className="break-all">
-                                          {isSensitive
-                                            ? "(sensitive)"
-                                            : JSON.stringify(change.after)}
+                                        <span>
+                                          {isSensitive ? "(sensitive)" : String(change.after)}
                                         </span>
                                       </div>
                                     )}
@@ -403,7 +415,6 @@ export function TerraformPlanPreview() {
         </CardContent>
       </Card>
 
-      {/* Plan Command */}
       <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900">
         <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100 text-sm sm:text-base">

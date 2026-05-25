@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { CostEstimator } from "@/components/wizard/cost-estimator/cost-estimator";
 import { InfraDiagram } from "@/components/wizard/infra-diagram/infra-diagram";
 import { TerraformPlanPreview } from "@/components/wizard/terraform-plan-preview/terraform-plan-preview";
-import { wizardStyles, WizardHeader } from "@/components/wizard/shared";
+import { wizardStyles, WizardHeader, GenerationStaleBanner } from "@/components/wizard/shared";
 import { ProjectSettingsCard } from "./project-settings-card";
 import { ConfigSummaryCard } from "./config-summary-card";
 import { ServiceConfigAccordion } from "./service-config-accordion";
@@ -94,6 +94,8 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
         description="Set project options and tune each service before generation."
         icon={Settings}
       />
+
+      <GenerationStaleBanner />
 
       <ProjectSettingsCard
         projectName={projectName}

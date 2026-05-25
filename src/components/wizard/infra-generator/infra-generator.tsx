@@ -40,6 +40,7 @@ import {
   WizardStatRow,
   WizardActionBar,
   GeneratedFileTabsList,
+  GenerationStaleBanner,
 } from "@/components/wizard/shared";
 
 interface InfraGeneratorProps {
@@ -75,6 +76,7 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
     setGeneratedFiles,
     setValidationResult,
     setStep,
+    isGenerationStale,
   } = useInfraStore();
 
   const [progress, setProgress] = useState(0);
@@ -265,6 +267,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
         description="Validate your config and produce production-ready IaC templates."
         icon={Sparkles}
       />
+
+      <GenerationStaleBanner />
 
       <WizardPanel title="Infrastructure Summary" description="Project overview" icon={FolderTree}>
         <WizardStatRow
@@ -550,7 +554,7 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
             )}
             Generate
           </Button>
-          {generatedFiles.length > 0 && validationResult?.valid !== false && (
+          {generatedFiles.length > 0 && !isGenerationStale && validationResult?.valid !== false && (
             <Button
               size="sm"
               onClick={() => setStep("export")}

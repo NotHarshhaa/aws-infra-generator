@@ -1808,23 +1808,4 @@ export function getServiceById(id: string): AWSService | undefined {
   return AWS_SERVICES.find((s) => s.id === id);
 }
 
-export function getServiceDependencies(serviceId: string): string[] {
-  const service = getServiceById(serviceId);
-  if (!service) return [];
-
-  const allDeps: Set<string> = new Set();
-
-  function resolveDeps(sid: string) {
-    const s = getServiceById(sid);
-    if (!s) return;
-    for (const dep of s.dependencies) {
-      if (!allDeps.has(dep)) {
-        allDeps.add(dep);
-        resolveDeps(dep);
-      }
-    }
-  }
-
-  resolveDeps(serviceId);
-  return Array.from(allDeps);
-}
+export { getServiceDependencies, resolveServicesInOrder } from "./service-dependencies";

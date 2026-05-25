@@ -37,6 +37,7 @@ import {
   WizardStatRow,
   WizardActionBar,
   GeneratedFileTabsList,
+  GenerationStaleBanner,
 } from "@/components/wizard/shared";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
     outputFormat,
     projectName,
     generatedFiles,
+    isGenerationStale,
     setStep,
     reset,
   } = useInfraStore();
@@ -247,7 +249,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
     setStep("services");
   };
 
-  if (generatedFiles.length === 0) {
+  if (generatedFiles.length === 0 || isGenerationStale) {
     return (
       <div className={wizardStyles.shell}>
         <WizardHeader
@@ -256,10 +258,12 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
           description="Download your IaC package and deploy with confidence."
           icon={Package}
         />
-        <Alert>
+        <Alert variant={isGenerationStale ? "destructive" : "default"}>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            No generated files found. Generate infrastructure first, then return here to export.
+            {isGenerationStale
+              ? "Configuration changed after your last generation. Re-generate infrastructure before exporting."
+              : "No generated files found. Generate infrastructure first, then return here to export."}
           </AlertDescription>
         </Alert>
         <WizardActionBar>
@@ -280,6 +284,8 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         description="Download your IaC package and deploy with confidence."
         icon={Package}
       />
+
+      <GenerationStaleBanner />
 
       <WizardPanel title="Export Summary" description="Package overview">
         <WizardStatRow

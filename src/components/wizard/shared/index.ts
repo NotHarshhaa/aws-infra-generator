@@ -9,3 +9,4 @@ export {
   GeneratedFileTabsList,
   generatedFileTabTriggerClass,
 } from "./generated-file-tabs-list";
+export { GenerationStaleBanner } from "./generation-stale-banner";
