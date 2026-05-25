@@ -4,7 +4,8 @@ import type { FieldError } from "./types";
 
 export function useConfigValidation(
   selectedServices: string[],
-  serviceConfig: Record<string, { config?: Record<string, unknown> }>
+  serviceConfig: Record<string, { config?: Record<string, unknown> }>,
+  projectName: string
 ) {
   const [fieldErrors, setFieldErrors] = useState<FieldError>({});
 
@@ -51,6 +52,16 @@ export function useConfigValidation(
     const errors: FieldError = {};
     let hasErrors = false;
 
+    if (!projectName.trim()) {
+      errors.project = { projectName: "Project name is required" };
+      hasErrors = true;
+    } else if (!/^[a-zA-Z0-9-_]+$/.test(projectName)) {
+      errors.project = {
+        projectName: "Project name can only contain letters, numbers, hyphens, and underscores",
+      };
+      hasErrors = true;
+    }
+
     selectedServices.forEach((serviceId) => {
       const service = getServiceById(serviceId);
       if (!service) return;
@@ -69,7 +80,7 @@ export function useConfigValidation(
 
     setFieldErrors(errors);
     return !hasErrors;
-  }, [selectedServices, serviceConfig, validateField]);
+  }, [selectedServices, serviceConfig, validateField, projectName]);
 
   const clearFieldError = useCallback((serviceId: string, fieldName: string) => {
     setFieldErrors((prev) => ({

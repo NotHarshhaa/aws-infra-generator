@@ -1,4 +1,4 @@
-import { GeneratedFile } from './types';
+import { GeneratedFile, ServiceBuilderResult } from './types';
 import { buildParameters } from './core/parameters';
 import { buildVpc } from './services/vpc';
 import { buildEc2 } from './services/ec2';
@@ -41,6 +41,29 @@ export type {
   CloudFormationTemplate,
   ServiceBuilderResult
 } from './types';
+
+function mergeServiceBuilderResult(
+  template: { Parameters: Record<string, unknown>; Resources: Record<string, unknown>; Outputs: Record<string, unknown> },
+  result: ServiceBuilderResult | GeneratedFile
+) {
+  if (Array.isArray(result)) {
+    const [resources, outputs] = result;
+    Object.assign(template.Resources, resources);
+    Object.assign(template.Outputs, outputs);
+    return;
+  }
+
+  if (result && typeof result === "object" && "content" in result) {
+    try {
+      const parsed = JSON.parse(result.content);
+      if (parsed.Parameters) Object.assign(template.Parameters, parsed.Parameters);
+      if (parsed.Resources) Object.assign(template.Resources, parsed.Resources);
+      if (parsed.Outputs) Object.assign(template.Outputs, parsed.Outputs);
+    } catch (error) {
+      console.warn(`Failed to merge CloudFormation fragment from ${result.name}:`, error);
+    }
+  }
+}
 
 export class CloudFormationGenerator {
   generate(
@@ -97,9 +120,7 @@ export class CloudFormationGenerator {
       const svcConfig = config[svc]?.config || {};
       const builder = serviceBuilders[svc];
       if (builder) {
-        const [resources, outputs] = builder(svcConfig, environment, projectName);
-        Object.assign(template.Resources, resources);
-        Object.assign(template.Outputs, outputs);
+        mergeServiceBuilderResult(template, builder(svcConfig, environment, projectName));
       }
     }
 

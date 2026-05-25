@@ -26,6 +26,10 @@ export async function downloadInfrastructure(payload: {
   region: string;
   format: string;
   projectName: string;
+}, options?: {
+  files?: GeneratedFile[];
+  includeReadme?: boolean;
+  includeGitignore?: boolean;
 }): Promise<Blob> {
-  return clientAPI.downloadInfrastructure(payload);
+  return clientAPI.downloadInfrastructure(payload, options);
 }

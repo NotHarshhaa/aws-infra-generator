@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import {
   WizardStep,
   ServiceConfig,
@@ -52,6 +53,7 @@ interface InfraStore {
   setIsGenerating: (val: boolean) => void;
   setGeneratedFiles: (files: GeneratedFile[]) => void;
   setValidationResult: (result: ValidationResult | null) => void;
+  invalidateGeneration: () => void;
 
   // Reset
   reset: () => void;
@@ -71,115 +73,172 @@ const initialState = {
   validationResult: null as ValidationResult | null,
 };
 
-export const useInfraStore = create<InfraStore>((set, get) => ({
-  ...initialState,
+const canNavigateToStep = (
+  step: WizardStep,
+  state: Pick<InfraStore, "selectedServices" | "generatedFiles">
+): boolean => {
+  if (step === "services") return true;
+  if (step === "configure") return state.selectedServices.length > 0;
+  if (step === "generate") return state.selectedServices.length > 0;
+  if (step === "export") return state.generatedFiles.length > 0;
+  return false;
+};
 
-  setStep: (step) => set({ currentStep: step }),
+export const useInfraStore = create<InfraStore>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
 
-  // Preset template functions
-  setSelectedTemplate: (template) => set({ selectedTemplate: template }),
-
-  applyPresetTemplate: (template) => {
-    // Extract service IDs from template
-    const serviceIds = template.services
-      .filter(service => service.enabled)
-      .map(service => service.serviceId);
-
-    // Build service config from template
-    const newServiceConfig: ServiceConfig = {};
-    template.services.forEach(service => {
-      if (service.enabled) {
-        newServiceConfig[service.serviceId] = {
-          enabled: true,
-          config: service.config
-        };
-      }
-    });
-
-    // Apply all template settings
-    set({
-      selectedTemplate: template,
-      selectedServices: serviceIds,
-      serviceConfig: newServiceConfig,
-      projectName: template.globalConfig.projectName,
-      environment: template.globalConfig.environment,
-      region: template.globalConfig.region,
-      outputFormat: template.globalConfig.outputFormat,
-    });
-  },
-
-  toggleService: (serviceId) => {
-    const { selectedServices } = get();
-    let updated: string[];
-
-    if (selectedServices.includes(serviceId)) {
-      // When removing, also check if any remaining service depends on this
-      updated = selectedServices.filter((id) => id !== serviceId);
-    } else {
-      // When adding, also add dependencies
-      const deps = getServiceDependencies(serviceId);
-      const toAdd = [serviceId, ...deps];
-      updated = [...new Set([...selectedServices, ...toAdd])];
-    }
-
-    set({ selectedServices: updated });
-  },
-
-  setSelectedServices: (services) => set({ selectedServices: services }),
-
-  clearAllServices: () => {
-    set({ 
-      selectedServices: [],
-      selectedTemplate: null, // Also clear the template when clearing all services
-      serviceConfig: {} // Clear service config as well
-    });
-  },
-
-  updateServiceConfig: (serviceId, key, value) => {
-    const { serviceConfig } = get();
-    set({
-      serviceConfig: {
-        ...serviceConfig,
-        [serviceId]: {
-          ...serviceConfig[serviceId],
-          enabled: true,
-          config: {
-            ...serviceConfig[serviceId]?.config,
-            [key]: value,
-          },
-        },
+      setStep: (step) => {
+        const state = get();
+        if (!canNavigateToStep(step, state)) return;
+        set({ currentStep: step });
       },
-    });
-  },
 
-  initServiceConfig: () => {
-    const { selectedServices, serviceConfig } = get();
-    const newConfig: ServiceConfig = { ...serviceConfig };
+      setSelectedTemplate: (template) => set({ selectedTemplate: template }),
 
-    for (const serviceId of selectedServices) {
-      if (!newConfig[serviceId]) {
-        const service = getServiceById(serviceId);
-        if (service) {
-          const defaults: { [key: string]: string | number | boolean } = {};
-          for (const field of service.configFields) {
-            defaults[field.name] = field.default;
+      applyPresetTemplate: (template) => {
+        const serviceIds = template.services
+          .filter((service) => service.enabled)
+          .map((service) => service.serviceId);
+
+        const newServiceConfig: ServiceConfig = {};
+        template.services.forEach((service) => {
+          if (service.enabled) {
+            newServiceConfig[service.serviceId] = {
+              enabled: true,
+              config: service.config,
+            };
           }
-          newConfig[serviceId] = { enabled: true, config: defaults };
+        });
+
+        set({
+          selectedTemplate: template,
+          selectedServices: serviceIds,
+          serviceConfig: newServiceConfig,
+          projectName: template.globalConfig.projectName,
+          environment: template.globalConfig.environment,
+          region: template.globalConfig.region,
+          outputFormat: template.globalConfig.outputFormat,
+          generatedFiles: [],
+          validationResult: null,
+        });
+      },
+
+      toggleService: (serviceId) => {
+        const { selectedServices, serviceConfig } = get();
+        let updated: string[];
+        let nextConfig = { ...serviceConfig };
+
+        if (selectedServices.includes(serviceId)) {
+          updated = selectedServices.filter((id) => id !== serviceId);
+          delete nextConfig[serviceId];
+        } else {
+          const deps = getServiceDependencies(serviceId);
+          updated = [...new Set([...selectedServices, serviceId, ...deps])];
         }
-      }
+
+        set({
+          selectedServices: updated,
+          serviceConfig: nextConfig,
+          generatedFiles: [],
+          validationResult: null,
+        });
+      },
+
+      setSelectedServices: (services) => {
+        const { serviceConfig } = get();
+        const nextConfig = Object.fromEntries(
+          Object.entries(serviceConfig).filter(([serviceId]) => services.includes(serviceId))
+        );
+
+        set({
+          selectedServices: services,
+          serviceConfig: nextConfig,
+          generatedFiles: [],
+          validationResult: null,
+        });
+      },
+
+      clearAllServices: () => {
+        set({
+          selectedServices: [],
+          selectedTemplate: null,
+          serviceConfig: {},
+          generatedFiles: [],
+          validationResult: null,
+        });
+      },
+
+      updateServiceConfig: (serviceId, key, value) => {
+        const { serviceConfig } = get();
+        set({
+          serviceConfig: {
+            ...serviceConfig,
+            [serviceId]: {
+              ...serviceConfig[serviceId],
+              enabled: true,
+              config: {
+                ...serviceConfig[serviceId]?.config,
+                [key]: value,
+              },
+            },
+          },
+          generatedFiles: [],
+          validationResult: null,
+        });
+      },
+
+      initServiceConfig: () => {
+        const { selectedServices, serviceConfig } = get();
+        const newConfig: ServiceConfig = { ...serviceConfig };
+
+        for (const serviceId of selectedServices) {
+          if (!newConfig[serviceId]) {
+            const service = getServiceById(serviceId);
+            if (service) {
+              const defaults: { [key: string]: string | number | boolean } = {};
+              for (const field of service.configFields) {
+                defaults[field.name] = field.default;
+              }
+              newConfig[serviceId] = { enabled: true, config: defaults };
+            }
+          }
+        }
+
+        set({ serviceConfig: newConfig });
+      },
+
+      setProjectName: (name) =>
+        set({ projectName: name, generatedFiles: [], validationResult: null }),
+      setEnvironment: (env) =>
+        set({ environment: env, generatedFiles: [], validationResult: null }),
+      setRegion: (region) =>
+        set({ region, generatedFiles: [], validationResult: null }),
+      setOutputFormat: (format) =>
+        set({ outputFormat: format, generatedFiles: [], validationResult: null }),
+
+      setIsGenerating: (val) => set({ isGenerating: val }),
+      setGeneratedFiles: (files) => set({ generatedFiles: files }),
+      setValidationResult: (result) => set({ validationResult: result }),
+      invalidateGeneration: () => set({ generatedFiles: [], validationResult: null }),
+
+      reset: () => set(initialState),
+    }),
+    {
+      name: "aws-infra-generator",
+      partialize: (state) => ({
+        currentStep: state.currentStep,
+        selectedTemplate: state.selectedTemplate,
+        selectedServices: state.selectedServices,
+        serviceConfig: state.serviceConfig,
+        projectName: state.projectName,
+        environment: state.environment,
+        region: state.region,
+        outputFormat: state.outputFormat,
+        generatedFiles: state.generatedFiles,
+        validationResult: state.validationResult,
+      }),
     }
-
-    set({ serviceConfig: newConfig });
-  },
-
-  setProjectName: (name) => set({ projectName: name }),
-  setEnvironment: (env) => set({ environment: env }),
-  setRegion: (region) => set({ region: region }),
-  setOutputFormat: (format) => set({ outputFormat: format }),
-
-  setIsGenerating: (val) => set({ isGenerating: val }),
-  setGeneratedFiles: (files) => set({ generatedFiles: files }),
-  setValidationResult: (result) => set({ validationResult: result }),
-
-  reset: () => set(initialState),
-}));
+  )
+);

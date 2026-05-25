@@ -26,7 +26,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useInfraStore } from "@/lib/store";
@@ -78,12 +77,11 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
 
   const [copiedFile, setCopiedFile] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [includeReadme, setIncludeReadme] = useState(true);
   const [includeGitignore, setIncludeGitignore] = useState(true);
   const [selectedDeployment, setSelectedDeployment] = useState("terraform");
   const [showLineNumbers, setShowLineNumbers] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   // Calculate export statistics
   const calculateExportStats = (): ExportStats => {
@@ -126,7 +124,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
       icon: Cloud,
       commands: [
         `cd ${projectName}`,
-        `aws cloudformation deploy --template-file template.yaml --stack-name ${projectName}-stack --capabilities CAPABILITY_IAM`
+        `aws cloudformation deploy --template-file template.json --stack-name ${projectName}-stack --capabilities CAPABILITY_IAM`,
       ],
       difficulty: "Intermediate",
       estimatedTime: stats.estimatedDeployTime
@@ -164,27 +162,31 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
   };
 
   const handleDownload = async () => {
+    if (generatedFiles.length === 0) {
+      setDownloadError("No generated files available. Go back and generate infrastructure first.");
+      return;
+    }
+
     setIsDownloading(true);
-    setDownloadProgress(0);
-    
-    // Simulate download progress
-    const progressInterval = setInterval(() => {
-      setDownloadProgress(prev => Math.min(prev + 10, 90));
-    }, 100);
+    setDownloadError(null);
 
     try {
-      const blob = await downloadInfrastructure({
-        services: selectedServices,
-        config: serviceConfig,
-        environment,
-        region,
-        format: outputFormat,
-        projectName,
-      });
+      const blob = await downloadInfrastructure(
+        {
+          services: selectedServices,
+          config: serviceConfig,
+          environment,
+          region,
+          format: outputFormat,
+          projectName,
+        },
+        {
+          files: generatedFiles,
+          includeReadme,
+          includeGitignore,
+        }
+      );
 
-      clearInterval(progressInterval);
-      setDownloadProgress(100);
-      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -193,28 +195,37 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
-      // Generate share URL (mock)
-      setShareUrl(`https://infra-share.example.com/${projectName}-${Date.now()}`);
     } catch (error) {
-      console.error('Download failed:', error);
+      setDownloadError(error instanceof Error ? error.message : "Download failed");
     } finally {
-      clearInterval(progressInterval);
       setIsDownloading(false);
-      setTimeout(() => setDownloadProgress(0), 1000);
     }
   };
 
-  const handleShare = async () => {
-    if (shareUrl) {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        setCopiedFile('share-url');
-        setTimeout(() => setCopiedFile(null), 2000);
-      } catch (err) {
-        console.error('Failed to copy share URL:', err);
-      }
+  const handleCopySummary = async () => {
+    const summary = [
+      `Project: ${projectName}`,
+      `Environment: ${environment}`,
+      `Region: ${region}`,
+      `Format: ${outputFormat}`,
+      `Services: ${selectedServices.join(", ")}`,
+      `Files: ${generatedFiles.map((file) => file.name).join(", ")}`,
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopiedFile("summary");
+      setTimeout(() => setCopiedFile(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy summary:", err);
     }
+  };
+
+  const openFilePreview = (content: string, fileName: string) => {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
   };
 
   const copyAllFiles = async () => {
@@ -233,20 +244,33 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
 
   const handleStartOver = () => {
     reset();
+    setStep("services");
   };
 
-  const deployCommands =
-    outputFormat === "terraform"
-      ? [
-          "cd " + projectName,
-          "terraform init",
-          "terraform plan",
-          "terraform apply",
-        ]
-      : [
-          "cd " + projectName,
-          `aws cloudformation deploy --template-file template.yaml --stack-name ${projectName}-stack --capabilities CAPABILITY_IAM`,
-        ];
+  if (generatedFiles.length === 0) {
+    return (
+      <div className={wizardStyles.shell}>
+        <WizardHeader
+          step="04"
+          title="Export Infrastructure"
+          description="Download your IaC package and deploy with confidence."
+          icon={Package}
+        />
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            No generated files found. Generate infrastructure first, then return here to export.
+          </AlertDescription>
+        </Alert>
+        <WizardActionBar>
+          <Button variant="outline" size="sm" onClick={() => setStep("generate")} className="h-8 text-xs">
+            <ArrowLeft className="mr-1 h-3 w-3" />
+            Back to Generate
+          </Button>
+        </WizardActionBar>
+      </div>
+    );
+  }
 
   return (
     <div className={wizardStyles.shell}>
@@ -316,12 +340,12 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                 size="sm"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+                className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm bg-orange-500 hover:bg-orange-600 text-white"
               >
                 {isDownloading ? (
                   <>
-                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2"></div>
-                    Downloading... {downloadProgress}%
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2" />
+                    Preparing ZIP...
                   </>
                 ) : (
                   <>
@@ -330,45 +354,62 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                   </>
                 )}
               </Button>
-              
-              {isDownloading && (
-                <Progress value={downloadProgress} className="w-full h-1 sm:h-2" />
+
+              {downloadError && (
+                <p className="text-xs text-red-500">{downloadError}</p>
               )}
-              
-              {shareUrl && (
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleShare}
-                        className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
-                      />
-                    }
-                  >
-                    {copiedFile === 'share-url' ? (
-                      <>
-                        <Check className="mr-1 h-3 w-3" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Share2 className="mr-1 h-3 w-3" />
-                        Share
-                      </>
-                    )}
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Copy share URL to clipboard</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
+
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopySummary}
+                      className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+                    />
+                  }
+                >
+                  {copiedFile === "summary" ? (
+                    <>
+                      <Check className="mr-1 h-3 w-3" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="mr-1 h-3 w-3" />
+                      Copy Summary
+                    </>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Copy project summary to clipboard</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
       </WizardPanel>
 
-      <WizardPanel title="Generated Files" description="Preview & copy" icon={FileCode2}>
+      <WizardPanel
+        title="Generated Files"
+        description="Preview & copy"
+        icon={FileCode2}
+        action={
+          <Button variant="outline" size="sm" onClick={copyAllFiles} className="h-7 text-xs">
+            {copiedFile === "all-files" ? (
+              <>
+                <Check className="mr-1 h-3 w-3" />
+                Copied all
+              </>
+            ) : (
+              <>
+                <Copy className="mr-1 h-3 w-3" />
+                Copy all
+              </>
+            )}
+          </Button>
+        }
+      >
           <Tabs
             defaultValue={generatedFiles[0]?.name || ""}
             className="w-full min-w-0 gap-3"
@@ -435,15 +476,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => {
-                                const blob = new Blob([file.content], { type: 'text/plain' });
-                                const url = window.URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = file.name;
-                                a.click();
-                                window.URL.revokeObjectURL(url);
-                              }}
+                              onClick={() => openFilePreview(file.content, file.name)}
                             />
                           }
                         >

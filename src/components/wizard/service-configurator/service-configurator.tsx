@@ -2,7 +2,7 @@
 
 import { Settings } from "lucide-react";
 import { useInfraStore } from "@/lib/store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CostEstimator } from "@/components/wizard/cost-estimator/cost-estimator";
 import { InfraDiagram } from "@/components/wizard/infra-diagram/infra-diagram";
 import { TerraformPlanPreview } from "@/components/wizard/terraform-plan-preview/terraform-plan-preview";
@@ -32,8 +32,6 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
     setStep,
   } = useInfraStore();
 
-  const [isGenerating, setIsGenerating] = useState(false);
-
   const {
     fieldErrors,
     validateField,
@@ -42,11 +40,11 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
     setProjectNameError,
     hasValidationErrors,
     setFieldErrors,
-  } = useConfigValidation(selectedServices, serviceConfig);
+  } = useConfigValidation(selectedServices, serviceConfig, projectName);
 
   useEffect(() => {
     initServiceConfig();
-  }, [initServiceConfig]);
+  }, [initServiceConfig, selectedServices]);
 
   const handleFieldChange = (
     serviceId: string,
@@ -71,19 +69,22 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
       setProjectNameError(
         "Project name can only contain letters, numbers, hyphens, and underscores"
       );
+    } else if (!name.trim()) {
+      setProjectNameError("Project name is required");
     } else {
       setProjectNameError(undefined);
     }
   };
 
-  const handleGenerate = () => {
+  const handleContinue = () => {
     if (!validateAllFields()) return;
-    setIsGenerating(true);
-    setTimeout(() => {
-      setIsGenerating(false);
-      setStep("generate");
-    }, 1000);
+    setStep("generate");
   };
+
+  const canContinue =
+    selectedServices.length > 0 &&
+    projectName.trim().length > 0 &&
+    !hasValidationErrors;
 
   return (
     <div className={wizardStyles.shell}>
@@ -128,10 +129,10 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
       />
 
       <ConfiguratorActions
-        isGenerating={isGenerating}
+        canContinue={canContinue}
         onBackToHome={onBackToHome}
         onBackToServices={() => setStep("services")}
-        onGenerate={handleGenerate}
+        onContinue={handleContinue}
       />
     </div>
   );

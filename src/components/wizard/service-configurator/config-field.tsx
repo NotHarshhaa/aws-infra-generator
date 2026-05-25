@@ -74,8 +74,11 @@ export function ConfigField({ field, value, error, onChange }: ConfigFieldProps)
         </Label>
         <Input
           type="number"
-          value={value as string}
-          onChange={(e) => onChange(e.target.value)}
+          value={value as string | number}
+          onChange={(e) => {
+            const raw = e.target.value;
+            onChange(raw === "" ? "" : Number(raw));
+          }}
           placeholder={field.default?.toString()}
           className={`h-8 sm:h-10 text-sm ${error ? "border-red-500" : ""}`}
         />

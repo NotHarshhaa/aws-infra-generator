@@ -18,6 +18,17 @@ export default function Home() {
     useInfraStore();
   const [showWizard, setShowWizard] = useState(false);
 
+  useEffect(() => {
+    const state = useInfraStore.getState();
+    if (
+      state.selectedServices.length > 0 ||
+      state.generatedFiles.length > 0 ||
+      state.currentStep !== "services"
+    ) {
+      setShowWizard(true);
+    }
+  }, []);
+
   const completedSteps = useMemo(() => {
     const steps: WizardStep[] = [];
     if (selectedServices.length > 0) steps.push("services");

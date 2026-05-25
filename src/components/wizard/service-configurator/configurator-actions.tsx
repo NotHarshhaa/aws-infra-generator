@@ -3,17 +3,17 @@ import { Button } from "@/components/ui/button";
 import { WizardActionBar } from "@/components/wizard/shared";
 
 interface ConfiguratorActionsProps {
-  isGenerating: boolean;
+  canContinue: boolean;
   onBackToHome: () => void;
   onBackToServices: () => void;
-  onGenerate: () => void;
+  onContinue: () => void;
 }
 
 export function ConfiguratorActions({
-  isGenerating,
+  canContinue,
   onBackToHome,
   onBackToServices,
-  onGenerate,
+  onContinue,
 }: ConfiguratorActionsProps) {
   return (
     <WizardActionBar>
@@ -28,22 +28,13 @@ export function ConfiguratorActions({
         </Button>
       </div>
       <Button
-        onClick={onGenerate}
+        onClick={onContinue}
         size="sm"
-        disabled={isGenerating}
-        className="h-8 w-full sm:w-auto sm:h-9 text-xs bg-orange-500 hover:bg-orange-600 text-white"
+        disabled={!canContinue}
+        className="h-8 w-full sm:w-auto sm:h-9 text-xs bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50"
       >
-        {isGenerating ? (
-          <>
-            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1.5" />
-            Generating...
-          </>
-        ) : (
-          <>
-            Generate
-            <ArrowRight className="ml-1.5 h-3 w-3" />
-          </>
-        )}
+        Continue to Generate
+        <ArrowRight className="ml-1.5 h-3 w-3" />
       </Button>
     </WizardActionBar>
   );

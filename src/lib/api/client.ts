@@ -48,8 +48,7 @@ export class ClientAPI {
       console.log(`Validating infrastructure for services: ${request.services}`);
       
       const resolvedServices = this.resolver.resolve(request.services);
-      const configDict = this._convertConfig(request.config);
-      const result = this.validator.validate(resolvedServices, configDict);
+      const result = this.validator.validate(resolvedServices, request.config);
 
       console.log(`Validation completed. Valid: ${result.valid}, Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`);
       return result;
@@ -66,9 +65,7 @@ export class ClientAPI {
       console.log(`Generating ${request.format} templates for project: ${request.projectName}, services: ${request.services}`);
       
       const resolvedServices = this.resolver.resolve(request.services);
-      const configDict = this._convertConfig(request.config);
-
-      const validation = this.validator.validate(resolvedServices, configDict);
+      const validation = this.validator.validate(resolvedServices, request.config);
 
       let generator: TerraformGenerator | CloudFormationGenerator;
       if (request.format === "terraform") {
@@ -79,7 +76,7 @@ export class ClientAPI {
 
       const files = generator.generate(
         resolvedServices,
-        configDict,
+        request.config,
         request.environment,
         request.region,
         request.projectName,
@@ -95,14 +92,30 @@ export class ClientAPI {
   }
 
   // Download infrastructure templates as ZIP file (client-side)
-  async downloadInfrastructure(request: GenerateRequest): Promise<Blob> {
+  async downloadInfrastructure(
+    request: GenerateRequest,
+    options?: {
+      files?: GeneratedFile[];
+      includeReadme?: boolean;
+      includeGitignore?: boolean;
+    }
+  ): Promise<Blob> {
     try {
       console.log(`Downloading ${request.format} templates for project: ${request.projectName}`);
-      
-      const { files } = await this.generateInfrastructure(request);
-      
-      // Create ZIP file in browser
-      const zipBlob = await this._createZipFile(files);
+
+      const files =
+        options?.files ??
+        (await this.generateInfrastructure(request)).files;
+
+      const zipBlob = await this._createZipFile(files, {
+        includeReadme: options?.includeReadme,
+        includeGitignore: options?.includeGitignore,
+        projectName: request.projectName,
+        environment: request.environment,
+        region: request.region,
+        outputFormat: request.format,
+        services: request.services,
+      });
       
       return zipBlob;
       
@@ -112,28 +125,38 @@ export class ClientAPI {
     }
   }
 
-  // Helper method to convert config format
-  private _convertConfig(config: Record<string, any>): Record<string, any> {
-    const result: Record<string, any> = {};
-    
-    for (const [key, value] of Object.entries(config)) {
-      if (typeof value === 'object' && value !== null) {
-        result[key] = (value as any).config || {};
-      } else {
-        result[key] = value;
-      }
-    }
-    
-    return result;
-  }
-
   // Create ZIP file in browser using JSZip
-  private async _createZipFile(files: GeneratedFile[]): Promise<Blob> {
-    // Dynamic import of JSZip to avoid SSR issues
+  private async _createZipFile(
+    files: GeneratedFile[],
+    extras?: {
+      includeReadme?: boolean;
+      includeGitignore?: boolean;
+      projectName: string;
+      environment: string;
+      region: string;
+      outputFormat: string;
+      services: string[];
+    }
+  ): Promise<Blob> {
     const JSZip = (await import('jszip')).default;
     const zip = new JSZip();
 
-    for (const file of files) {
+    let filesToZip = files;
+
+    if (extras) {
+      const { buildExportFileList } = await import('../export-utils');
+      filesToZip = buildExportFileList(files, {
+        includeReadme: extras.includeReadme ?? true,
+        includeGitignore: extras.includeGitignore ?? true,
+        projectName: extras.projectName,
+        environment: extras.environment,
+        region: extras.region,
+        outputFormat: extras.outputFormat as 'terraform' | 'cloudformation',
+        services: extras.services,
+      });
+    }
+
+    for (const file of filesToZip) {
       zip.file(file.path, file.content);
     }
 

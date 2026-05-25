@@ -198,36 +198,26 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
     setProgress(0);
     setGenerationSteps(initializeGenerationSteps());
 
-    const stepDuration = estimatedTime / 5; // Divide time among steps
-    
     try {
-      // Step 1: Validation
       updateStepStatus("validate", "running");
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
-      updateStepStatus("validate", "completed", stepDuration);
-      setProgress(20);
+      setProgress(10);
 
-      // Step 2: Template Generation
+      const validation = await validateInfrastructure({
+        services: selectedServices,
+        config: serviceConfig,
+      });
+      setValidationResult(validation);
+
+      if (!validation.valid) {
+        updateStepStatus("validate", "error");
+        setError("Fix validation errors before generating infrastructure.");
+        return;
+      }
+
+      updateStepStatus("validate", "completed");
+      setProgress(25);
+
       updateStepStatus("template", "running");
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
-      updateStepStatus("template", "completed", stepDuration);
-      setProgress(40);
-
-      // Step 3: Resource Processing
-      updateStepStatus("resources", "running");
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
-      updateStepStatus("resources", "completed", stepDuration);
-      setProgress(60);
-
-      // Step 4: Optimization
-      updateStepStatus("optimize", "running");
-      await new Promise(resolve => setTimeout(resolve, stepDuration));
-      updateStepStatus("optimize", "completed", stepDuration);
-      setProgress(80);
-
-      // Step 5: Finalization
-      updateStepStatus("finalize", "running");
-      
       const result = await generateInfrastructure({
         services: selectedServices,
         config: serviceConfig,
@@ -237,14 +227,17 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
         projectName,
       });
 
-      updateStepStatus("finalize", "completed", stepDuration);
+      updateStepStatus("template", "completed");
+      updateStepStatus("resources", "completed");
+      updateStepStatus("optimize", "completed");
+      updateStepStatus("finalize", "completed");
       setProgress(100);
+
       setGeneratedFiles(result.files);
       setValidationResult(result.validation);
 
-      // Calculate file stats
       const stats: Record<string, FileStats> = {};
-      result.files.forEach(file => {
+      result.files.forEach((file) => {
         stats[file.name] = calculateFileStats(file.content);
       });
       setFileStats(stats);
@@ -253,14 +246,12 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
         setActiveFileTab(result.files[0].name);
       }
     } catch (err) {
-      // Mark current step as error
-      const currentStep = generationSteps.find(step => step.status === "running");
-      if (currentStep) {
-        updateStepStatus(currentStep.id, "error");
-      }
-      setError(
-        err instanceof Error ? err.message : "Generation failed"
+      setGenerationSteps((prev) =>
+        prev.map((step) =>
+          step.status === "running" ? { ...step, status: "error" as const } : step
+        )
       );
+      setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
       setIsGenerating(false);
     }
@@ -549,7 +540,7 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
           <Button
             size="sm"
             onClick={handleGenerate}
-            disabled={isGenerating || isValidating}
+            disabled={isGenerating || isValidating || selectedServices.length === 0}
             className="h-8 flex-1 sm:h-9 text-xs bg-orange-500 hover:bg-orange-600 text-white"
           >
             {isGenerating ? (
@@ -559,7 +550,7 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
             )}
             Generate
           </Button>
-          {generatedFiles.length > 0 && (
+          {generatedFiles.length > 0 && validationResult?.valid !== false && (
             <Button
               size="sm"
               onClick={() => setStep("export")}
