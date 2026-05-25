@@ -411,11 +411,10 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         serviceId: "cloudfront",
         enabled: true,
         config: {
-          distribution_name: "website-cdn",
-          origin_domain: "static-website-hosting.s3.amazonaws.com",
           price_class: "PriceClass_100",
-          enable_logging: true,
           default_ttl: 86400,
+          enable_compress: true,
+          enable_https_only: true,
         },
       },
       {
@@ -423,9 +422,9 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         enabled: true,
         config: {
           domain_name: "example.com",
-          record_type: "A",
-          ttl: 300,
-          geo_routing: false,
+          create_hosted_zone: true,
+          create_records: true,
+          subdomain: "www",
         },
       },
     ],

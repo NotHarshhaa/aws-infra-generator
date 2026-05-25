@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateEcs(cfg: Record<string, any>, environment: string, projectName: string): GeneratedFile {
   const launchType = cfg.launch_type || "FARGATE";
@@ -68,7 +69,7 @@ resource "aws_ecs_service" "main" {
   launch_type     = "${launchType}"
 
   network_configuration {
-    subnets          = aws_subnet.private[*].id
+    subnets          = ${terraformLocalSubnetIds("private")}
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = false
   }

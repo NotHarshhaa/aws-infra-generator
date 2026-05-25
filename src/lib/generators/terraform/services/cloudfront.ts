@@ -17,7 +17,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   # S3 Origin
   origin {
-    domain_name = aws_s3_bucket.app.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.main.bucket_regional_domain_name
     origin_id = "S3-${'${var.project_name}-${var.environment}'}"
 
     s3_origin_config {
@@ -73,7 +73,7 @@ resource "aws_cloudfront_origin_access_identity" "main" {
 
 # S3 Bucket Policy for CloudFront access
 resource "aws_s3_bucket_policy" "cloudfront" {
-  bucket = aws_s3_bucket.app.id
+  bucket = aws_s3_bucket.main.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_policy" "cloudfront" {
           Service = "cloudfront.amazonaws.com"
         }
         Action = "s3:GetObject"
-        Resource = "${'${aws_s3_bucket.app.arn}/*'}"
+        Resource = "${'${aws_s3_bucket.main.arn}/*'}"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = aws_cloudfront_distribution.main.arn

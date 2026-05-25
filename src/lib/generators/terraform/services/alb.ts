@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateAlb(cfg: Record<string, any>, environment: string, projectName: string): GeneratedFile {
   const internal = cfg.internal === true;
@@ -35,7 +36,7 @@ resource "aws_lb" "main" {
   internal           = ${internal}
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = [aws_subnet.public_0.id, aws_subnet.public_1.id]
+  subnets            = ${terraformLocalSubnetIds("public")}
 
   tags = {
     Name = "${'${var.project_name}-${var.environment}-alb'}"

@@ -1,9 +1,9 @@
-import { GeneratedFile, ValidationResult } from "./types";
+import { GeneratedFile, ValidationResult, ServiceConfig } from "./types";
 import { clientAPI } from "./api/client";
 
 export async function generateInfrastructure(payload: {
   services: string[];
-  config: Record<string, { enabled: boolean; config: Record<string, unknown> }>;
+  config: ServiceConfig;
   environment: string;
   region: string;
   format: string;
@@ -14,14 +14,16 @@ export async function generateInfrastructure(payload: {
 
 export async function validateInfrastructure(payload: {
   services: string[];
-  config: Record<string, { enabled: boolean; config: Record<string, unknown> }>;
+  config: ServiceConfig;
+  environment?: string;
+  projectName?: string;
 }): Promise<ValidationResult> {
   return clientAPI.validateInfrastructure(payload);
 }
 
 export async function downloadInfrastructure(payload: {
   services: string[];
-  config: Record<string, { enabled: boolean; config: Record<string, unknown> }>;
+  config: ServiceConfig;
   environment: string;
   region: string;
   format: string;

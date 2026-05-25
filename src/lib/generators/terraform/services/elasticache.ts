@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateElastiCache(
   cfg: Record<string, any>,
@@ -20,7 +21,7 @@ export function generateElastiCache(
   let content = `# ElastiCache Subnet Group
 resource "aws_elasticache_subnet_group" "main" {
   name       = "${'${var.project_name}-${var.environment}-cache-subnet-group'}"
-  subnet_ids = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+  subnet_ids = ${terraformLocalSubnetIds("private")}
 
   tags = {
     Name = "${'${var.project_name}-${var.environment}-cache-subnet-group'}"

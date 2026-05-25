@@ -1,37 +1,16 @@
-export interface ServiceConfig {
-  enabled: boolean;
-  config: Record<string, any>;
-}
-
-export interface GeneratedFile {
-  name: string;
-  path: string;
-  content: string;
-  language: string;
-}
+export type {
+  GeneratedFile,
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ServiceConfig,
+} from "../../types";
 
 export interface GenerateRequest {
   services: string[];
-  config: Record<string, ServiceConfig>;
+  config: import("../../types").ServiceConfig;
   environment: string;
   region: string;
   format: string;
   projectName: string;
-}
-
-export interface ValidationResult {
-  valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
-}
-
-export interface ValidationError {
-  service: string;
-  message: string;
-  type: "dependency" | "config" | "conflict";
-}
-
-export interface ValidationWarning {
-  service: string;
-  message: string;
 }

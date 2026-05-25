@@ -13,6 +13,7 @@ import { ServiceConfigAccordion } from "./service-config-accordion";
 import { ConfiguratorActions } from "./configurator-actions";
 import { ConfiguratorTabs } from "./configurator-tabs";
 import { useConfigValidation } from "./use-config-validation";
+import { validateProjectName, normalizeProjectName } from "@/lib/validation/project-name";
 import type { ServiceConfiguratorProps } from "./types";
 
 export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) {
@@ -64,16 +65,10 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
   };
 
   const handleProjectNameChange = (name: string) => {
-    setProjectName(name);
-    if (name.length > 0 && !/^[a-zA-Z0-9-_]+$/.test(name)) {
-      setProjectNameError(
-        "Project name can only contain letters, numbers, hyphens, and underscores"
-      );
-    } else if (!name.trim()) {
-      setProjectNameError("Project name is required");
-    } else {
-      setProjectNameError(undefined);
-    }
+    const normalized = normalizeProjectName(name);
+    setProjectName(normalized);
+    const error = validateProjectName(normalized);
+    setProjectNameError(error ?? undefined);
   };
 
   const handleContinue = () => {

@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateRds(cfg: Record<string, any>, environment: string, projectName: string): GeneratedFile {
   const engine = cfg.engine || "postgres";
@@ -11,7 +12,7 @@ export function generateRds(cfg: Record<string, any>, environment: string, proje
 
   const content = `resource "aws_db_subnet_group" "main" {
   name       = "${'${var.project_name}-${var.environment}-db-subnet'}"
-  subnet_ids = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+  subnet_ids = ${terraformLocalSubnetIds("private")}
 
   tags = {
     Name = "${'${var.project_name}-${var.environment}-db-subnet'}"

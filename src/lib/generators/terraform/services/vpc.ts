@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformSubnetIdList } from '../../../terraform-helpers';
 
 export function generateVpc(cfg: Record<string, any>, environment: string, projectName: string): GeneratedFile {
   const cidr = cfg.cidr_block || "10.0.0.0/16";
@@ -238,19 +239,13 @@ export function generateVpc(cfg: Record<string, any>, environment: string, proje
     }
   }
 
-  // Add locals for common tags
-  lines.unshift(
-    `# Locals for common tags and naming`,
+  lines.push(
+    ``,
+    `# Subnet ID lists referenced by compute and database services`,
     `locals {`,
-    `  common_tags = {`,
-    `    Project     = var.project_name`,
-    `    Environment = var.environment`,
-    `    ManagedBy   = "terraform"`,
-    `    CostCenter  = var.cost_center`,
-    `    Owner       = var.owner_email`,
-    `  }`,
-    `}`,
-    ``
+    `  public_subnet_ids  = ${terraformSubnetIdList("public", publicCount)}`,
+    `  private_subnet_ids = ${terraformSubnetIdList("private", privateCount)}`,
+    `}`
   );
 
   const content = lines.join('\n') + '\n';

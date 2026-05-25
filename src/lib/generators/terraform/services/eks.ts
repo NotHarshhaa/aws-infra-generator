@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateEks(cfg: Record<string, any>, environment: string, projectName: string): GeneratedFile {
   const kubernetesVersion = cfg.kubernetes_version || "1.29";
@@ -14,7 +15,7 @@ resource "aws_eks_cluster" "main" {
   version  = "${kubernetesVersion}"
 
   vpc_config {
-    subnet_ids = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)
+    subnet_ids = concat(${terraformLocalSubnetIds("public")}, ${terraformLocalSubnetIds("private")})
     endpoint_public_access = true
     endpoint_private_access = true
   }
@@ -33,7 +34,7 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${'${var.project_name}-${var.environment}-nodes'}"
   node_role_arn   = aws_iam_role.eks_node.arn
-  subnet_ids      = aws_subnet.private[*].id
+  subnet_ids      = ${terraformLocalSubnetIds("private")}
 
   scaling_config {
     desired_size = ${nodeDesiredSize}

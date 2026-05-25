@@ -43,18 +43,21 @@ export class ClientAPI {
   }
 
   // Validate infrastructure configuration
-  async validateInfrastructure(request: { services: string[], config: Record<string, any> }): Promise<ValidationResult> {
+  async validateInfrastructure(request: {
+    services: string[];
+    config: Record<string, any>;
+    environment?: string;
+    projectName?: string;
+  }): Promise<ValidationResult> {
     try {
-      console.log(`Validating infrastructure for services: ${request.services}`);
-      
       const resolvedServices = this.resolver.resolve(request.services);
-      const result = this.validator.validate(resolvedServices, request.config);
+      const result = this.validator.validate(resolvedServices, request.config, {
+        environment: request.environment as import("../types").Environment | undefined,
+        projectName: request.projectName,
+      });
 
-      console.log(`Validation completed. Valid: ${result.valid}, Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`);
       return result;
-      
     } catch (error: any) {
-      console.error(`Validation failed: ${error.message}`);
       throw new Error(`Validation failed: ${error.message}`);
     }
   }
@@ -65,7 +68,10 @@ export class ClientAPI {
       console.log(`Generating ${request.format} templates for project: ${request.projectName}, services: ${request.services}`);
       
       const resolvedServices = this.resolver.resolve(request.services);
-      const validation = this.validator.validate(resolvedServices, request.config);
+      const validation = this.validator.validate(resolvedServices, request.config, {
+        environment: request.environment as import("../types").Environment,
+        projectName: request.projectName,
+      });
 
       let generator: TerraformGenerator | CloudFormationGenerator;
       if (request.format === "terraform") {

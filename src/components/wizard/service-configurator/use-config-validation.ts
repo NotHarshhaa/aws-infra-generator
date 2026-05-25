@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { getServiceById } from "@/lib/aws-services";
+import { validateProjectName } from "@/lib/validation/project-name";
 import type { FieldError } from "./types";
 
 export function useConfigValidation(
@@ -55,11 +56,12 @@ export function useConfigValidation(
     if (!projectName.trim()) {
       errors.project = { projectName: "Project name is required" };
       hasErrors = true;
-    } else if (!/^[a-zA-Z0-9-_]+$/.test(projectName)) {
-      errors.project = {
-        projectName: "Project name can only contain letters, numbers, hyphens, and underscores",
-      };
-      hasErrors = true;
+    } else {
+      const projectNameError = validateProjectName(projectName);
+      if (projectNameError) {
+        errors.project = { projectName: projectNameError };
+        hasErrors = true;
+      }
     }
 
     selectedServices.forEach((serviceId) => {

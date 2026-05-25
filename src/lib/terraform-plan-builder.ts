@@ -1,7 +1,7 @@
 import { TerraformGenerator } from "./generators/terraform";
 import { DependencyResolver } from "./services/dependency";
 import type { GeneratedFile, ServiceConfig } from "./types";
-import type { TerraformPlanSummary } from "./terraform-plan-simulator";
+import type { TerraformPlanSummary } from "./terraform-plan-types";
 import { buildPlanSummaryFromTerraformFiles } from "./terraform-plan-parser";
 
 interface BuildTerraformPlanPreviewInput {

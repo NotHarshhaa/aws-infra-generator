@@ -96,7 +96,11 @@ export class TerraformGenerator {
       const svcConfig = config[svc]?.config || {};
       const generator = serviceGenerators[svc];
       if (generator) {
-        files.push(generator(svcConfig, environment, projectName));
+        if (svc === "route53") {
+          files.push(generateRoute53(svcConfig, environment, projectName, services));
+        } else {
+          files.push(generator(svcConfig, environment, projectName));
+        }
       }
     }
 

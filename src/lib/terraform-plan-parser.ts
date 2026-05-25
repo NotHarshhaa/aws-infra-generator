@@ -2,7 +2,7 @@ import type { GeneratedFile } from "./types";
 import type {
   TerraformPlanAction,
   TerraformPlanSummary,
-} from "./terraform-plan-simulator";
+} from "./terraform-plan-types";
 
 interface ParsedResource {
   type: string;

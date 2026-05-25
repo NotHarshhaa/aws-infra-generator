@@ -13,7 +13,17 @@ export function generateProvider(region: string, projectName: string, environmen
     path = "terraform.tfstate"
   }`;
 
-  const content = `terraform {
+  const content = `locals {
+  common_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "terraform"
+    CostCenter  = var.cost_center
+    Owner       = var.owner_email
+  }
+}
+
+terraform {
   required_version = ">= 1.5"
 
   required_providers {

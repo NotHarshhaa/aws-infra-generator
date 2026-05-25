@@ -1,4 +1,5 @@
 import { AWS_SERVICES } from "./aws-services";
+import { stableJsonStringify } from "./stable-json";
 
 export function getDirectDependencies(serviceId: string): string[] {
   const service = AWS_SERVICES.find((s) => s.id === serviceId);
@@ -57,10 +58,10 @@ export type ConfigSnapshotInput = {
 };
 
 export function computeConfigSnapshot(input: ConfigSnapshotInput): string {
-  return JSON.stringify({
+  return stableJsonStringify({
     selectedServices: [...input.selectedServices].sort(),
     serviceConfig: input.serviceConfig,
-    projectName: input.projectName,
+    projectName: input.projectName.trim().toLowerCase(),
     environment: input.environment,
     region: input.region,
     outputFormat: input.outputFormat,

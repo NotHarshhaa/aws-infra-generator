@@ -1,4 +1,5 @@
 import { GeneratedFile } from '../types';
+import { terraformLocalSubnetIds } from '../../../terraform-helpers';
 
 export function generateLambda(
   cfg: Record<string, any>,
@@ -32,7 +33,7 @@ resource "aws_lambda_function" "main" {
   
   ${enableVpc ? `
   vpc_config {
-    subnet_ids         = [aws_subnet.private_0.id, aws_subnet.private_1.id]
+    subnet_ids         = ${terraformLocalSubnetIds("private")}
     security_group_ids = [aws_security_group.lambda.id]
   }` : ''}
   

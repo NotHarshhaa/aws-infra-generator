@@ -19,7 +19,7 @@ export function buildCloudFront(cfg: Record<string, any>, environment: string, p
           Origins: [
             {
               Id: "S3Origin",
-              DomainName: { "Fn::GetAtt": ["AppBucket", "RegionalDomainName"] },
+              DomainName: { "Fn::GetAtt": ["S3Bucket", "RegionalDomainName"] },
               S3OriginConfig: {
                 OriginAccessIdentity: {
                   "Fn::Sub": "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"

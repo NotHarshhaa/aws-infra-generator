@@ -183,6 +183,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
       const result = await validateInfrastructure({
         services: selectedServices,
         config: serviceConfig,
+        environment,
+        projectName,
       });
       setValidationResult(result);
     } catch (err) {
@@ -207,6 +209,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
       const validation = await validateInfrastructure({
         services: selectedServices,
         config: serviceConfig,
+        environment,
+        projectName,
       });
       setValidationResult(validation);
 

@@ -8,9 +8,12 @@ import {
   GeneratedFile,
   ValidationResult,
 } from "./types";
-import { getServiceById } from "./aws-services";
-import { getServiceDependencies, computeConfigSnapshot } from "./service-dependencies";
 import { PresetTemplate } from "./preset-templates";
+import { computeConfigSnapshot } from "./service-dependencies";
+import {
+  ensureServiceConfigs,
+  resolveServicesWithDependencies,
+} from "./service-config-utils";
 
 interface InfraStore {
   currentStep: WizardStep;
@@ -123,24 +126,19 @@ export const useInfraStore = create<InfraStore>()(
       setSelectedTemplate: (template) => set({ selectedTemplate: template }),
 
       applyPresetTemplate: (template) => {
-        const serviceIds = template.services
-          .filter((service) => service.enabled)
-          .map((service) => service.serviceId);
-
-        const newServiceConfig: ServiceConfig = {};
-        template.services.forEach((service) => {
-          if (service.enabled) {
-            newServiceConfig[service.serviceId] = {
-              enabled: true,
-              config: service.config,
-            };
-          }
-        });
+        const enabledServices = template.services.filter((service) => service.enabled);
+        const presetConfigs = Object.fromEntries(
+          enabledServices.map((service) => [service.serviceId, service.config])
+        );
+        const resolvedServices = resolveServicesWithDependencies(
+          enabledServices.map((service) => service.serviceId)
+        );
+        const serviceConfig = ensureServiceConfigs(resolvedServices, {}, presetConfigs);
 
         set({
           selectedTemplate: template,
-          selectedServices: serviceIds,
-          serviceConfig: newServiceConfig,
+          selectedServices: resolvedServices,
+          serviceConfig,
           projectName: template.globalConfig.projectName,
           environment: template.globalConfig.environment,
           region: template.globalConfig.region,
@@ -161,8 +159,11 @@ export const useInfraStore = create<InfraStore>()(
           updated = state.selectedServices.filter((id) => id !== serviceId);
           delete nextConfig[serviceId];
         } else {
-          const deps = getServiceDependencies(serviceId);
-          updated = [...new Set([...state.selectedServices, serviceId, ...deps])];
+          updated = resolveServicesWithDependencies([
+            ...state.selectedServices,
+            serviceId,
+          ]);
+          nextConfig = ensureServiceConfigs(updated, nextConfig);
         }
 
         const nextState = {
@@ -180,20 +181,22 @@ export const useInfraStore = create<InfraStore>()(
 
       setSelectedServices: (services) => {
         const state = get();
-        const nextConfig = Object.fromEntries(
+        const resolved = resolveServicesWithDependencies(services);
+        const prunedConfig = Object.fromEntries(
           Object.entries(state.serviceConfig).filter(([serviceId]) =>
-            services.includes(serviceId)
+            resolved.includes(serviceId)
           )
-        );
+        ) as ServiceConfig;
+        const nextConfig = ensureServiceConfigs(resolved, prunedConfig);
 
         const nextState = {
           ...state,
-          selectedServices: services,
+          selectedServices: resolved,
           serviceConfig: nextConfig,
         };
 
         set({
-          selectedServices: services,
+          selectedServices: resolved,
           serviceConfig: nextConfig,
           ...markGenerationStale(nextState),
         });
@@ -236,21 +239,7 @@ export const useInfraStore = create<InfraStore>()(
 
       initServiceConfig: () => {
         const { selectedServices, serviceConfig } = get();
-        const newConfig: ServiceConfig = { ...serviceConfig };
-
-        for (const serviceId of selectedServices) {
-          if (!newConfig[serviceId]) {
-            const service = getServiceById(serviceId);
-            if (service) {
-              const defaults: { [key: string]: string | number | boolean } = {};
-              for (const field of service.configFields) {
-                defaults[field.name] = field.default;
-              }
-              newConfig[serviceId] = { enabled: true, config: defaults };
-            }
-          }
-        }
-
+        const newConfig = ensureServiceConfigs(selectedServices, serviceConfig);
         set({ serviceConfig: newConfig });
       },
 
@@ -306,11 +295,16 @@ export const useInfraStore = create<InfraStore>()(
         environment: state.environment,
         region: state.region,
         outputFormat: state.outputFormat,
-        generatedFiles: state.generatedFiles,
-        validationResult: state.validationResult,
         configSnapshot: state.configSnapshot,
-        isGenerationStale: state.isGenerationStale,
+        isGenerationStale:
+          state.isGenerationStale || state.generatedFiles.length > 0,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.generatedFiles = [];
+        state.validationResult = null;
+        state.isGenerating = false;
+      },
     }
   )
 );
