@@ -27,12 +27,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useInfraStore } from "@/lib/store";
-import { buildTerraformPlanPreview } from "@/lib/terraform-plan-builder";
-import type {
-  TerraformPlanSummary,
-  TerraformPlanAction,
-} from "@/lib/terraform-plan-simulator";
+import {
+  useInfraStore,
+  buildTerraformPlanPreview,
+  type TerraformPlanSummary,
+  type TerraformPlanAction,
+} from "@/lib";
 
 export function TerraformPlanPreview() {
   const {

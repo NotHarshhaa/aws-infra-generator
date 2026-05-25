@@ -22,8 +22,12 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useInfraStore } from "@/lib/store";
-import { estimateInfrastructureCost, TotalCostEstimate, CostEstimate } from "@/lib/cost-estimator";
+import {
+  useInfraStore,
+  estimateInfrastructureCost,
+  type TotalCostEstimate,
+  type CostEstimate,
+} from "@/lib";
 
 export function CostEstimator() {
   const { selectedServices, serviceConfig, region, environment } = useInfraStore();

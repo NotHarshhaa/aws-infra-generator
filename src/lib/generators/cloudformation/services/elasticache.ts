@@ -1,9 +1,14 @@
 import { GeneratedFile } from '../types';
+import {
+  cfPrivateSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
 export function generateElastiCache(
   cfg: Record<string, any>,
   environment: string,
-  projectName: string
+  projectName: string,
+  context?: CloudFormationBuildContext
 ): GeneratedFile {
   const engine = cfg.engine || "redis";
   const nodeType = cfg.node_type || "cache.t3.micro";
@@ -60,10 +65,7 @@ export function generateElastiCache(
     Properties: {
       CacheSubnetGroupName: `${projectName}-${environment}-cache-subnet-group`,
       Description: "Subnet group for ElastiCache cluster",
-      SubnetIds: [
-        { Ref: "PrivateSubnet0" },
-        { Ref: "PrivateSubnet1" },
-      ],
+      SubnetIds: cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
       Tags: [
         {
           Key: "Name",

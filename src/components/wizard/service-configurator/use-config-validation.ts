@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-import { getServiceById } from "@/lib/aws-services";
-import { validateProjectName } from "@/lib/validation/project-name";
+import { getServiceById, validateProjectName } from "@/lib";
 import type { FieldError } from "./types";
 
 export function useConfigValidation(

@@ -1,4 +1,8 @@
 import { ServiceBuilderResult } from '../types';
+import {
+  cfPublicSubnetIdsJoin,
+  cfPrivateSubnetIdsJoin,
+} from '../../../cloudformation-helpers';
 
 export function buildVpc(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
   const resources: any = {};
@@ -404,6 +408,20 @@ export function buildVpc(cfg: Record<string, any>, environment: string, projectN
     Description: "VPC CIDR block",
     Value: { "Fn::GetAtt": ["VPC", "CidrBlock"] },
   };
+
+  if (publicCount > 0) {
+    outputs.PublicSubnetIds = {
+      Description: "Comma-separated public subnet IDs",
+      Value: cfPublicSubnetIdsJoin(publicCount),
+    };
+  }
+
+  if (privateCount > 0) {
+    outputs.PrivateSubnetIds = {
+      Description: "Comma-separated private subnet IDs",
+      Value: cfPrivateSubnetIdsJoin(privateCount),
+    };
+  }
 
   if (enableNat) {
     outputs.NatGatewayId = {

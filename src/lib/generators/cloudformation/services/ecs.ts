@@ -1,6 +1,16 @@
-import { CloudFormationTemplate, ServiceBuilderResult } from '../types';
+import { ServiceBuilderResult } from '../types';
+import {
+  cfPrivateSubnetRefs,
+  cfPublicSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
-export function buildEcs(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
+export function buildEcs(
+  cfg: Record<string, any>,
+  environment: string,
+  projectName: string,
+  context?: CloudFormationBuildContext
+): ServiceBuilderResult {
   const launchType = cfg.launch_type || "FARGATE";
   const taskCpu = cfg.task_cpu || "256";
   const taskMemory = cfg.task_memory || "512";
@@ -71,7 +81,7 @@ export function buildEcs(cfg: Record<string, any>, environment: string, projectN
         LaunchType: launchType,
         NetworkConfiguration: {
           AwsvpcConfiguration: {
-            Subnets: { "Fn::Split": [",", { "Ref": "PrivateSubnetIds" }] },
+            Subnets: cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
             SecurityGroups: [{ "Ref": "ECSSecurityGroup" }],
             AssignPublicIp: "DISABLED"
           }

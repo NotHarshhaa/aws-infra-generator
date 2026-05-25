@@ -29,10 +29,13 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useInfraStore } from "@/lib/store";
-import { generateInfrastructure, validateInfrastructure } from "@/lib/api";
-import { getServiceById } from "@/lib/aws-services";
-import { cn } from "@/lib/utils";
+import {
+  useInfraStore,
+  generateInfrastructure,
+  validateInfrastructure,
+  getServiceById,
+  cn,
+} from "@/lib";
 import {
   wizardStyles,
   WizardHeader,

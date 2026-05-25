@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AWS_REGIONS } from "@/lib/aws-services";
+import { AWS_REGIONS } from "@/lib";
 import { WizardPanel } from "@/components/wizard/shared";
 
 interface ProjectSettingsCardProps {

@@ -2,9 +2,12 @@
 
 import { useState, useMemo } from "react";
 import { Layers } from "lucide-react";
-import { AWS_SERVICES, SERVICE_CATEGORIES } from "@/lib/aws-services";
-import { useInfraStore } from "@/lib/store";
-import { PresetTemplate } from "@/lib/preset-templates";
+import {
+  AWS_SERVICES,
+  SERVICE_CATEGORIES,
+  useInfraStore,
+  type PresetTemplate,
+} from "@/lib";
 import { wizardStyles, WizardHeader } from "@/components/wizard/shared";
 import { QuickStartTemplates } from "./quick-start-templates";
 import { SelectionModeToggle } from "./selection-mode-toggle";

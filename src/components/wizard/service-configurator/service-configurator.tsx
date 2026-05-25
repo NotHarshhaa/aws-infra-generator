@@ -1,8 +1,12 @@
 "use client";
 
 import { Settings } from "lucide-react";
-import { useInfraStore } from "@/lib/store";
 import { useEffect } from "react";
+import {
+  useInfraStore,
+  validateProjectName,
+  normalizeProjectName,
+} from "@/lib";
 import { CostEstimator } from "@/components/wizard/cost-estimator/cost-estimator";
 import { InfraDiagram } from "@/components/wizard/infra-diagram/infra-diagram";
 import { TerraformPlanPreview } from "@/components/wizard/terraform-plan-preview/terraform-plan-preview";
@@ -13,7 +17,6 @@ import { ServiceConfigAccordion } from "./service-config-accordion";
 import { ConfiguratorActions } from "./configurator-actions";
 import { ConfiguratorTabs } from "./configurator-tabs";
 import { useConfigValidation } from "./use-config-validation";
-import { validateProjectName, normalizeProjectName } from "@/lib/validation/project-name";
 import type { ServiceConfiguratorProps } from "./types";
 
 export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) {

@@ -1,6 +1,15 @@
 import { ServiceBuilderResult } from '../types';
+import {
+  cfPublicSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
-export function buildEc2(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
+export function buildEc2(
+  cfg: Record<string, any>,
+  environment: string,
+  projectName: string,
+  context?: CloudFormationBuildContext
+): ServiceBuilderResult {
   const resources: any = {};
   const outputs: any = {};
 
@@ -180,7 +189,9 @@ export function buildEc2(cfg: Record<string, any>, environment: string, projectN
           { Ref: "AmiId" },
         ],
       },
-      SubnetId: { Ref: "PublicSubnet0" },
+      SubnetId: cfPublicSubnetRefs(context?.publicSubnetCount ?? 2)[0] ?? {
+        Ref: "PublicSubnet0",
+      },
       SecurityGroupIds: [{ Ref: "EC2SecurityGroup" }],
       IamInstanceProfile: { Ref: "EC2InstanceProfile" },
       AssociatePublicIpAddress: publicIp,

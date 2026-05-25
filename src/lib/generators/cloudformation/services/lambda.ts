@@ -1,9 +1,14 @@
 import { GeneratedFile } from '../types';
+import {
+  cfPrivateSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
 export function generateLambda(
   cfg: Record<string, any>,
   environment: string,
-  projectName: string
+  projectName: string,
+  context?: CloudFormationBuildContext
 ): GeneratedFile {
   const functionName = cfg.function_name || `${projectName}-${environment}-lambda`;
   const runtime = cfg.runtime || "python3.11";
@@ -122,10 +127,7 @@ export function generateLambda(
   // VPC Configuration
   if (enableVpc) {
     functionProperties.VpcConfig = {
-      SubnetIds: [
-        { Ref: "PrivateSubnet0" },
-        { Ref: "PrivateSubnet1" },
-      ],
+      SubnetIds: cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
       SecurityGroupIds: [{ Ref: "LambdaSecurityGroup" }],
     };
   }

@@ -61,10 +61,10 @@ export function buildCloudFront(cfg: Record<string, any>, environment: string, p
         }
       }
     },
-    AppBucketPolicy: {
+    S3BucketPolicy: {
       Type: "AWS::S3::BucketPolicy",
       Properties: {
-        Bucket: { "Ref": "AppBucket" },
+        Bucket: { "Ref": "S3Bucket" },
         PolicyDocument: {
           Version: "2012-10-17",
           Statement: [
@@ -79,7 +79,7 @@ export function buildCloudFront(cfg: Record<string, any>, environment: string, p
                 "Fn::Join": [
                   "",
                   [
-                    { "Fn::GetAtt": ["AppBucket", "Arn"] },
+                    { "Fn::GetAtt": ["S3Bucket", "Arn"] },
                     "/*"
                   ]
                 ]

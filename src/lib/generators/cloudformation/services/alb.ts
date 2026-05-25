@@ -1,6 +1,15 @@
 import { ServiceBuilderResult } from '../types';
+import {
+  cfPublicSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
-export function buildAlb(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
+export function buildAlb(
+  cfg: Record<string, any>,
+  environment: string,
+  projectName: string,
+  context?: CloudFormationBuildContext
+): ServiceBuilderResult {
   const resources: any = {};
   const outputs: any = {};
 
@@ -40,10 +49,7 @@ export function buildAlb(cfg: Record<string, any>, environment: string, projectN
       Scheme: internal ? "internal" : "internet-facing",
       Type: "application",
       SecurityGroups: [{ Ref: "ALBSecurityGroup" }],
-      Subnets: [
-        { Ref: "PublicSubnet0" },
-        { Ref: "PublicSubnet1" },
-      ],
+      Subnets: cfPublicSubnetRefs(context?.publicSubnetCount ?? 2),
       Tags: [
         {
           Key: "Name",

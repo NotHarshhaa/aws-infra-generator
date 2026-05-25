@@ -1,4 +1,5 @@
 import { GeneratedFile, ServiceBuilderResult } from './types';
+import { getCloudFormationBuildContext } from '../../cloudformation-helpers';
 import { buildParameters } from './core/parameters';
 import { buildVpc } from './services/vpc';
 import { buildEc2 } from './services/ec2';
@@ -115,12 +116,17 @@ export class CloudFormationGenerator {
       'cloudformation-stacksets': buildCloudFormationStackSets,
     };
 
+    const context = getCloudFormationBuildContext(services, config);
+
     // Build resources and outputs for each service
     for (const svc of services) {
       const svcConfig = config[svc]?.config || {};
       const builder = serviceBuilders[svc];
       if (builder) {
-        mergeServiceBuilderResult(template, builder(svcConfig, environment, projectName));
+        mergeServiceBuilderResult(
+          template,
+          builder(svcConfig, environment, projectName, context)
+        );
       }
     }
 

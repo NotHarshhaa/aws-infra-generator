@@ -1,9 +1,14 @@
 import { GeneratedFile } from '../types';
+import {
+  cfSubnetRefAt,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
 export function generateEfs(
   cfg: Record<string, any>,
   environment: string,
-  projectName: string
+  projectName: string,
+  context?: CloudFormationBuildContext
 ): GeneratedFile {
   const performanceMode = cfg.performance_mode || "generalPurpose";
   const throughputMode = cfg.throughput_mode || "bursting";
@@ -80,15 +85,19 @@ export function generateEfs(
     Value: { "Fn::GetAtt": ["FileSystem", "Arn"] },
   };
 
+  const subnetContext = context ?? {
+    publicSubnetCount: 2,
+    privateSubnetCount: 2,
+    selectedServices: [],
+  };
+
   // Mount Targets
   for (let i = 0; i < mountTargets; i++) {
-    const subnetName = i < 2 ? `PrivateSubnet${i}` : `PublicSubnet${i - 2}`;
-    
     resources.Resources[`MountTarget${i}`] = {
       Type: "AWS::EFS::MountTarget",
       Properties: {
         FileSystemId: { Ref: "FileSystem" },
-        SubnetId: { Ref: subnetName },
+        SubnetId: cfSubnetRefAt(subnetContext, i),
         SecurityGroups: [{ Ref: "EFSSecurityGroup" }],
       },
     };

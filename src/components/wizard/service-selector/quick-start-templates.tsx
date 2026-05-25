@@ -1,10 +1,9 @@
 import { Zap, Star, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PRESET_TEMPLATES, PresetTemplate } from "@/lib/preset-templates";
+import { PRESET_TEMPLATES, type PresetTemplate, cn } from "@/lib";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
 import { WizardPanel } from "@/components/wizard/shared";
-import { cn } from "@/lib/utils";
 
 interface QuickStartTemplatesProps {
   onSelectTemplate: (template: PresetTemplate) => void;

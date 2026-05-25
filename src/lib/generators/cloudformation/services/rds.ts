@@ -1,6 +1,15 @@
 import { ServiceBuilderResult } from '../types';
+import {
+  cfPrivateSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
-export function buildRds(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
+export function buildRds(
+  cfg: Record<string, any>,
+  environment: string,
+  projectName: string,
+  context?: CloudFormationBuildContext
+): ServiceBuilderResult {
   const resources: any = {};
   const outputs: any = {};
 
@@ -16,10 +25,7 @@ export function buildRds(cfg: Record<string, any>, environment: string, projectN
     Type: "AWS::RDS::DBSubnetGroup",
     Properties: {
       DBSubnetGroupDescription: "Database subnet group",
-      SubnetIds: [
-        { Ref: "PrivateSubnet0" },
-        { Ref: "PrivateSubnet1" },
-      ],
+      SubnetIds: cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
       Tags: [
         {
           Key: "Name",

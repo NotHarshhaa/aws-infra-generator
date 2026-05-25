@@ -1,6 +1,16 @@
-import { CloudFormationTemplate, ServiceBuilderResult } from '../types';
+import { ServiceBuilderResult } from '../types';
+import {
+  cfPrivateSubnetRefs,
+  cfPublicSubnetRefs,
+  type CloudFormationBuildContext,
+} from '../../../cloudformation-helpers';
 
-export function buildEks(cfg: Record<string, any>, environment: string, projectName: string): ServiceBuilderResult {
+export function buildEks(
+  cfg: Record<string, any>,
+  environment: string,
+  projectName: string,
+  context?: CloudFormationBuildContext
+): ServiceBuilderResult {
   const kubernetesVersion = cfg.kubernetes_version || "1.29";
   const nodeInstanceType = cfg.node_group_instance_type || "t3.medium";
   const nodeDesiredSize = cfg.node_group_desired_size || 2;
@@ -15,7 +25,10 @@ export function buildEks(cfg: Record<string, any>, environment: string, projectN
         Version: kubernetesVersion,
         RoleArn: { "Fn::GetAtt": ["EKSClusterRole", "Arn"] },
         ResourcesVpcConfig: {
-          SubnetIds: { "Fn::Split": [",", { "Fn::Join": [",", [{ "Ref": "PublicSubnetIds" }, { "Ref": "PrivateSubnetIds" }]]}] },
+          SubnetIds: [
+            ...cfPublicSubnetRefs(context?.publicSubnetCount ?? 2),
+            ...cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
+          ],
           EndpointPublicAccess: true,
           EndpointPrivateAccess: true
         },
@@ -44,7 +57,7 @@ export function buildEks(cfg: Record<string, any>, environment: string, projectN
         ClusterName: { "Ref": "EKSCluster" },
         NodegroupName: `${projectName}-${environment}-nodes`,
         NodeRole: { "Fn::GetAtt": ["EKSNodeRole", "Arn"] },
-        Subnets: { "Fn::Split": [",", { "Ref": "PrivateSubnetIds" }] },
+        Subnets: cfPrivateSubnetRefs(context?.privateSubnetCount ?? 2),
         ScalingConfig: {
           DesiredSize: nodeDesiredSize,
           MinSize: nodeMinSize,
