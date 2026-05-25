@@ -11,8 +11,6 @@ import {
   Package,
   CheckCircle2,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   SERVICES_OVERVIEW,
   COMPUTE_SERVICES,
@@ -22,40 +20,42 @@ import {
   MESSAGING_SERVICES,
   DEVOPS_SERVICES,
 } from "../landing-data";
+import { LandingSection } from "../shared/landing-section";
+import { landingStyles } from "../shared/landing-styles";
+import { cn } from "@/lib/utils";
 import { ServiceCategoryBlock } from "./service-category-block";
 
 export function SupportedServicesSection() {
   return (
-    <section className="space-y-6 sm:space-y-8 px-3 py-6 sm:py-12 overflow-x-hidden" id="services">
-      <div className="text-center space-y-3 sm:space-y-4">
-        <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1">
-          Services
-        </Badge>
-        <h2 className="text-xl sm:text-3xl font-bold">Supported AWS Services</h2>
-        <p className="text-muted-foreground max-w-3xl mx-auto text-sm sm:text-lg">
-          Generate infrastructure for 32+ AWS services with comprehensive configuration options and best practices
-        </p>
-      </div>
-
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 sm:gap-4 mb-6 sm:mb-8 sm:mb-12">
+    <LandingSection
+      id="services"
+      eyebrow="Services"
+      title="Supported AWS services"
+      description="Generate infrastructure for 32+ services with configuration options and best-practice defaults."
+    >
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
           {SERVICES_OVERVIEW.map((service) => (
-            <div key={service.name} className="group relative">
-              <div className="flex items-center gap-1.5 sm:gap-2 sm:gap-3 p-2 sm:p-3 sm:p-4 rounded-xl border bg-card hover:bg-accent/50 transition-all duration-200 hover:shadow-md hover:border-primary/30">
-                <service.icon className="h-4 w-4 sm:h-6 sm:h-8 sm:w-8 text-primary group-hover:scale-110 transition-transform flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-xs sm:text-sm truncate">{service.name}</div>
-                  <div className="text-xs text-muted-foreground capitalize hidden sm:block">{service.category}</div>
-                </div>
-                <div className="flex-shrink-0 hidden sm:block">
-                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+            <div
+              key={service.name}
+              className={cn(
+                landingStyles.card,
+                "p-2.5 sm:p-3 flex items-center gap-2 hover:border-orange-500/30"
+              )}
+            >
+              <service.icon className="h-4 w-4 shrink-0 text-orange-500" />
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-[11px] sm:text-xs truncate">{service.name}</div>
+                <div className="text-[10px] text-muted-foreground capitalize hidden sm:block truncate">
+                  {service.category}
                 </div>
               </div>
+              <span className="hidden sm:block h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
             </div>
           ))}
         </div>
 
-        <div className="space-y-6 sm:space-y-10">
+        <div className="space-y-6 sm:space-y-8">
           <ServiceCategoryBlock
             icon={Server}
             title="Compute Services"
@@ -83,90 +83,100 @@ export function SupportedServicesSection() {
             services={NETWORKING_SERVICES}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
-                <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                <h3 className="text-lg sm:text-xl font-bold">Security</h3>
-                <Badge variant="outline" className="text-xs">1 Service</Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-border/60">
+                <div className={landingStyles.iconBox}>
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold">Security</h3>
+                <span className={landingStyles.pill}>1 Service</span>
               </div>
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <ShieldCheck className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
-                    <div>
-                      <div className="font-bold text-lg">IAM</div>
-                      <div className="text-sm text-muted-foreground">Access management service</div>
+              <div className={landingStyles.card}>
+                <div className="flex items-start gap-3">
+                  <div className={landingStyles.iconBox}>
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">IAM</div>
+                    <div className="text-[11px] sm:text-sm text-muted-foreground">
+                      Access management service
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    {["Roles & policies", "Fine-grained access", "Multi-factor auth"].map((feature) => (
-                      <div key={feature} className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <CheckCircle2 className="h-3 w-3 text-green-600" />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <ul className="mt-3 space-y-1">
+                  {["Roles & policies", "Fine-grained access", "Multi-factor auth"].map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                      <CheckCircle2 className="h-3 w-3 text-orange-500" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
-                <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                <h3 className="text-lg sm:text-xl font-bold">Messaging</h3>
-                <Badge variant="outline" className="text-xs">2 Services</Badge>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-border/60">
+                <div className={landingStyles.iconBox}>
+                  <MessageSquare className="h-4 w-4" />
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold">Messaging</h3>
+                <span className={landingStyles.pill}>2 Services</span>
               </div>
-              <div className="space-y-2 sm:space-y-3">
+              <div className="space-y-3">
                 {MESSAGING_SERVICES.map((service) => (
-                  <Card key={service.name} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-3 space-y-2">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <service.icon className="h-6 w-6 sm:h-8 sm:w-8 text-primary flex-shrink-0" />
-                        <div>
-                          <div className="font-bold text-lg">{service.name}</div>
-                          <div className="text-sm text-muted-foreground">{service.desc}</div>
-                        </div>
+                  <div key={service.name} className={landingStyles.card}>
+                    <div className="flex items-start gap-3">
+                      <div className={landingStyles.iconBox}>
+                        <service.icon className="h-4 w-4" />
                       </div>
-                      <div className="flex flex-wrap gap-1 sm:gap-2">
-                        {service.features.map((feature) => (
-                          <Badge key={feature} variant="secondary" className="text-xs">
-                            {feature}
-                          </Badge>
-                        ))}
+                      <div>
+                        <div className="font-semibold">{service.name}</div>
+                        <div className="text-[11px] sm:text-sm text-muted-foreground">{service.desc}</div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {service.features.map((feature) => (
+                        <span key={feature} className={landingStyles.pill}>
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center gap-2 sm:gap-3 pb-2 border-b">
-              <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              <h3 className="text-lg sm:text-xl font-bold">Management & Monitoring</h3>
-              <Badge variant="outline" className="text-xs">1 Service</Badge>
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-border/60">
+              <div className={landingStyles.iconBox}>
+                <Activity className="h-4 w-4" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold">Management & Monitoring</h3>
+              <span className={landingStyles.pill}>1 Service</span>
             </div>
-            <Card className="hover:shadow-lg transition-shadow max-w-md">
-              <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-primary flex-shrink-0" />
-                  <div>
-                    <div className="font-bold text-lg">CloudWatch</div>
-                    <div className="text-sm text-muted-foreground">Monitoring and observability</div>
+            <div className={cn(landingStyles.card, "max-w-md")}>
+              <div className="flex items-start gap-3">
+                <div className={landingStyles.iconBox}>
+                  <Activity className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="font-semibold">CloudWatch</div>
+                  <div className="text-[11px] sm:text-sm text-muted-foreground">
+                    Monitoring and observability
                   </div>
                 </div>
-                <div className="space-y-1">
-                  {["Metrics", "Logs", "Alarms", "Dashboards"].map((feature) => (
-                    <div key={feature} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="h-3 w-3 text-green-600" />
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              <ul className="mt-3 space-y-1">
+                {["Metrics", "Logs", "Alarms", "Dashboards"].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-3 w-3 text-orange-500" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <ServiceCategoryBlock
@@ -177,16 +187,16 @@ export function SupportedServicesSection() {
           />
         </div>
 
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-full border border-primary/20">
-            <Package className="h-5 w-5 text-primary" />
-            <span className="text-base font-semibold text-primary">32+ AWS Services Across 8 Categories</span>
+        <div className="text-center">
+          <div className={cn(landingStyles.pillActive, "mx-auto w-fit px-4 py-2")}>
+            <Package className="h-4 w-4" />
+            32+ AWS services across 8 categories
           </div>
-          <p className="text-sm text-muted-foreground mt-3">
-            Production-ready templates with best practices, security configurations, and comprehensive documentation
+          <p className="mt-2 text-[11px] sm:text-sm text-muted-foreground">
+            Production-ready templates with security configurations and documentation
           </p>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 }

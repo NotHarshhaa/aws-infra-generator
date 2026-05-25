@@ -8,23 +8,20 @@ import {
   Database,
   GitBranch,
   Server,
-  Clock,
   Star,
   ArrowRight,
   Search,
-  Filter,
   Shield,
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useInfraStore } from "@/lib/store";
-import { PRESET_TEMPLATES, getTemplateById, PresetTemplate } from "@/lib/preset-templates";
+import { PRESET_TEMPLATES, PresetTemplate } from "@/lib/preset-templates";
+import { landingStyles } from "@/components/landing/shared/landing-styles";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Globe,
@@ -37,40 +34,59 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   TrendingUp,
 };
 
-const difficultyColors = {
-  Beginner: "bg-green-100 text-green-800 border-green-200",
-  Intermediate: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  Advanced: "bg-red-100 text-red-800 border-red-200",
-};
-
-const costColors = {
-  Low: "text-green-600",
-  Medium: "text-yellow-600",
-  High: "text-red-600",
+const difficultyTone: Record<string, string> = {
+  Beginner: "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400",
+  Intermediate: "border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
+  Advanced: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400",
 };
 
 interface PresetTemplatesProps {
   onTemplateSelect?: () => void;
 }
 
+function FilterPill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        active ? landingStyles.pillActive : landingStyles.pill,
+        "cursor-pointer transition-colors shrink-0"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function PresetTemplates({ onTemplateSelect }: PresetTemplatesProps) {
   const { applyPresetTemplate, setStep } = useInfraStore();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [showPopularOnly, setShowPopularOnly] = useState(false);
 
-  // Filter templates
-  const filteredTemplates = PRESET_TEMPLATES.filter(template => {
-    const matchesSearch = searchQuery === "" || 
+  const filteredTemplates = PRESET_TEMPLATES.filter((template) => {
+    const matchesSearch =
+      searchQuery === "" ||
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesCategory = !selectedCategory || template.category === selectedCategory;
     const matchesDifficulty = !selectedDifficulty || template.difficulty === selectedDifficulty;
-    const matchesPopular = !showPopularOnly || ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
-    
+    const matchesPopular =
+      !showPopularOnly ||
+      ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
+
     return matchesSearch && matchesCategory && matchesDifficulty && matchesPopular;
   });
 
@@ -84,220 +100,185 @@ export function PresetTemplates({ onTemplateSelect }: PresetTemplatesProps) {
   };
 
   const categories = [
-    { id: "web", label: "Web Applications", icon: Globe },
-    { id: "api", label: "API Services", icon: Zap },
-    { id: "database", label: "Data & Analytics", icon: Database },
+    { id: "web", label: "Web", icon: Globe },
+    { id: "api", label: "API", icon: Zap },
+    { id: "database", label: "Data", icon: Database },
     { id: "microservices", label: "Microservices", icon: Package },
     { id: "serverless", label: "Serverless", icon: Zap },
-    { id: "ml", label: "Machine Learning", icon: TrendingUp },
+    { id: "ml", label: "ML", icon: TrendingUp },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-2">
-          <Package className="h-8 w-8 text-primary" />
-          <h2 className="text-2xl sm:text-3xl font-bold">Preset Templates</h2>
-        </div>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Start with pre-configured infrastructure templates. All services and settings are pre-configured for common use cases.
+    <div className="space-y-5 sm:space-y-6">
+      <div className={landingStyles.sectionHeader}>
+        <span className={landingStyles.eyebrow}>Templates</span>
+        <h2 className={landingStyles.sectionTitle}>Preset templates</h2>
+        <p className={landingStyles.sectionDesc}>
+          Jump-start with pre-configured stacks for common AWS architectures.
         </p>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Find Templates
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className={cn(landingStyles.panel, "overflow-hidden")}>
+        <div className="border-b border-border/60 px-3 py-3 sm:px-4 flex items-center gap-2">
+          <Search className="h-4 w-4 text-orange-500" />
+          <span className="text-sm font-semibold">Find templates</span>
+        </div>
+        <div className="p-3 sm:p-4 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search templates by name or description..."
+              placeholder="Search by name or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-9 h-9"
             />
           </div>
-          
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm">Category:</Label>
-              <div className="flex gap-1">
-                <Button
-                  variant={!selectedCategory ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(null)}
-                >
-                  All
-                </Button>
-                {categories.map(category => (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category.id)}
-                  >
-                    {category.label}
-                  </Button>
-                ))}
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-[11px] text-muted-foreground mb-1.5 block">Category</Label>
+              <div className={landingStyles.filterRail}>
+                <div className={cn(landingStyles.filterList, "gap-1.5 py-0.5")}>
+                  <FilterPill active={!selectedCategory} onClick={() => setSelectedCategory(null)}>
+                    All
+                  </FilterPill>
+                  {categories.map((category) => (
+                    <FilterPill
+                      key={category.id}
+                      active={selectedCategory === category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                    >
+                      <category.icon className="h-3 w-3" />
+                      {category.label}
+                    </FilterPill>
+                  ))}
+                </div>
               </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Label className="text-sm">Difficulty:</Label>
-              <div className="flex gap-1">
-                <Button
-                  variant={!selectedDifficulty ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedDifficulty(null)}
-                >
-                  All
-                </Button>
-                {["Beginner", "Intermediate", "Advanced"].map(difficulty => (
-                  <Button
-                    key={difficulty}
-                    variant={selectedDifficulty === difficulty ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedDifficulty(difficulty)}
-                  >
-                    {difficulty}
-                  </Button>
-                ))}
+
+            <div>
+              <Label className="text-[11px] text-muted-foreground mb-1.5 block">Difficulty</Label>
+              <div className={landingStyles.filterRail}>
+                <div className={cn(landingStyles.filterList, "gap-1.5 py-0.5")}>
+                  <FilterPill active={!selectedDifficulty} onClick={() => setSelectedDifficulty(null)}>
+                    All
+                  </FilterPill>
+                  {(["Beginner", "Intermediate", "Advanced"] as const).map((difficulty) => (
+                    <FilterPill
+                      key={difficulty}
+                      active={selectedDifficulty === difficulty}
+                      onClick={() => setSelectedDifficulty(difficulty)}
+                    >
+                      {difficulty}
+                    </FilterPill>
+                  ))}
+                </div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Switch
-                checked={showPopularOnly}
-                onCheckedChange={setShowPopularOnly}
-              />
-              <Label className="text-sm flex items-center gap-1">
-                <Star className="h-3 w-3" />
+              <Switch checked={showPopularOnly} onCheckedChange={setShowPopularOnly} />
+              <Label className="text-xs flex items-center gap-1 cursor-pointer">
+                <Star className="h-3 w-3 text-yellow-500" />
                 Popular only
               </Label>
             </div>
           </div>
-          
-          {searchQuery && (
-            <div className="text-sm text-muted-foreground">
-              Found {filteredTemplates.length} template{filteredTemplates.length !== 1 ? "s" : ""}
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Templates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(searchQuery || selectedCategory || selectedDifficulty || showPopularOnly) && (
+            <p className="text-[11px] text-muted-foreground">
+              Showing {filteredTemplates.length} template{filteredTemplates.length !== 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {filteredTemplates.map((template) => {
           const Icon = iconMap[template.icon];
-          const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
-          
+          const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(
+            template.id
+          );
+
           return (
-            <Card
+            <button
               key={template.id}
-              className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 hover:border-primary/50"
+              type="button"
               onClick={() => handleTemplateSelect(template)}
+              className={cn(
+                landingStyles.card,
+                "text-left cursor-pointer hover:border-orange-500/35 hover:shadow-md"
+              )}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      {Icon && <Icon className="h-5 w-5" />}
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        {template.name}
-                        {isPopular && (
-                          <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        )}
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        {template.description}
-                      </CardDescription>
-                    </div>
-                  </div>
+              <div className="flex items-start gap-3">
+                <div className={landingStyles.iconBox}>
+                  {Icon && <Icon className="h-4 w-4" />}
                 </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Metadata */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className={difficultyColors[template.difficulty]}>
-                    {template.difficulty}
-                  </Badge>
-                  <Badge variant="outline" className={costColors[template.estimatedCost]}>
-                    {template.estimatedCost} Cost
-                  </Badge>
-                  <Badge variant="secondary">
-                    {template.estimatedServices} Services
-                  </Badge>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {template.tags.map(tag => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                {/* Services Preview */}
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Included Services:</div>
-                  <div className="flex flex-wrap gap-1">
-                    {template.services.slice(0, 4).map(service => {
-                      const serviceName = service.serviceId.toUpperCase();
-                      return (
-                        <Badge key={service.serviceId} variant="secondary" className="text-xs">
-                          {serviceName}
-                        </Badge>
-                      );
-                    })}
-                    {template.services.length > 4 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{template.services.length - 4} more
-                      </Badge>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm sm:text-base font-semibold truncate">{template.name}</h3>
+                    {isPopular && (
+                      <Star className="h-3.5 w-3.5 shrink-0 text-yellow-500 fill-yellow-500" />
                     )}
                   </div>
+                  <p className="mt-0.5 text-[11px] sm:text-sm text-muted-foreground line-clamp-2">
+                    {template.description}
+                  </p>
                 </div>
+              </div>
 
-                {/* Action */}
-                <Button className="w-full">
-                  <ArrowRight className="mr-2 h-4 w-4" />
-                  Use This Template
-                </Button>
-              </CardContent>
-            </Card>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                <span className={cn(landingStyles.pill, difficultyTone[template.difficulty])}>
+                  {template.difficulty}
+                </span>
+                <span className={landingStyles.pill}>{template.estimatedCost} cost</span>
+                <span className={landingStyles.pill}>{template.estimatedServices} services</span>
+              </div>
+
+              <div className="mt-2 flex flex-wrap gap-1">
+                {template.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className={landingStyles.pill}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-1">
+                {template.services.slice(0, 4).map((service) => (
+                  <span key={service.serviceId} className={landingStyles.pill}>
+                    {service.serviceId.toUpperCase()}
+                  </span>
+                ))}
+                {template.services.length > 4 && (
+                  <span className={landingStyles.pill}>+{template.services.length - 4}</span>
+                )}
+              </div>
+
+              <span className={cn(landingStyles.pillActive, "mt-4 w-full justify-center py-2")}>
+                Use template
+                <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </button>
           );
         })}
       </div>
 
-      {/* No Results */}
       {filteredTemplates.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <div className="space-y-2">
-              <p className="text-muted-foreground">No templates found matching your criteria.</p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory(null);
-                  setSelectedDifficulty(null);
-                  setShowPopularOnly(false);
-                }}
-              >
-                Clear Filters
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className={cn(landingStyles.panel, "p-6 text-center space-y-3")}>
+          <p className="text-sm text-muted-foreground">No templates match your filters.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedCategory(null);
+              setSelectedDifficulty(null);
+              setShowPopularOnly(false);
+            }}
+          >
+            Clear filters
+          </Button>
+        </div>
       )}
     </div>
   );

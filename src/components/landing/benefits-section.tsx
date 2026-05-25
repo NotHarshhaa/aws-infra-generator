@@ -1,21 +1,34 @@
-import { CheckCircle2 } from "lucide-react";
 import { BENEFITS } from "./landing-data";
+import { LandingSection } from "./shared/landing-section";
+import { landingStyles } from "./shared/landing-styles";
 
 export function BenefitsSection() {
   return (
-    <section className="space-y-4 sm:space-y-6 px-3">
-      <h2 className="text-xl sm:text-2xl font-bold text-center">Why Choose AWS Infra Generator?</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-        {BENEFITS.map((benefit) => (
-          <div key={benefit.title} className="space-y-3 sm:space-y-4">
-            <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-              {benefit.title}
-            </h3>
-            <p className="text-sm sm:text-base text-muted-foreground">{benefit.desc}</p>
+    <LandingSection
+      eyebrow="Benefits"
+      title="Why choose AWS Infra Generator?"
+      description="Save time, reduce errors, and keep infrastructure consistent across projects."
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 max-w-5xl mx-auto">
+        {BENEFITS.map((benefit, index) => (
+          <div
+            key={benefit.title}
+            className={index % 2 === 0 ? landingStyles.card : landingStyles.cardAccent}
+          >
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-orange-500/15 text-xs font-bold text-orange-600 dark:text-orange-400">
+                {index + 1}
+              </span>
+              <div>
+                <h3 className="text-sm sm:text-base font-semibold">{benefit.title}</h3>
+                <p className="mt-1 text-[11px] sm:text-sm text-muted-foreground leading-relaxed">
+                  {benefit.desc}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
-    </section>
+    </LandingSection>
   );
 }

@@ -1,3 +1,4 @@
+import { PresetTemplates } from "@/components/wizard/preset-templates";
 import { LandingHero } from "./landing-hero";
 import { FeaturesSection } from "./features-section";
 import { HowItWorksSection } from "./how-it-works-section";
@@ -8,24 +9,29 @@ import { TechnicalDetailsSection } from "./technical-details-section";
 import { SupportedServicesSection } from "./supported-services/supported-services-section";
 import { CreatorSection } from "./creator-section";
 import { LandingFooter } from "./landing-footer";
+import { landingStyles } from "./shared/landing-styles";
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onTemplateSelect: () => void;
 }
 
-export function LandingPage({ onGetStarted }: LandingPageProps) {
+export function LandingPage({ onGetStarted, onTemplateSelect }: LandingPageProps) {
   return (
-    <>
+    <div className={landingStyles.page}>
       <LandingHero onGetStarted={onGetStarted} />
       <FeaturesSection />
       <HowItWorksSection />
       <EnvironmentsSection />
+      <section id="templates" className={landingStyles.section}>
+        <PresetTemplates onTemplateSelect={onTemplateSelect} />
+      </section>
       <UseCasesSection />
       <BenefitsSection />
       <TechnicalDetailsSection />
       <SupportedServicesSection />
       <CreatorSection />
       <LandingFooter />
-    </>
+    </div>
   );
 }

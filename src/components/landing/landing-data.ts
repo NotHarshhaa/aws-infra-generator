@@ -50,6 +50,13 @@ export interface BenefitItem {
   desc: string;
 }
 
+export const HERO_STATS = [
+  { value: "32+", label: "AWS Services" },
+  { value: "2", label: "IaC Formats" },
+  { value: "4", label: "Wizard Steps" },
+  { value: "100%", label: "Open Source" },
+] as const;
+
 export interface ServiceOverviewItem {
   icon: LucideIcon;
   name: string;

@@ -7,7 +7,6 @@ import {
   ServiceConfigurator,
   InfraGenerator,
   InfraExport,
-  PresetTemplates,
 } from "@/components/wizard";
 import { WizardStepNav } from "@/components/wizard/shared";
 import { LandingPage } from "@/components/landing";
@@ -56,15 +55,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
-      <Header onBackToHome={handleBackToHome} />
+      <Header
+        onBackToHome={handleBackToHome}
+        showNav={!showWizard}
+        onGetStarted={handleGetStarted}
+      />
       <main className="flex-1 container mx-auto px-3 sm:px-4 pb-8 sm:pb-12 pt-16 sm:pt-16 overflow-x-hidden">
         {!showWizard ? (
-          <div className="space-y-8 sm:space-y-16">
-            <LandingPage onGetStarted={handleGetStarted} />
-            <section className="space-y-4 sm:space-y-6 px-3" id="templates">
-              <PresetTemplates onTemplateSelect={handleTemplateSelect} />
-            </section>
-          </div>
+          <LandingPage
+            onGetStarted={handleGetStarted}
+            onTemplateSelect={handleTemplateSelect}
+          />
         ) : (
           <>
             <WizardStepNav
