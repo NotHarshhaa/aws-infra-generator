@@ -1,0 +1,31 @@
+import {
+  Network,
+  Server,
+  HardDrive,
+  Database,
+  Shield,
+  GitFork,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
+  Cloud,
+} from "lucide-react";
+
+export const awsIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Network,
+  Server,
+  HardDrive,
+  Database,
+  Shield,
+  GitFork,
+  Zap,
+  Globe,
+  Package,
+  MessageSquare,
+  Bell,
+  Activity,
+  Cloud,
+};
