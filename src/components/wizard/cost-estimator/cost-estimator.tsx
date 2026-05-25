@@ -73,38 +73,30 @@ export function CostEstimator() {
 
   if (!costEstimate || selectedServices.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="pt-6 text-center">
-          <Calculator className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground">
-            Select services to see cost estimates
-          </p>
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 px-4 py-8 text-center">
+        <Calculator className="h-8 w-8 mx-auto text-muted-foreground mb-2 opacity-60" />
+        <p className="text-xs text-muted-foreground">Select services to see cost estimates</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Total Cost Summary */}
-      <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
-        <CardHeader className="pb-3 sm:pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
-                Estimated Cost
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                {costEstimate.environment.charAt(0).toUpperCase() + costEstimate.environment.slice(1)} • {costEstimate.region}
-              </CardDescription>
-            </div>
-            <Badge variant="outline" className="text-xs w-fit">
-              {costEstimate.services.length} services
-            </Badge>
+    <div className="space-y-3">
+      <div className="rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-card/80 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+          <div>
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-orange-500" />
+              Estimated Cost
+            </h3>
+            <p className="text-[11px] text-muted-foreground capitalize">
+              {costEstimate.environment} · {costEstimate.region}
+            </p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3 sm:space-y-4">
+          <Badge variant="outline" className="text-[10px] w-fit">
+            {costEstimate.services.length} services
+          </Badge>
+        </div>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-1 sm:space-y-2">
               <div className="text-xs sm:text-sm text-muted-foreground">Monthly</div>
@@ -146,21 +138,14 @@ export function CostEstimator() {
               </Alert>
             </>
           )}
-        </CardContent>
-      </Card>
+      </div>
 
-      {/* Service Breakdown */}
-      <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-            <PieChart className="h-4 w-4 sm:h-5 sm:w-5" />
-            Cost Breakdown
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Detailed cost per service
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-3">
+      <div className="rounded-xl border border-border/80 bg-card/80 p-3 sm:p-4">
+        <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
+          <PieChart className="h-4 w-4 text-orange-500" />
+          Cost Breakdown
+        </h3>
+        <div className="space-y-2">
           {costEstimate.services
             .sort((a, b) => b.monthlyCost - a.monthlyCost)
             .map((service: CostEstimate) => (
@@ -232,19 +217,15 @@ export function CostEstimator() {
                 )}
               </div>
             ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Cost Optimization Tips */}
-      <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-900">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-blue-900 dark:text-blue-100 text-sm sm:text-base">
-            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
-            Optimization Tips
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1.5 sm:space-y-2">
-          <div className="text-xs sm:text-sm space-y-1.5 sm:space-y-2 text-blue-900 dark:text-blue-100">
+      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-3 sm:p-4">
+        <h3 className="text-sm font-semibold flex items-center gap-2 text-blue-800 dark:text-blue-200 mb-2">
+          <TrendingUp className="h-4 w-4" />
+          Optimization Tips
+        </h3>
+        <div className="text-[11px] sm:text-xs space-y-1.5 text-blue-900/90 dark:text-blue-100/90">
             <div className="flex items-start gap-1.5 sm:gap-2">
               <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
               <span>Use Reserved Instances or Savings Plans (up to 72% savings)</span>
@@ -261,9 +242,8 @@ export function CostEstimator() {
               <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
               <span>Set up CloudWatch alarms to monitor costs</span>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

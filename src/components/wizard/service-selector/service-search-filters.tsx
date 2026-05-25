@@ -1,10 +1,11 @@
 import { Search, Star } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { SERVICE_CATEGORIES } from "@/lib/aws-services";
+import { WizardPanel } from "@/components/wizard/shared";
+import { cn } from "@/lib/utils";
 
 interface ServiceSearchFiltersProps {
   searchQuery: string;
@@ -26,65 +27,65 @@ export function ServiceSearchFilters({
   onPopularOnlyChange,
 }: ServiceSearchFiltersProps) {
   return (
-    <Card>
-      <CardHeader className="pb-2 sm:pb-3">
-        <CardTitle className="text-sm sm:text-lg flex items-center gap-2">
-          <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-          Search & Filter Services
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 sm:space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search services..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 h-9 sm:h-10 text-sm"
+    <WizardPanel bodyClassName="space-y-2.5">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search services..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="h-8 sm:h-9 pl-8 text-xs sm:text-sm bg-muted/30 border-border/70"
+        />
+      </div>
+
+      <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+        <button
+          type="button"
+          onClick={() => onCategoryChange(null)}
+          className={cn(
+            "shrink-0 rounded-md px-2 py-1 text-[10px] sm:text-xs font-medium border transition-colors",
+            !selectedCategory
+              ? "bg-orange-500 text-white border-orange-500"
+              : "bg-muted/40 text-muted-foreground border-border/60 hover:border-orange-500/30"
+          )}
+        >
+          All
+        </button>
+        {SERVICE_CATEGORIES.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            onClick={() => onCategoryChange(category.id)}
+            className={cn(
+              "shrink-0 rounded-md px-2 py-1 text-[10px] sm:text-xs font-medium border transition-colors",
+              selectedCategory === category.id
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-muted/40 text-muted-foreground border-border/60 hover:border-orange-500/30"
+            )}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={showPopularOnly}
+            onCheckedChange={onPopularOnlyChange}
+            className="scale-75 sm:scale-90"
           />
+          <Label className="text-[11px] sm:text-xs flex items-center gap-1 cursor-pointer">
+            <Star className="h-3 w-3 text-amber-500" />
+            Popular only
+          </Label>
         </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <div className="flex items-center gap-2">
-            <Label className="text-xs sm:text-sm">Category:</Label>
-            <div className="flex gap-1 flex-wrap">
-              <Button
-                variant={!selectedCategory ? "default" : "outline"}
-                size="sm"
-                onClick={() => onCategoryChange(null)}
-                className="text-xs h-7 px-2 sm:h-8 sm:px-3"
-              >
-                All
-              </Button>
-              {SERVICE_CATEGORIES.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onCategoryChange(category.id)}
-                  className="text-xs h-7 px-2 sm:h-8 sm:px-3"
-                >
-                  {category.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Switch checked={showPopularOnly} onCheckedChange={onPopularOnlyChange} />
-            <Label className="text-xs sm:text-sm flex items-center gap-1">
-              <Star className="h-3 w-3" />
-              Popular only
-            </Label>
-          </div>
-        </div>
-
         {searchQuery && (
-          <div className="text-xs sm:text-sm text-muted-foreground">
-            Found {filteredCount} service{filteredCount !== 1 ? "s" : ""}
-          </div>
+          <Badge variant="secondary" className="text-[10px] h-5">
+            {filteredCount} found
+          </Badge>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </WizardPanel>
   );
 }

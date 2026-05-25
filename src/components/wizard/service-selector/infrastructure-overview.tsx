@@ -1,7 +1,7 @@
 import { RotateCcw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { WizardPanel, WizardStatRow } from "@/components/wizard/shared";
 import type { ServiceStats } from "./types";
 
 interface InfrastructureOverviewProps {
@@ -16,69 +16,65 @@ export function InfrastructureOverview({
   onClearAll,
 }: InfrastructureOverviewProps) {
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Infrastructure Overview</CardTitle>
-          {hasSelection && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearAll}
-              className="text-xs h-8 px-2 sm:px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
-              title="Clear all selected services and start over"
-            >
-              <RotateCcw className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Clear All</span>
-              <span className="sm:hidden">Clear</span>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-primary">{stats.selectedServices}</div>
-            <div className="text-xs text-muted-foreground">Selected</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{stats.requiredDependencies}</div>
-            <div className="text-xs text-muted-foreground">Dependencies</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.totalServices}</div>
-            <div className="text-xs text-muted-foreground">Total Services</div>
-          </div>
-          <div className="text-center">
-            <Badge
-              variant={
-                stats.estimatedComplexity === "High"
-                  ? "destructive"
-                  : stats.estimatedComplexity === "Medium"
-                    ? "default"
-                    : "secondary"
-              }
-            >
-              {stats.estimatedComplexity} Complexity
-            </Badge>
-            <div className="text-xs text-muted-foreground mt-1">Estimated</div>
-          </div>
-          <div className="text-center">
-            <Badge
-              variant={
-                stats.estimatedCost === "High"
-                  ? "destructive"
-                  : stats.estimatedCost === "Medium"
-                    ? "default"
-                    : "secondary"
-              }
-            >
-              {stats.estimatedCost} Cost
-            </Badge>
-            <div className="text-xs text-muted-foreground mt-1">Estimated</div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <WizardPanel
+      title="Stack Overview"
+      description="Live estimate as you build"
+      action={
+        hasSelection ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearAll}
+            className="h-7 px-2 text-[11px] sm:text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <RotateCcw className="mr-1 h-3 w-3" />
+            Clear
+          </Button>
+        ) : undefined
+      }
+    >
+      <WizardStatRow
+        columns={5}
+        stats={[
+          { label: "Selected", value: stats.selectedServices, valueClassName: "text-orange-600 dark:text-orange-400" },
+          { label: "Deps", value: stats.requiredDependencies, valueClassName: "text-blue-600" },
+          { label: "Total", value: stats.totalServices, valueClassName: "text-emerald-600" },
+          {
+            label: "Complexity",
+            value: (
+              <Badge
+                variant={
+                  stats.estimatedComplexity === "High"
+                    ? "destructive"
+                    : stats.estimatedComplexity === "Medium"
+                      ? "default"
+                      : "secondary"
+                }
+                className="text-[10px] px-1.5 py-0"
+              >
+                {stats.estimatedComplexity}
+              </Badge>
+            ),
+          },
+          {
+            label: "Cost",
+            value: (
+              <Badge
+                variant={
+                  stats.estimatedCost === "High"
+                    ? "destructive"
+                    : stats.estimatedCost === "Medium"
+                      ? "default"
+                      : "secondary"
+                }
+                className="text-[10px] px-1.5 py-0"
+              >
+                {stats.estimatedCost}
+              </Badge>
+            ),
+          },
+        ]}
+      />
+    </WizardPanel>
   );
 }

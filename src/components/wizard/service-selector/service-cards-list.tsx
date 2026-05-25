@@ -1,19 +1,10 @@
-import {
-  Star,
-  AlertTriangle,
-  CheckCircle2,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Star, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getServiceById } from "@/lib/aws-services";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
+import { wizardStyles, WizardPanel } from "@/components/wizard/shared";
 import { cn } from "@/lib/utils";
 import type { AWSService } from "@/lib/types";
 import type { SERVICE_CATEGORIES } from "@/lib/aws-services";
@@ -32,136 +23,101 @@ export function ServiceCardsList({
   onToggleService,
 }: ServiceCardsListProps) {
   return (
-    <div className="space-y-6 max-h-[600px] overflow-y-auto overflow-x-hidden px-1">
-      <div className="space-y-6">
-        {categories.map(({ category, services }) => {
-          const CategoryIcon = awsIconMap[category.icon];
+    <WizardPanel title="Service Catalog" description="Tap to select · deps auto-included">
+      <div className={wizardStyles.scrollList}>
+        <div className="space-y-4">
+          {categories.map(({ category, services }) => {
+            const CategoryIcon = awsIconMap[category.icon];
 
-          return (
-            <div key={category.id} className="space-y-2 sm:space-y-3">
-              <div className="flex items-center gap-2">
-                {CategoryIcon && (
-                  <CategoryIcon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                )}
-                <h3 className="text-base sm:text-lg font-semibold">
-                  {category.label}
-                  <Badge variant="secondary" className="ml-2 text-xs">
+            return (
+              <div key={category.id} className="space-y-2">
+                <div className="flex items-center gap-2 sticky top-0 bg-card/95 backdrop-blur-sm py-1 z-10">
+                  {CategoryIcon && (
+                    <CategoryIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-500" />
+                  )}
+                  <h3 className="text-xs sm:text-sm font-semibold">{category.label}</h3>
+                  <Badge variant="secondary" className="text-[10px] h-4 px-1.5">
                     {services.length}
                   </Badge>
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3">
-                {services.map((service) => {
-                  const isSelected = selectedServices.includes(service.id);
-                  const Icon = awsIconMap[service.icon];
-                  const isDependency = selectedServices.some((sid) => {
-                    const s = getServiceById(sid);
-                    return s?.dependencies.includes(service.id) && sid !== service.id;
-                  });
-                  const isPopular = ["vpc", "ec2", "s3", "rds"].includes(service.id);
+                </div>
 
-                  return (
-                    <Card
-                      key={service.id}
-                      className={cn(
-                        "relative cursor-pointer hover:shadow-md",
-                        isSelected && "border-primary ring-2 ring-primary/20 shadow-md",
-                        isDependency && isSelected && "border-primary/50"
-                      )}
-                      onClick={() => onToggleService(service.id)}
-                    >
-                      <CardHeader className="pb-1 sm:pb-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div
-                              className={cn(
-                                "flex h-6 w-6 sm:h-10 sm:w-10 items-center justify-center rounded-lg",
-                                isSelected
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted text-muted-foreground"
-                              )}
-                            >
-                              {Icon && <Icon className="h-3 w-3 sm:h-5 sm:w-5" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-1 sm:gap-2">
-                                <CardTitle className="text-sm sm:text-base truncate">
-                                  {service.name}
-                                </CardTitle>
-                                {isPopular && (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Star className="h-2 w-2 sm:h-3 sm:w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Popular service</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-1.5 sm:gap-2">
+                  {services.map((service) => {
+                    const isSelected = selectedServices.includes(service.id);
+                    const Icon = awsIconMap[service.icon];
+                    const isDependency = selectedServices.some((sid) => {
+                      const s = getServiceById(sid);
+                      return s?.dependencies.includes(service.id) && sid !== service.id;
+                    });
+                    const isPopular = ["vpc", "ec2", "s3", "rds"].includes(service.id);
+
+                    return (
+                      <button
+                        key={service.id}
+                        type="button"
+                        onClick={() => onToggleService(service.id)}
+                        className={cn(
+                          "group flex w-full items-start gap-2 rounded-lg border p-2 sm:p-2.5 text-left transition-all",
+                          "hover:border-orange-500/40 hover:bg-orange-500/5",
+                          isSelected
+                            ? "border-orange-500/50 bg-orange-500/10 ring-1 ring-orange-500/20"
+                            : "border-border/70 bg-muted/20"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-md",
+                            isSelected
+                              ? "bg-orange-500 text-white"
+                              : "bg-muted text-muted-foreground group-hover:bg-orange-500/15 group-hover:text-orange-600"
+                          )}
+                        >
+                          {Icon && <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs sm:text-sm font-semibold truncate">
+                              {service.name}
+                            </span>
+                            {isPopular && (
+                              <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500 shrink-0" />
+                            )}
                           </div>
-                          <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={() => onToggleService(service.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-4 w-4 sm:h-5 sm:w-5"
-                          />
+                          <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                            {service.description}
+                          </p>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {service.dependencies.length > 0 && (
+                              <span className={wizardStyles.tag + " border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"}>
+                                <AlertTriangle className="h-2.5 w-2.5" />
+                                {service.dependencies.length} dep
+                              </span>
+                            )}
+                            {isDependency && isSelected && (
+                              <span className={wizardStyles.tag + " border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"}>
+                                <CheckCircle2 className="h-2.5 w-2.5" />
+                                Auto
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-1 sm:line-clamp-2">
-                          {service.description}
-                        </p>
-                        <div className="flex items-center gap-1 sm:gap-2 mt-2 flex-wrap">
-                          {service.dependencies.length > 0 && (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Badge variant="secondary" className="text-xs gap-1">
-                                  <AlertTriangle className="h-2 w-2 sm:h-3 sm:w-3" />
-                                  {service.dependencies.length} dep
-                                </Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <div className="space-y-1">
-                                  <p className="font-medium">Required dependencies:</p>
-                                  {service.dependencies.map((dep) => {
-                                    const depService = getServiceById(dep);
-                                    return (
-                                      <div key={dep} className="text-xs">
-                                        • {depService?.name || dep}
-                                      </div>
-                                    );
-                                  })}
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    These will be automatically included
-                                  </p>
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                          {isDependency && isSelected && (
-                            <Badge variant="outline" className="text-xs">
-                              <CheckCircle2 className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-                              Auto
-                            </Badge>
-                          )}
-                          {service.configFields.length > 0 && (
-                            <Badge variant="outline" className="text-xs hidden sm:inline-flex">
-                              {service.configFields.length} config
-                            </Badge>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => onToggleService(service.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 shrink-0 mt-0.5"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <Separator className="mt-4" />
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </WizardPanel>
   );
 }

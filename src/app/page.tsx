@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Header, StepIndicator, ScrollToTop } from "@/components/layout";
+import { Header, ScrollToTop } from "@/components/layout";
 import {
   ServiceSelector,
   ServiceConfigurator,
@@ -9,6 +9,7 @@ import {
   InfraExport,
   PresetTemplates,
 } from "@/components/wizard";
+import { WizardStepNav } from "@/components/wizard/shared";
 import { LandingPage } from "@/components/landing";
 import { useInfraStore } from "@/lib/store";
 import { WizardStep } from "@/lib/types";
@@ -66,12 +67,12 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <StepIndicator
+            <WizardStepNav
               currentStep={currentStep}
               onStepClick={setStep}
               completedSteps={completedSteps}
             />
-            <div className="max-w-7xl mx-auto px-1 sm:px-0">
+            <div className="max-w-6xl mx-auto">
               {currentStep === "services" && (
                 <ServiceSelector onBackToHome={handleBackToHome} />
               )}

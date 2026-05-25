@@ -1,22 +1,17 @@
 "use client";
 
-import {
-  Network,
-  DollarSign,
-  Projector,
-  Eye,
-} from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings } from "lucide-react";
 import { useInfraStore } from "@/lib/store";
 import { useEffect, useState } from "react";
 import { CostEstimator } from "@/components/wizard/cost-estimator/cost-estimator";
 import { InfraDiagram } from "@/components/wizard/infra-diagram/infra-diagram";
 import { TerraformPlanPreview } from "@/components/wizard/terraform-plan-preview/terraform-plan-preview";
+import { wizardStyles, WizardHeader } from "@/components/wizard/shared";
 import { ProjectSettingsCard } from "./project-settings-card";
 import { ConfigSummaryCard } from "./config-summary-card";
 import { ServiceConfigAccordion } from "./service-config-accordion";
 import { ConfiguratorActions } from "./configurator-actions";
+import { ConfiguratorTabs } from "./configurator-tabs";
 import { useConfigValidation } from "./use-config-validation";
 import type { ServiceConfiguratorProps } from "./types";
 
@@ -65,10 +60,7 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
     if (error) {
       setFieldErrors((prev) => ({
         ...prev,
-        [serviceId]: {
-          ...prev[serviceId],
-          [fieldName]: error,
-        },
+        [serviceId]: { ...prev[serviceId], [fieldName]: error },
       }));
     }
   };
@@ -94,13 +86,13 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
   };
 
   return (
-    <div className="space-y-4 sm:space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-lg sm:text-2xl font-bold">Configure Infrastructure</h2>
-        <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
-          Set project-level options and fine-tune each service configuration.
-        </p>
-      </div>
+    <div className={wizardStyles.shell}>
+      <WizardHeader
+        step="02"
+        title="Configure Infrastructure"
+        description="Set project options and tune each service before generation."
+        icon={Settings}
+      />
 
       <ProjectSettingsCard
         projectName={projectName}
@@ -121,53 +113,19 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
         hasErrors={hasValidationErrors}
       />
 
-      <Tabs defaultValue="configuration" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="configuration" className="text-xs sm:text-sm flex items-center gap-2">
-            <Network className="h-4 w-4" />
-            <span className="hidden sm:inline">Configuration</span>
-            <span className="sm:hidden">Config</span>
-          </TabsTrigger>
-          <TabsTrigger value="cost" className="text-xs sm:text-sm flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span className="hidden sm:inline">Cost Estimate</span>
-            <span className="sm:hidden">Cost</span>
-          </TabsTrigger>
-          <TabsTrigger value="diagram" className="text-xs sm:text-sm flex items-center gap-2">
-            <Projector className="h-4 w-4" />
-            <span className="hidden sm:inline">Diagram</span>
-            <span className="sm:hidden">Diagram</span>
-          </TabsTrigger>
-          <TabsTrigger value="plan" className="text-xs sm:text-sm flex items-center gap-2">
-            <Eye className="h-4 w-4" />
-            <span className="hidden sm:inline">Plan Preview</span>
-            <span className="sm:hidden">Plan</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="configuration" className="mt-4">
+      <ConfiguratorTabs
+        configuration={
           <ServiceConfigAccordion
             selectedServices={selectedServices}
             serviceConfig={serviceConfig}
             fieldErrors={fieldErrors}
             onFieldChange={handleFieldChange}
           />
-        </TabsContent>
-
-        <TabsContent value="cost" className="mt-4">
-          <CostEstimator />
-        </TabsContent>
-
-        <TabsContent value="diagram" className="mt-4">
-          <InfraDiagram />
-        </TabsContent>
-
-        <TabsContent value="plan" className="mt-4">
-          <TerraformPlanPreview />
-        </TabsContent>
-      </Tabs>
-
-      <Separator />
+        }
+        cost={<CostEstimator />}
+        diagram={<InfraDiagram />}
+        plan={<TerraformPlanPreview />}
+      />
 
       <ConfiguratorActions
         isGenerating={isGenerating}

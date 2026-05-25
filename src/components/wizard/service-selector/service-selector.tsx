@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Layers } from "lucide-react";
 import { AWS_SERVICES, SERVICE_CATEGORIES } from "@/lib/aws-services";
 import { useInfraStore } from "@/lib/store";
 import { PresetTemplate } from "@/lib/preset-templates";
+import { wizardStyles, WizardHeader } from "@/components/wizard/shared";
 import { QuickStartTemplates } from "./quick-start-templates";
 import { SelectionModeToggle } from "./selection-mode-toggle";
 import { InfrastructureOverview } from "./infrastructure-overview";
@@ -33,12 +35,6 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
     setStep("configure");
   };
 
-  const handleClearAll = () => {
-    if (selectedServices.length > 0) {
-      setShowClearConfirm(true);
-    }
-  };
-
   const confirmClearAll = () => {
     clearAllServices();
     setShowClearConfirm(false);
@@ -50,11 +46,8 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
   const toggleCategoryCollapse = (categoryId: string) => {
     setCollapsedCategories((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(categoryId)) {
-        newSet.delete(categoryId);
-      } else {
-        newSet.add(categoryId);
-      }
+      if (newSet.has(categoryId)) newSet.delete(categoryId);
+      else newSet.add(categoryId);
       return newSet;
     });
   };
@@ -65,11 +58,9 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
         searchQuery === "" ||
         service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         service.description.toLowerCase().includes(searchQuery.toLowerCase());
-
       const matchesCategory = !selectedCategory || service.category === selectedCategory;
       const matchesPopular =
         !showPopularOnly || ["vpc", "ec2", "s3", "rds"].includes(service.id);
-
       return matchesSearch && matchesCategory && matchesPopular;
     });
   }, [searchQuery, selectedCategory, showPopularOnly]);
@@ -82,21 +73,24 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
   }, [filteredServices]);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-xl sm:text-2xl font-bold">Select AWS Services</h2>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
-          Choose the AWS services you need for your infrastructure. Dependencies
-          will be automatically resolved.
-        </p>
-      </div>
+    <div className={wizardStyles.shell}>
+      <WizardHeader
+        step="01"
+        title="Select AWS Services"
+        description="Pick services for your stack. Dependencies are resolved automatically."
+        icon={Layers}
+      />
 
       <QuickStartTemplates onSelectTemplate={handlePresetTemplateSelect} />
-      <SelectionModeToggle mode={selectionMode} onModeChange={setSelectionMode} />
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <SelectionModeToggle mode={selectionMode} onModeChange={setSelectionMode} />
+      </div>
+
       <InfrastructureOverview
         stats={stats}
         hasSelection={selectedServices.length > 0}
-        onClearAll={handleClearAll}
+        onClearAll={() => selectedServices.length > 0 && setShowClearConfirm(true)}
       />
 
       {selectionMode === "templates" ? (

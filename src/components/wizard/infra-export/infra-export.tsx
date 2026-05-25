@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Download,
   FileArchive,
@@ -14,35 +14,32 @@ import {
   Share2,
   Github,
   Cloud,
-  Clock,
   CheckCircle2,
   AlertTriangle,
-  Zap,
   Shield,
   Package,
   Eye,
-  GitBranch,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import Link from "next/link";
 import { useInfraStore } from "@/lib/store";
 import { downloadInfrastructure } from "@/lib/api";
+import {
+  wizardStyles,
+  WizardHeader,
+  WizardPanel,
+  WizardStatRow,
+  WizardActionBar,
+  GeneratedFileTabsList,
+} from "@/components/wizard/shared";
+import { cn } from "@/lib/utils";
 
 interface InfraExportProps {
   onBackToHome: () => void;
@@ -252,83 +249,38 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         ];
 
   return (
-    <div className="space-y-4 sm:space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-lg sm:text-2xl font-bold">Export Infrastructure</h2>
-        <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
-          Download your generated infrastructure templates and deploy them.
-        </p>
-      </div>
+    <div className={wizardStyles.shell}>
+      <WizardHeader
+        step="04"
+        title="Export Infrastructure"
+        description="Download your IaC package and deploy with confidence."
+        icon={Package}
+      />
 
-      {/* Export Statistics */}
-      <Card>
-        <CardHeader className="pb-2 sm:pb-6">
-          <CardTitle className="text-sm sm:text-lg">Export Summary</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Overview of your generated infrastructure package
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-4">
-            <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold">{stats.totalFiles}</div>
-              <div className="text-xs text-muted-foreground">Files</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold">{stats.totalSize}</div>
-              <div className="text-xs text-muted-foreground">Size</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg sm:text-2xl font-bold">{stats.totalLines}</div>
-              <div className="text-xs text-muted-foreground">Lines</div>
-            </div>
-            <div className="text-center hidden md:block">
-              <div className="text-lg sm:text-2xl font-bold">{stats.securityScore}%</div>
-              <div className="text-xs text-muted-foreground">Security</div>
-            </div>
-            <div className="text-center hidden md:block">
-              <div className="text-lg sm:text-2xl font-bold">{stats.estimatedDeployTime}</div>
-              <div className="text-xs text-muted-foreground">Deploy</div>
-            </div>
+      <WizardPanel title="Export Summary" description="Package overview">
+        <WizardStatRow
+          columns={5}
+          stats={[
+            { label: "Files", value: stats.totalFiles },
+            { label: "Size", value: stats.totalSize },
+            { label: "Lines", value: stats.totalLines },
+            { label: "Security", value: `${stats.securityScore}%` },
+            { label: "Deploy", value: stats.estimatedDeployTime },
+          ]}
+        />
+        <div className="mt-2 space-y-1">
+          <div className="flex items-center gap-1.5 text-[11px] text-emerald-600">
+            <CheckCircle2 className="h-3 w-3" />
+            Generated successfully
           </div>
-          
-          {/* Mobile-only additional stats */}
-          <div className="grid grid-cols-2 gap-2 mt-2 md:hidden">
-            <div className="text-center">
-              <div className="text-lg font-bold">{stats.securityScore}%</div>
-              <div className="text-xs text-muted-foreground">Security</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold">{stats.estimatedDeployTime}</div>
-              <div className="text-xs text-muted-foreground">Deploy</div>
-            </div>
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Shield className="h-3 w-3" />
+            Security best practices applied
           </div>
-          
-          <div className="mt-3 sm:mt-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-              <span className="text-xs sm:text-sm text-green-700">Infrastructure generated successfully!</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-blue-500" />
-              <span className="text-sm">Security best practices applied</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </WizardPanel>
 
-      {/* Enhanced Download Card */}
-      <Card className="border-primary/20">
-        <CardHeader className="pb-2 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-            <FileArchive className="h-4 w-4 sm:h-5 sm:w-5" />
-            Download Package
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Download all generated files as a ZIP archive
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 sm:space-y-4">
+      <WizardPanel variant="accent" title="Download Package" icon={FileArchive}>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex-1 space-y-2">
               <p className="text-sm sm:font-medium truncate">
@@ -385,25 +337,27 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               
               {shareUrl && (
                 <Tooltip>
-                  <TooltipTrigger>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleShare}
-                      className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
-                    >
-                      {copiedFile === 'share-url' ? (
-                        <>
-                          <Check className="mr-1 h-3 w-3" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="mr-1 h-3 w-3" />
-                          Share
-                        </>
-                      )}
-                    </Button>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleShare}
+                        className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+                      />
+                    }
+                  >
+                    {copiedFile === 'share-url' ? (
+                      <>
+                        <Check className="mr-1 h-3 w-3" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="mr-1 h-3 w-3" />
+                        Share
+                      </>
+                    )}
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Copy share URL to clipboard</p>
@@ -412,81 +366,30 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+      </WizardPanel>
 
-      {/* Enhanced File Preview */}
-      <Card>
-        <CardHeader className="pb-2 sm:pb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-                <FileCode2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                Generated Files
-              </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
-                Preview and copy individual files
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={copyAllFiles}
-                  >
-                    {copiedFile === 'all-files' ? (
-                      <>
-                        <Check className="mr-1 h-3 w-3" />
-                        Copied All!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="mr-1 h-3 w-3" />
-                        Copy All
-                      </>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Copy all files to clipboard</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger>
-                  <Label className="flex items-center gap-2 cursor-pointer">
-                    <Switch
-                      checked={showLineNumbers}
-                      onCheckedChange={setShowLineNumbers}
-                    />
-                    <span className="text-sm">Line Numbers</span>
-                  </Label>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Toggle line numbers in code view</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
+      <WizardPanel title="Generated Files" description="Preview & copy" icon={FileCode2}>
           <Tabs
             defaultValue={generatedFiles[0]?.name || ""}
+            className="w-full min-w-0 gap-3"
           >
-            <TabsList className="flex-wrap h-auto gap-1">
-              {generatedFiles.map((file) => (
-                <TabsTrigger key={file.name} value={file.name} className="text-xs">
-                  {file.name}
-                  <Badge variant="secondary" className="ml-2 text-[10px]">
+            <GeneratedFileTabsList
+              files={generatedFiles}
+              renderBadge={(fileName) => {
+                const file = generatedFiles.find((f) => f.name === fileName);
+                if (!file) return null;
+                return (
+                  <Badge
+                    variant="secondary"
+                    className="file-tab-badge ml-1 hidden border-0 bg-muted/80 text-[10px] sm:inline-flex group-data-active/trigger:bg-white/20 group-data-active/trigger:text-white"
+                  >
                     {file.language}
                   </Badge>
-                </TabsTrigger>
-              ))}
-            </TabsList>
+                );
+              }}
+            />
             {generatedFiles.map((file) => (
-              <TabsContent key={file.name} value={file.name}>
+              <TabsContent key={file.name} value={file.name} className="mt-0 outline-none">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -500,24 +403,26 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                     
                     <div className="flex items-center gap-2">
                       <Tooltip>
-                        <TooltipTrigger>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleCopy(file.content, file.name)}
-                          >
-                            {copiedFile === file.name ? (
-                              <>
-                                <Check className="mr-1 h-3 w-3" />
-                                Copied!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="mr-1 h-3 w-3" />
-                                Copy
-                              </>
-                            )}
-                          </Button>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCopy(file.content, file.name)}
+                            />
+                          }
+                        >
+                          {copiedFile === file.name ? (
+                            <>
+                              <Check className="mr-1 h-3 w-3" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="mr-1 h-3 w-3" />
+                              Copy
+                            </>
+                          )}
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Copy file content to clipboard</p>
@@ -525,23 +430,25 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                       </Tooltip>
                       
                       <Tooltip>
-                        <TooltipTrigger>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const blob = new Blob([file.content], { type: 'text/plain' });
-                              const url = window.URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = file.name;
-                              a.click();
-                              window.URL.revokeObjectURL(url);
-                            }}
-                          >
-                            <Eye className="mr-1 h-3 w-3" />
-                            View
-                          </Button>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const blob = new Blob([file.content], { type: 'text/plain' });
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = file.name;
+                                a.click();
+                                window.URL.revokeObjectURL(url);
+                              }}
+                            />
+                          }
+                        >
+                          <Eye className="mr-1 h-3 w-3" />
+                          View
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Open file in new tab</p>
@@ -550,7 +457,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                     </div>
                   </div>
                   
-                  <ScrollArea className="h-[400px] w-full rounded-md border bg-muted/30">
+                  <ScrollArea className={cn("w-full h-[240px] sm:h-[360px] rounded-lg", wizardStyles.codeBlock)}>
                     <pre className="p-4 text-sm">
                       <code className={showLineNumbers ? 'flex' : ''}>
                         {showLineNumbers ? (
@@ -576,21 +483,9 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               </TabsContent>
             ))}
           </Tabs>
-        </CardContent>
-      </Card>
+      </WizardPanel>
 
-      {/* Enhanced Deploy Instructions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Terminal className="h-5 w-5" />
-            Deploy Instructions
-          </CardTitle>
-          <CardDescription>
-            Choose your preferred deployment method
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <WizardPanel title="Deploy Instructions" description="Choose your method" icon={Terminal}>
           <div className="space-y-4">
             {/* Deployment Options */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -655,18 +550,20 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               
               <div className="flex items-center gap-2">
                 <Tooltip>
-                  <TooltipTrigger>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const commands = deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.join('\n') || '';
-                        navigator.clipboard.writeText(commands);
-                      }}
-                    >
-                      <Copy className="mr-1 h-3 w-3" />
-                      Copy Commands
-                    </Button>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const commands = deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.join('\n') || '';
+                          navigator.clipboard.writeText(commands);
+                        }}
+                      />
+                    }
+                  >
+                    <Copy className="mr-1 h-3 w-3" />
+                    Copy Commands
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Copy commands to clipboard</p>
@@ -691,31 +588,24 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
               </AlertDescription>
             </Alert>
           </div>
-        </CardContent>
-      </Card>
+      </WizardPanel>
 
-      <Separator />
-
-      {/* Navigation */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <div className="flex gap-2 sm:flex-row sm:gap-2">
-          <Button variant="outline" size="sm" onClick={onBackToHome} className="flex-1 h-8 sm:h-9">
-            <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Back to Home</span>
-            <span className="sm:hidden">Home</span>
+      <WizardActionBar>
+        <div className="flex gap-2 flex-1 sm:flex-none">
+          <Button variant="outline" size="sm" onClick={onBackToHome} className="h-8 flex-1 sm:h-9 text-xs">
+            <Home className="mr-1 h-3 w-3" />
+            Home
           </Button>
-          <Button variant="outline" onClick={() => setStep("generate")} className="flex-1 h-8 sm:h-9">
-            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Back to Generate</span>
-            <span className="sm:hidden">Generate</span>
+          <Button variant="outline" size="sm" onClick={() => setStep("generate")} className="h-8 flex-1 sm:h-9 text-xs">
+            <ArrowLeft className="mr-1 h-3 w-3" />
+            Back
           </Button>
         </div>
-        <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm">
-          <RotateCcw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Start Over</span>
-          <span className="sm:hidden">Reset</span>
+        <Button variant="outline" size="sm" onClick={handleStartOver} className="h-8 w-full sm:w-auto sm:h-9 text-xs">
+          <RotateCcw className="mr-1 h-3 w-3" />
+          Start Over
         </Button>
-      </div>
+      </WizardActionBar>
     </div>
   );
 }

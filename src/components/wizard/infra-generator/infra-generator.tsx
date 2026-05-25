@@ -13,33 +13,34 @@ import {
   Home,
   Download,
   Copy,
-  Eye,
   GitBranch,
   Clock,
   Zap,
   Shield,
+  Sparkles,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import Link from "next/link";
 import { useInfraStore } from "@/lib/store";
 import { generateInfrastructure, validateInfrastructure } from "@/lib/api";
 import { getServiceById } from "@/lib/aws-services";
+import { cn } from "@/lib/utils";
+import {
+  wizardStyles,
+  WizardHeader,
+  WizardPanel,
+  WizardStatRow,
+  WizardActionBar,
+  GeneratedFileTabsList,
+} from "@/components/wizard/shared";
 
 interface InfraGeneratorProps {
   onBackToHome: () => void;
@@ -266,101 +267,74 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-8">
-      <div className="text-center space-y-2">
-        <h2 className="text-lg sm:text-2xl font-bold">Generate Infrastructure</h2>
-        <p className="text-xs sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
-          Validate and generate your infrastructure templates.
-        </p>
-      </div>
+    <div className={wizardStyles.shell}>
+      <WizardHeader
+        step="03"
+        title="Generate Infrastructure"
+        description="Validate your config and produce production-ready IaC templates."
+        icon={Sparkles}
+      />
 
-      {/* Enhanced Summary */}
-      <Card>
-        <CardHeader className="pb-2 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-            <FolderTree className="h-3 w-3 sm:h-5 sm:w-5" />
-            Infrastructure Summary
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Overview of your infrastructure configuration and estimated generation time
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-            <div className="space-y-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">Project</p>
-              <p className="text-xs sm:font-semibold truncate">{projectName}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">Region</p>
-              <p className="text-xs sm:font-semibold">{region}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">Environment</p>
-              <Badge variant="secondary" className="text-xs">{environment}</Badge>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs sm:text-sm text-muted-foreground">Format</p>
-              <Badge className="text-xs">{outputFormat}</Badge>
-            </div>
-          </div>
-          <Separator className="my-2 sm:my-4" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
-            <div className="flex items-center gap-2">
-              <GitBranch className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Services</p>
-                <p className="text-xs sm:font-semibold">{selectedServices.length}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Est. Time</p>
-                <p className="text-xs sm:font-semibold">{(estimatedTime / 1000).toFixed(1)}s</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Complexity</p>
-                <p className="text-xs sm:font-semibold">
-                  {selectedServices.length <= 2 ? "Low" : selectedServices.length <= 4 ? "Medium" : "High"}
-                </p>
-              </div>
-            </div>
-          </div>
-          <Separator className="my-2 sm:my-4" />
-          <div className="space-y-2">
-            <p className="text-xs sm:text-sm text-muted-foreground">Selected Services</p>
-            <div className="flex flex-wrap gap-1 sm:gap-2">
-              {selectedServices.map((sid) => {
-                const service = getServiceById(sid);
-                return (
-                  <Badge key={sid} variant="outline" className="flex items-center gap-1 text-xs">
-                    {service?.name || sid}
-                  </Badge>
-                );
-              })}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <WizardPanel title="Infrastructure Summary" description="Project overview" icon={FolderTree}>
+        <WizardStatRow
+          columns={4}
+          stats={[
+            { label: "Project", value: <span className="text-xs truncate max-w-[80px]">{projectName}</span> },
+            { label: "Region", value: region.split("-")[1]?.toUpperCase() || region },
+            {
+              label: "Environment",
+              value: (
+                <Badge variant="secondary" className="text-[10px] capitalize">
+                  {environment}
+                </Badge>
+              ),
+            },
+            {
+              label: "Format",
+              value: (
+                <Badge className="text-[10px] bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/20">
+                  {outputFormat}
+                </Badge>
+              ),
+            },
+          ]}
+        />
+        <Separator className="my-2 sm:my-3" />
+        <WizardStatRow
+          columns={3}
+          stats={[
+            { label: "Services", value: selectedServices.length },
+            { label: "Est. Time", value: `${(estimatedTime / 1000).toFixed(1)}s` },
+            {
+              label: "Complexity",
+              value:
+                selectedServices.length <= 2
+                  ? "Low"
+                  : selectedServices.length <= 4
+                    ? "Medium"
+                    : "High",
+            },
+          ]}
+        />
+        <div className="flex flex-wrap gap-1 mt-2">
+          {selectedServices.map((sid) => {
+            const service = getServiceById(sid);
+            return (
+              <Badge key={sid} variant="outline" className="text-[10px] h-5 px-1.5">
+                {service?.name || sid}
+              </Badge>
+            );
+          })}
+        </div>
+      </WizardPanel>
 
       {/* Validation */}
       {validationResult && (
-        <Card>
-          <CardHeader className="pb-2 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-              {validationResult.valid ? (
-                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
-              ) : (
-                <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
-              )}
-              Validation Result
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 sm:space-y-3">
+        <WizardPanel
+          title="Validation Result"
+          icon={validationResult.valid ? CheckCircle2 : XCircle}
+        >
+          <div className="space-y-2">
             {validationResult.errors.map((err, i) => (
               <Alert key={i} variant="destructive" className="p-3 sm:p-4">
                 <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -386,8 +360,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                   </AlertDescription>
                 </Alert>
               )}
-          </CardContent>
-        </Card>
+          </div>
+        </WizardPanel>
       )}
 
       {/* Error */}
@@ -401,20 +375,9 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
 
       {/* Enhanced Progress with Steps */}
       {isGenerating && (
-        <Card>
-          <CardHeader className="pb-2 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-              Generating Infrastructure
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Processing your infrastructure configuration step by step
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 sm:space-y-4">
-            <Progress value={progress} className="w-full h-2 sm:h-4" />
-            
-            <div className="space-y-2 sm:space-y-3">
+        <WizardPanel title="Generating..." description="Processing step by step" icon={Loader2}>
+          <Progress value={progress} className="w-full h-1.5 sm:h-2 mb-3" />
+          <div className="space-y-2">
               {generationSteps.map((step) => (
                 <div key={step.id} className="flex items-center gap-2 sm:gap-3">
                   <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
@@ -453,66 +416,46 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                   </div>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </WizardPanel>
       )}
 
-      {/* Enhanced Generated Files */}
       {generatedFiles.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2 sm:pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
-                  <FileCode2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Generated Files
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  {generatedFiles.length} file{generatedFiles.length !== 1 ? "s" : ""} generated
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Label className="flex items-center gap-2 cursor-pointer">
-                      <Switch
-                        checked={showLineNumbers}
-                        onCheckedChange={setShowLineNumbers}
-                        className="scale-75 sm:scale-100"
-                      />
-                      <span className="text-xs sm:text-sm hidden sm:inline">Line Numbers</span>
-                      <span className="text-xs sm:hidden">#</span>
-                    </Label>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Toggle line numbers in code view</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
+        <WizardPanel
+          title="Generated Files"
+          description={`${generatedFiles.length} file${generatedFiles.length !== 1 ? "s" : ""}`}
+          icon={FileCode2}
+          action={
+            <Label className="flex items-center gap-1.5 cursor-pointer text-[10px] sm:text-xs">
+              <Switch checked={showLineNumbers} onCheckedChange={setShowLineNumbers} className="scale-75" />
+              #
+            </Label>
+          }
+        >
             <Tabs
               value={activeFileTab}
               onValueChange={setActiveFileTab}
+              className="w-full min-w-0 gap-3"
             >
-              <TabsList className="flex-wrap h-auto gap-1 p-1">
-                {generatedFiles.map((file) => (
-                  <TabsTrigger key={file.name} value={file.name} className="text-xs relative h-7 px-2 sm:h-8 sm:px-3">
-                    <span className="truncate max-w-20 sm:max-w-none">{file.name}</span>
-                    {fileStats[file.name] && (
-                      <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] hidden sm:inline-flex">
-                        {fileStats[file.name].complexity}
-                      </Badge>
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <GeneratedFileTabsList
+                files={generatedFiles}
+                renderBadge={(fileName: string) => {
+                  const stats = fileStats[fileName];
+                  if (!stats) return null;
+                  return (
+                    <Badge
+                      variant="secondary"
+                      className="file-tab-badge ml-1 hidden border-0 bg-muted/80 text-[10px] sm:inline-flex group-data-active/trigger:bg-white/20 group-data-active/trigger:text-white"
+                    >
+                      {stats.complexity}
+                    </Badge>
+                  );
+                }}
+              />
               {generatedFiles.map((file) => {
                 const stats = fileStats[file.name];
                 return (
-                  <TabsContent key={file.name} value={file.name} className="space-y-3">
+                  <TabsContent key={file.name} value={file.name} className="mt-0 space-y-3 outline-none">
                     {stats && (
                       <div className="flex items-center gap-4 text-sm text-muted-foreground border-b pb-2">
                         <span>{stats.lines} lines</span>
@@ -548,8 +491,8 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                         Download
                       </Button>
                     </div>
-                    <ScrollArea className="h-[400px] w-full rounded-md border">
-                      <pre className="p-4 text-sm">
+                    <ScrollArea className={cn("w-full rounded-lg", wizardStyles.codeBlock, "h-[280px] sm:h-[400px]")}>
+                      <pre className="p-3 sm:p-4">
                         <code className={showLineNumbers ? 'flex' : ''}>
                           {showLineNumbers ? (
                             <div className="flex">
@@ -574,79 +517,60 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                 );
               })}
             </Tabs>
-          </CardContent>
-        </Card>
+        </WizardPanel>
       )}
 
-      {/* Enhanced Actions */}
-      <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-2 sm:flex-row sm:gap-2">
-          <Button variant="outline" size="sm" onClick={onBackToHome} className="flex-1 h-8 sm:h-9">
-            <Home className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Back to Home</span>
-            <span className="sm:hidden">Home</span>
+      <WizardActionBar>
+        <div className="flex gap-2 flex-1 sm:flex-none">
+          <Button variant="outline" size="sm" onClick={onBackToHome} className="h-8 flex-1 sm:h-9 text-xs">
+            <Home className="mr-1 h-3 w-3" />
+            Home
           </Button>
-          <Button variant="outline" onClick={() => setStep("configure")} className="flex-1 h-8 sm:h-9">
-            <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Back to Configure</span>
-            <span className="sm:hidden">Configure</span>
+          <Button variant="outline" size="sm" onClick={() => setStep("configure")} className="h-8 flex-1 sm:h-9 text-xs">
+            <ArrowLeft className="mr-1 h-3 w-3" />
+            Back
           </Button>
         </div>
-        <div className="flex gap-2 sm:flex-row sm:gap-3">
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
+            size="sm"
             onClick={handleValidate}
             disabled={isGenerating || isValidating}
-            className="flex-1 h-8 sm:h-9 text-xs sm:text-sm"
+            className="h-8 flex-1 sm:h-9 text-xs"
           >
             {isValidating ? (
-              <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             ) : (
-              <Shield className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <Shield className="mr-1 h-3 w-3" />
             )}
-            {isValidating ? 'Validating...' : 'Validate'}
+            Validate
           </Button>
           <Button
+            size="sm"
             onClick={handleGenerate}
             disabled={isGenerating || isValidating}
-            size="sm"
-            className="flex-1 h-8 sm:h-9 text-xs sm:text-sm"
+            className="h-8 flex-1 sm:h-9 text-xs bg-orange-500 hover:bg-orange-600 text-white"
           >
             {isGenerating ? (
-              <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             ) : (
-              <FileCode2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <FileCode2 className="mr-1 h-3 w-3" />
             )}
-            {isGenerating ? 'Generating...' : 'Generate'}
+            Generate
           </Button>
           {generatedFiles.length > 0 && (
-            <div className="flex gap-2">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button 
-                    onClick={downloadAllFiles} 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
-                  >
-                    <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">Download All</span>
-                    <span className="sm:hidden">Download</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Download all generated files as ZIP</p>
-                </TooltipContent>
-              </Tooltip>
-              <Button onClick={() => setStep("export")} size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm">
-                <span className="hidden sm:inline">Export</span>
-                <span className="sm:hidden">Export</span>
-                <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              onClick={() => setStep("export")}
+              className="h-8 flex-1 sm:h-9 text-xs bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              Export
+              <ArrowRight className="ml-1 h-3 w-3" />
+            </Button>
           )}
         </div>
-      </div>
+      </WizardActionBar>
     </div>
   );
 }

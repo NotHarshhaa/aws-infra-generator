@@ -1,9 +1,10 @@
 import { Zap, Star, ArrowRight } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PRESET_TEMPLATES, PresetTemplate } from "@/lib/preset-templates";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
+import { WizardPanel } from "@/components/wizard/shared";
+import { cn } from "@/lib/utils";
 
 interface QuickStartTemplatesProps {
   onSelectTemplate: (template: PresetTemplate) => void;
@@ -11,84 +12,56 @@ interface QuickStartTemplatesProps {
 
 export function QuickStartTemplates({ onSelectTemplate }: QuickStartTemplatesProps) {
   return (
-    <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
-      <CardHeader className="pb-2 sm:pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
-            </div>
-            <CardTitle className="text-sm sm:text-lg">Quick Start Templates</CardTitle>
-          </div>
-          <Badge variant="secondary" className="text-xs">
-            Popular
-          </Badge>
-        </div>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Get started instantly with pre-configured infrastructure templates. No setup required.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-3 sm:space-y-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-          {PRESET_TEMPLATES.slice(0, 3).map((template) => {
-            const Icon = awsIconMap[template.icon];
-            const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
+    <WizardPanel
+      variant="accent"
+      title="Quick Start"
+      description="Pre-built stacks · one click"
+      icon={Zap}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {PRESET_TEMPLATES.slice(0, 3).map((template) => {
+          const Icon = awsIconMap[template.icon];
+          const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
 
-            return (
-              <Card
-                key={template.id}
-                className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border hover:border-primary/50 bg-background"
-                onClick={() => onSelectTemplate(template)}
-              >
-                <CardHeader className="pb-2 sm:pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                        {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <CardTitle className="text-xs sm:text-sm font-medium truncate">
-                            {template.name}
-                          </CardTitle>
-                          {isPopular && (
-                            <Star className="h-2 w-2 sm:h-3 sm:w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                          )}
-                        </div>
-                        <CardDescription className="text-xs mt-1 line-clamp-2 hidden sm:block">
-                          {template.description}
-                        </CardDescription>
-                      </div>
-                    </div>
+          return (
+            <button
+              key={template.id}
+              type="button"
+              onClick={() => onSelectTemplate(template)}
+              className={cn(
+                "group flex flex-col rounded-lg border border-border/70 bg-background/60 p-2.5 sm:p-3 text-left",
+                "hover:border-orange-500/40 hover:bg-orange-500/5 transition-all hover:shadow-sm"
+              )}
+            >
+              <div className="flex items-start gap-2 mb-2">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-orange-500/15 text-orange-600">
+                  {Icon && <Icon className="h-3.5 w-3.5" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs sm:text-sm font-semibold truncate">{template.name}</span>
+                    {isPopular && <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500 shrink-0" />}
                   </div>
-                </CardHeader>
-
-                <CardContent className="pt-0">
-                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-2 sm:mb-3">
-                    <Badge variant="outline" className="text-xs">
-                      {template.estimatedServices} services
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {template.estimatedCost} cost
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
-                      {template.difficulty}
-                    </Badge>
-                    <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-200">
-                      {template.globalConfig.outputFormat === "terraform" ? "Terraform" : "CloudFormation"}
-                    </Badge>
-                  </div>
-
-                  <Button size="sm" className="w-full text-xs h-7 sm:h-8">
-                    <ArrowRight className="mr-1 h-3 w-3" />
-                    Use Template
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+                  <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5 hidden sm:block">
+                    {template.description}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-1 mb-2">
+                <Badge className="text-[10px] h-4 px-1 bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/20">
+                  {template.globalConfig.outputFormat === "terraform" ? "TF" : "CFN"}
+                </Badge>
+                <Badge variant="outline" className="text-[10px] h-4 px-1">
+                  {template.estimatedServices} svc
+                </Badge>
+              </div>
+              <span className="inline-flex items-center text-[10px] sm:text-xs font-medium text-orange-600 dark:text-orange-400 group-hover:gap-1.5 gap-1 transition-all">
+                Use template <ArrowRight className="h-3 w-3" />
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </WizardPanel>
   );
 }

@@ -2,12 +2,13 @@
 
 import { useMemo } from "react";
 import { Zap, Star, ArrowRight, ChevronDown, ChevronUp, Package } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PRESET_TEMPLATES, PresetTemplate } from "@/lib/preset-templates";
 import { SERVICE_CATEGORIES } from "@/lib/aws-services";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
+import { WizardPanel } from "@/components/wizard/shared";
+import { cn } from "@/lib/utils";
 
 interface TemplatesViewProps {
   collapsedCategories: Set<string>;
@@ -23,9 +24,7 @@ export function TemplatesView({
   const templatesByCategory = useMemo(() => {
     return PRESET_TEMPLATES.reduce(
       (acc, template) => {
-        if (!acc[template.category]) {
-          acc[template.category] = [];
-        }
+        if (!acc[template.category]) acc[template.category] = [];
         acc[template.category].push(template);
         return acc;
       },
@@ -34,124 +33,81 @@ export function TemplatesView({
   }, []);
 
   return (
-    <Card>
-      <CardHeader className="pb-3 sm:pb-4">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
-          </div>
-          <CardTitle className="text-sm sm:text-lg">All Preset Templates</CardTitle>
-        </div>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Choose from our complete library of pre-configured infrastructure templates.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4 sm:space-y-6">
+    <WizardPanel title="All Templates" description="Browse by category" icon={Zap}>
+      <div className="space-y-2">
         {Object.entries(templatesByCategory).map(([category, templates]) => {
           const categoryInfo = SERVICE_CATEGORIES.find((cat) => cat.id === category);
           const CategoryIcon = categoryInfo ? awsIconMap[categoryInfo.icon] : Package;
           const isCollapsed = collapsedCategories.has(category);
 
           return (
-            <Card key={category} className="border border-border/50">
-              <CardHeader
-                className="pb-2 sm:pb-3 cursor-pointer hover:bg-muted/50 transition-colors"
+            <div key={category} className="rounded-lg border border-border/70 overflow-hidden">
+              <button
+                type="button"
                 onClick={() => onToggleCategory(category)}
+                className="flex w-full items-center justify-between gap-2 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-muted/30 hover:bg-muted/50 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      {CategoryIcon && <CategoryIcon className="h-3 w-3 sm:h-4 sm:w-4" />}
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm sm:text-base capitalize">
-                        {category} Templates
-                      </CardTitle>
-                      <CardDescription className="text-xs">
-                        {templates.length} template{templates.length !== 1 ? "s" : ""} available
-                      </CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {templates.length}
-                    </Badge>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8 p-0">
-                      {isCollapsed ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronUp className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  {CategoryIcon && <CategoryIcon className="h-3.5 w-3.5 text-orange-500 shrink-0" />}
+                  <span className="text-xs sm:text-sm font-medium capitalize truncate">
+                    {category}
+                  </span>
+                  <Badge variant="secondary" className="text-[10px] h-4 shrink-0">
+                    {templates.length}
+                  </Badge>
                 </div>
-              </CardHeader>
+                {isCollapsed ? (
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                ) : (
+                  <ChevronUp className="h-3.5 w-3.5 shrink-0" />
+                )}
+              </button>
 
               {!isCollapsed && (
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                    {templates.map((template) => {
-                      const Icon = awsIconMap[template.icon];
-                      const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(
-                        template.id
-                      );
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 p-2">
+                  {templates.map((template) => {
+                    const Icon = awsIconMap[template.icon];
+                    const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(
+                      template.id
+                    );
 
-                      return (
-                        <Card
-                          key={template.id}
-                          className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border hover:border-primary/50 bg-background"
-                          onClick={() => onSelectTemplate(template)}
-                        >
-                          <CardHeader className="pb-2">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0">
-                                {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4" />}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1">
-                                  <CardTitle className="text-xs sm:text-sm font-medium truncate">
-                                    {template.name}
-                                  </CardTitle>
-                                  {isPopular && (
-                                    <Star className="h-2 w-2 sm:h-3 sm:w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </CardHeader>
-
-                          <CardContent className="pt-0 space-y-2">
-                            <p className="text-xs text-muted-foreground line-clamp-2 hidden sm:block">
-                              {template.description}
-                            </p>
-                            <div className="flex items-center gap-1 flex-wrap">
-                              <Badge className="text-xs bg-blue-100 text-blue-800 border-blue-200">
-                                {template.globalConfig.outputFormat === "terraform"
-                                  ? "Terraform"
-                                  : "CloudFormation"}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {template.estimatedServices}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                {template.difficulty.slice(0, 3)}
-                              </Badge>
-                            </div>
-                            <Button size="sm" className="w-full text-xs h-7 sm:h-8">
-                              <ArrowRight className="mr-1 h-3 w-3" />
-                              Use
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </CardContent>
+                    return (
+                      <button
+                        key={template.id}
+                        type="button"
+                        onClick={() => onSelectTemplate(template)}
+                        className={cn(
+                          "flex flex-col rounded-md border border-border/60 p-2 text-left",
+                          "hover:border-orange-500/40 hover:bg-orange-500/5 transition-all"
+                        )}
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-orange-500/15 text-orange-600">
+                            {Icon && <Icon className="h-3 w-3" />}
+                          </div>
+                          <span className="text-xs font-semibold truncate flex-1">{template.name}</span>
+                          {isPopular && (
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500 shrink-0" />
+                          )}
+                        </div>
+                        <div className="flex gap-1 mb-2">
+                          <Badge className="text-[10px] h-4 px-1">{template.estimatedServices}</Badge>
+                          <Badge variant="outline" className="text-[10px] h-4 px-1">
+                            {template.difficulty.slice(0, 3)}
+                          </Badge>
+                        </div>
+                        <span className="text-[10px] text-orange-600 dark:text-orange-400 inline-flex items-center gap-1">
+                          Use <ArrowRight className="h-2.5 w-2.5" />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-            </Card>
+            </div>
           );
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </WizardPanel>
   );
 }

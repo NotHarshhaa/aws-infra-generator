@@ -6,3 +6,4 @@ export { PresetTemplates } from "./preset-templates/preset-templates";
 export { CostEstimator } from "./cost-estimator/cost-estimator";
 export { InfraDiagram } from "./infra-diagram/infra-diagram";
 export { TerraformPlanPreview } from "./terraform-plan-preview/terraform-plan-preview";
+export * from "./shared";
