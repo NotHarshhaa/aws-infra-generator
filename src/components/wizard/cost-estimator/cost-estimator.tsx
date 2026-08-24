@@ -101,26 +101,55 @@ export function CostEstimator() {
             {costEstimate.services.length} services
           </Badge>
         </div>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="space-y-1 sm:space-y-2">
-              <div className="text-xs sm:text-sm text-muted-foreground">Monthly</div>
-              <div className={`text-xl sm:text-3xl font-bold ${getCostColor(costEstimate.monthly)}`}>
-                ${costEstimate.monthly.toFixed(2)}
-              </div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">
-                per month
-              </div>
+
+        <div className="grid grid-cols-2 gap-2 text-center py-2 bg-background/50 rounded-lg border border-border/50">
+          <div>
+            <span className="text-[10px] text-muted-foreground uppercase font-mono">Monthly</span>
+            <p className="text-lg font-bold text-orange-600 dark:text-orange-400 font-mono">
+              ${costEstimate.monthly.toFixed(2)}
+            </p>
+          </div>
+          <div>
+            <span className="text-[10px] text-muted-foreground uppercase font-mono">Yearly</span>
+            <p className="text-lg font-bold text-foreground font-mono">
+              ${costEstimate.yearly.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        {/* Category Cost Allocation Bar */}
+        {costEstimate.monthly > 0 && (
+          <div className="mt-3 space-y-1.5 pt-2 border-t border-border/40">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground font-medium">Cost Distribution</span>
+              <span className="font-mono text-muted-foreground font-medium">
+                ${costEstimate.monthly.toFixed(2)} / mo
+              </span>
             </div>
-            <div className="space-y-1 sm:space-y-2">
-              <div className="text-xs sm:text-sm text-muted-foreground">Yearly</div>
-              <div className={`text-xl sm:text-3xl font-bold ${getCostColor(costEstimate.yearly)}`}>
-                ${costEstimate.yearly.toFixed(2)}
-              </div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">
-                per year
-              </div>
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex">
+              {costEstimate.services.map((svc, i) => {
+                const pct = (svc.monthlyCost / (costEstimate.monthly || 1)) * 100;
+                if (pct === 0) return null;
+                const colors = [
+                  "bg-blue-500",
+                  "bg-amber-500",
+                  "bg-emerald-500",
+                  "bg-purple-500",
+                  "bg-rose-500",
+                  "bg-indigo-500",
+                ];
+                return (
+                  <div
+                    key={svc.service}
+                    style={{ width: `${pct}%` }}
+                    className={`h-full ${colors[i % colors.length]}`}
+                    title={`${svc.serviceName}: $${svc.monthlyCost.toFixed(2)}`}
+                  />
+                );
+              })}
             </div>
           </div>
+        )}
 
           {showDisclaimer && (
             <>

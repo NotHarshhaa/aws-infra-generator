@@ -1,5 +1,6 @@
 import { TerraformGenerator, GenerateRequest, ValidationResult, GeneratedFile } from '../generators/terraform';
 import { CloudFormationGenerator } from '../generators/cloudformation';
+import { CDKGenerator } from '../generators/cdk';
 import { InfraValidator } from '../services/validator';
 import { DependencyResolver } from '../services/dependency';
 
@@ -7,12 +8,14 @@ import { DependencyResolver } from '../services/dependency';
 export class ClientAPI {
   private terraformGenerator: TerraformGenerator;
   private cloudFormationGenerator: CloudFormationGenerator;
+  private cdkGenerator: CDKGenerator;
   private validator: InfraValidator;
   private resolver: DependencyResolver;
 
   constructor() {
     this.terraformGenerator = new TerraformGenerator();
     this.cloudFormationGenerator = new CloudFormationGenerator();
+    this.cdkGenerator = new CDKGenerator();
     this.validator = new InfraValidator();
     this.resolver = new DependencyResolver();
   }
@@ -25,6 +28,7 @@ export class ClientAPI {
       const resolver = new DependencyResolver();
       const terraformGen = new TerraformGenerator();
       const cloudFormationGen = new CloudFormationGenerator();
+      const cdkGen = new CDKGenerator();
       
       return {
         status: "healthy",
@@ -34,7 +38,8 @@ export class ClientAPI {
           validator: "ok",
           dependency_resolver: "ok",
           terraform_generator: "ok",
-          cloudformation_generator: "ok"
+          cloudformation_generator: "ok",
+          cdk_generator: "ok"
         }
       };
     } catch (error: any) {
@@ -73,9 +78,11 @@ export class ClientAPI {
         projectName: request.projectName,
       });
 
-      let generator: TerraformGenerator | CloudFormationGenerator;
+      let generator: TerraformGenerator | CloudFormationGenerator | CDKGenerator;
       if (request.format === "terraform") {
         generator = this.terraformGenerator;
+      } else if (request.format === "cdk") {
+        generator = this.cdkGenerator;
       } else {
         generator = this.cloudFormationGenerator;
       }

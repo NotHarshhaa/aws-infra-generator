@@ -1,7 +1,8 @@
 "use client";
 
+import { Layers, FileJson } from "lucide-react";
 import { useState, useMemo } from "react";
-import { Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   AWS_SERVICES,
   SERVICE_CATEGORIES,
@@ -17,6 +18,7 @@ import { ServiceSearchFilters } from "./service-search-filters";
 import { ServiceCardsList } from "./service-cards-list";
 import { SelectedServicesFooter } from "./selected-services-footer";
 import { ClearAllDialog } from "./clear-all-dialog";
+import { ConfigImportExportDialog } from "./config-import-export-dialog";
 import { useServiceStats } from "./use-service-stats";
 import type { ServiceSelectorProps } from "./types";
 
@@ -30,6 +32,7 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
   const [selectionMode, setSelectionMode] = useState<"manual" | "templates">("manual");
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showImportExport, setShowImportExport] = useState(false);
 
   const stats = useServiceStats(selectedServices);
 
@@ -88,6 +91,16 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <SelectionModeToggle mode={selectionMode} onModeChange={setSelectionMode} />
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setShowImportExport(true)}
+          className="h-8 text-xs gap-1.5 border-blue-500/30 hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 self-start sm:self-auto"
+        >
+          <FileJson className="h-3.5 w-3.5" />
+          Import / Export Config (JSON)
+        </Button>
       </div>
 
       <InfrastructureOverview
@@ -137,6 +150,11 @@ export function ServiceSelector({ onBackToHome }: ServiceSelectorProps) {
           onConfirm={confirmClearAll}
         />
       )}
+
+      <ConfigImportExportDialog
+        open={showImportExport}
+        onOpenChange={setShowImportExport}
+      />
     </div>
   );
 }

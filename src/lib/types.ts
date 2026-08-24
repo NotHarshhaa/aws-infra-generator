@@ -37,7 +37,7 @@ export interface InfraProject {
 }
 
 export type Environment = "development" | "staging" | "production";
-export type OutputFormat = "terraform" | "cloudformation";
+export type OutputFormat = "terraform" | "cloudformation" | "cdk";
 
 export interface GenerationResult {
   success: boolean;

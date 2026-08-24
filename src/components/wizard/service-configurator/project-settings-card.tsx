@@ -7,19 +7,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AWS_REGIONS } from "@/lib";
+import { AWS_REGIONS, OutputFormat } from "@/lib";
 import { WizardPanel } from "@/components/wizard/shared";
 
 interface ProjectSettingsCardProps {
   projectName: string;
   region: string;
   environment: "development" | "staging" | "production";
-  outputFormat: "terraform" | "cloudformation";
+  outputFormat: OutputFormat;
   projectNameError?: string;
   onProjectNameChange: (name: string) => void;
   onRegionChange: (region: string) => void;
   onEnvironmentChange: (env: "development" | "staging" | "production") => void;
-  onOutputFormatChange: (format: "terraform" | "cloudformation") => void;
+  onOutputFormatChange: (format: OutputFormat) => void;
 }
 
 export function ProjectSettingsCard({
@@ -93,15 +93,16 @@ export function ProjectSettingsCard({
           <Select
             value={outputFormat}
             onValueChange={(v) =>
-              v && onOutputFormatChange(v as "terraform" | "cloudformation")
+              v && onOutputFormatChange(v as OutputFormat)
             }
           >
             <SelectTrigger id="format" className="h-8 text-xs sm:text-sm bg-muted/30">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="terraform">Terraform</SelectItem>
-              <SelectItem value="cloudformation">CloudFormation</SelectItem>
+              <SelectItem value="terraform">Terraform (HCL)</SelectItem>
+              <SelectItem value="cloudformation">CloudFormation (JSON)</SelectItem>
+              <SelectItem value="cdk">AWS CDK (TypeScript)</SelectItem>
             </SelectContent>
           </Select>
         </div>

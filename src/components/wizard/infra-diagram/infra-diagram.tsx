@@ -29,6 +29,8 @@ import {
   GitBranch,
   Rocket,
 } from "lucide-react";
+import { toast } from "sonner";
+import { X, CheckCircle2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -60,9 +62,10 @@ interface DiagramConnection {
 }
 
 export function InfraDiagram() {
-  const { selectedServices, serviceConfig } = useInfraStore();
+  const { selectedServices, serviceConfig, projectName } = useInfraStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const getServiceIcon = (serviceId: string) => {
     const iconMap: Record<string, any> = {
@@ -423,6 +426,7 @@ export function InfraDiagram() {
                     transform={`translate(${node.x}, ${node.y})`}
                     onMouseEnter={() => setHoveredNode(node.id)}
                     onMouseLeave={() => setHoveredNode(null)}
+                    onClick={() => setSelectedNodeId(selectedNodeId === node.id ? null : node.id)}
                     className="cursor-pointer transition-all"
                     style={{
                       opacity: hoveredNode && !isHovered && !isDependency && !isDependentOn ? 0.3 : 1,
@@ -518,6 +522,60 @@ export function InfraDiagram() {
             </g>
           </svg>
         </div>
+
+        {/* Selected Node Inspector Drawer */}
+        {selectedNodeId && (() => {
+          const selectedServiceDef = getServiceById(selectedNodeId);
+          const configData = serviceConfig[selectedNodeId]?.config || {};
+          const selectedNodeObj = nodes.find(n => n.id === selectedNodeId);
+
+          if (!selectedServiceDef) return null;
+
+          return (
+            <div className="mt-3 p-3.5 rounded-lg border border-blue-500/30 bg-gradient-to-r from-blue-500/5 via-background to-purple-500/5 space-y-2 text-xs relative">
+              <button
+                type="button"
+                onClick={() => setSelectedNodeId(null)}
+                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-sm text-foreground">{selectedServiceDef.name} Inspector</span>
+                <Badge variant="outline" className="text-[10px] uppercase font-mono bg-blue-500/10 text-blue-600 border-blue-500/20">
+                  {selectedServiceDef.category}
+                </Badge>
+              </div>
+              
+              <p className="text-muted-foreground text-[11px] max-w-xl">
+                {selectedServiceDef.description}
+              </p>
+
+              {selectedNodeObj && selectedNodeObj.dependencies.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap text-[11px] pt-1">
+                  <span className="text-muted-foreground">Dependencies:</span>
+                  {selectedNodeObj.dependencies.map(d => (
+                    <Badge key={d} variant="secondary" className="text-[10px]">
+                      {d}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-border/50 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {Object.entries(configData).map(([key, val]) => (
+                  <div key={key} className="bg-background/80 p-2 rounded border border-border/60">
+                    <span className="block text-[10px] text-muted-foreground font-mono">{key}</span>
+                    <span className="font-mono text-[11px] font-medium text-foreground truncate block">
+                      {String(val)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Legend */}
         <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 sm:gap-4 text-[10px] sm:text-xs">

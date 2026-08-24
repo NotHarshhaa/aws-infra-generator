@@ -11,9 +11,11 @@ export function buildReadmeContent(options: {
   const deploySteps =
     outputFormat === "terraform"
       ? ["terraform init", "terraform plan", "terraform apply"]
-      : [
+      : outputFormat === "cloudformation"
+      ? [
           `aws cloudformation deploy --template-file template.json --stack-name ${projectName}-stack --capabilities CAPABILITY_IAM`,
-        ];
+        ]
+      : ["npm install", "npx cdk synth", "npx cdk deploy"];
 
   return `# ${projectName}
 
@@ -50,6 +52,16 @@ export function buildGitignoreContent(outputFormat: OutputFormat): string {
       "terraform.tfstate.backup",
       "*.tfvars",
       "crash.log"
+    );
+  } else if (outputFormat === "cdk") {
+    lines.push(
+      "node_modules/",
+      "cdk.out/",
+      "dist/",
+      "*.js",
+      "!.eslintrc.js",
+      "*.d.ts",
+      "package-lock.json"
     );
   }
 

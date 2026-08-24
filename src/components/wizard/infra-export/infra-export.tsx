@@ -132,6 +132,20 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
       estimatedTime: stats.estimatedDeployTime
     },
     {
+      id: "cdk",
+      name: "AWS CDK CLI",
+      description: "Deploy using AWS Cloud Development Kit (TypeScript)",
+      icon: Terminal,
+      commands: [
+        `cd ${projectName}`,
+        "npm install",
+        "npx cdk synth",
+        "npx cdk deploy"
+      ],
+      difficulty: "Intermediate",
+      estimatedTime: stats.estimatedDeployTime
+    },
+    {
       id: "github",
       name: "GitHub Actions",
       description: "Deploy using GitHub Actions CI/CD",
@@ -146,7 +160,11 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
         "    steps:",
         "      - uses: actions/checkout@v2",
         "      - name: Deploy",
-        "        run: terraform apply"
+        outputFormat === "cdk"
+          ? "        run: npx cdk deploy --all --require-approval never"
+          : outputFormat === "terraform"
+          ? "        run: terraform apply -auto-approve"
+          : "        run: aws cloudformation deploy --template-file template.json --stack-name my-stack"
       ],
       difficulty: "Advanced",
       estimatedTime: "15-25 min"

@@ -1,4 +1,4 @@
-import { AWSService, Environment } from "./types";
+import { AWSService, Environment, OutputFormat } from "./types";
 
 export interface PresetTemplate {
   id: string;
@@ -19,7 +19,7 @@ export interface PresetTemplate {
     projectName: string;
     region: string;
     environment: Environment;
-    outputFormat: "terraform" | "cloudformation";
+    outputFormat: OutputFormat;
   };
 }
 
@@ -564,6 +564,99 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
       region: "us-east-1",
       environment: "production",
       outputFormat: "cloudformation",
+    },
+  },
+  {
+    id: "fullstack-saas-cdk",
+    name: "Full-Stack SaaS (CDK TypeScript)",
+    description: "Production-ready Web App with CloudFront CDN, S3, Cognito Auth, API Gateway & DynamoDB",
+    icon: "Sparkles",
+    category: "serverless",
+    difficulty: "Advanced",
+    estimatedServices: 6,
+    estimatedCost: "Low",
+    tags: ["cdk", "serverless", "auth", "saas", "fullstack"],
+    services: [
+      {
+        serviceId: "s3",
+        enabled: true,
+        config: { bucket_name: "frontend-app", versioning: true, block_public_access: true, encryption: "AES256" },
+      },
+      {
+        serviceId: "cloudfront",
+        enabled: true,
+        config: { price_class: "PriceClass_100", compress: true, default_root_object: "index.html" },
+      },
+      {
+        serviceId: "cognito",
+        enabled: true,
+        config: { user_pool_name: "saas-users", allow_self_signup: true },
+      },
+      {
+        serviceId: "api-gateway",
+        enabled: true,
+        config: { api_name: "saas-api", api_type: "rest", stage_name: "prod", enable_cors: true },
+      },
+      {
+        serviceId: "lambda",
+        enabled: true,
+        config: { function_name: "saas-backend", runtime: "nodejs20.x", memory_size: 256, timeout: 10 },
+      },
+      {
+        serviceId: "dynamodb",
+        enabled: true,
+        config: { table_name: "saas-tenants", billing_mode: "PAY_PER_REQUEST" },
+      },
+    ],
+    globalConfig: {
+      projectName: "my-saas-platform",
+      region: "us-east-1",
+      environment: "production",
+      outputFormat: "cdk",
+    },
+  },
+  {
+    id: "event-driven-pipeline",
+    name: "Event-Driven Data Pipeline",
+    description: "Decoupled architecture using EventBridge, SQS, SNS & Lambda for async processing",
+    icon: "Zap",
+    category: "api",
+    difficulty: "Intermediate",
+    estimatedServices: 5,
+    estimatedCost: "Low",
+    tags: ["events", "sqs", "sns", "eventbridge", "async"],
+    services: [
+      {
+        serviceId: "eventbridge",
+        enabled: true,
+        config: { bus_name: "app-events" },
+      },
+      {
+        serviceId: "sqs",
+        enabled: true,
+        config: { queue_name: "order-processing-queue", delay_seconds: 0 },
+      },
+      {
+        serviceId: "sns",
+        enabled: true,
+        config: { topic_name: "order-notifications" },
+      },
+      {
+        serviceId: "lambda",
+        enabled: true,
+        config: { function_name: "order-processor", runtime: "nodejs20.x", memory_size: 512 },
+      },
+      {
+        serviceId: "dynamodb",
+        enabled: true,
+        config: { table_name: "orders", billing_mode: "PAY_PER_REQUEST" },
+      },
+    ],
+    globalConfig: {
+      projectName: "event-pipeline-stack",
+      region: "us-east-1",
+      environment: "staging",
+      outputFormat: "terraform",
     },
   },
 ];

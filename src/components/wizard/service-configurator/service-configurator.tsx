@@ -14,7 +14,7 @@ import { wizardStyles, WizardHeader, GenerationStaleBanner } from "@/components/
 import { ProjectSettingsCard } from "./project-settings-card";
 import { ConfigSummaryCard } from "./config-summary-card";
 import { ServiceConfigAccordion } from "./service-config-accordion";
-import { ConfiguratorActions } from "./configurator-actions";
+import { SecurityAuditCard } from "./security-audit-card";
 import { ConfiguratorTabs } from "./configurator-tabs";
 import { useConfigValidation } from "./use-config-validation";
 import type { ServiceConfiguratorProps } from "./types";
@@ -113,6 +113,8 @@ export function ServiceConfigurator({ onBackToHome }: ServiceConfiguratorProps) 
         region={region}
         hasErrors={hasValidationErrors}
       />
+
+      <SecurityAuditCard />
 
       <ConfiguratorTabs
         configuration={
