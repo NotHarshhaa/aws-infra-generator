@@ -30,7 +30,7 @@ export function WizardStepNav({
 }: WizardStepNavProps) {
   return (
     <nav className="mb-4 sm:mb-6 px-1">
-      <div className="rounded-full border border-border/70 bg-card/85 backdrop-blur-2xl p-1.5 shadow-xs max-w-4xl mx-auto">
+      <div className="rounded-full border border-border/70 bg-card/85 backdrop-blur-md transform-gpu p-1.5 shadow-xs max-w-4xl mx-auto">
         <div className="grid grid-cols-4 gap-1 sm:gap-2">
           {STEPS.map((step) => {
             const isActive = currentStep === step.id;

@@ -111,6 +111,8 @@ export class ClientAPI {
       files?: GeneratedFile[];
       includeReadme?: boolean;
       includeGitignore?: boolean;
+      includeMakefile?: boolean;
+      includeDeployScript?: boolean;
     }
   ): Promise<Blob> {
     try {
@@ -123,6 +125,8 @@ export class ClientAPI {
       const zipBlob = await this._createZipFile(files, {
         includeReadme: options?.includeReadme,
         includeGitignore: options?.includeGitignore,
+        includeMakefile: options?.includeMakefile,
+        includeDeployScript: options?.includeDeployScript,
         projectName: request.projectName,
         environment: request.environment,
         region: request.region,
@@ -144,6 +148,8 @@ export class ClientAPI {
     extras?: {
       includeReadme?: boolean;
       includeGitignore?: boolean;
+      includeMakefile?: boolean;
+      includeDeployScript?: boolean;
       projectName: string;
       environment: string;
       region: string;
@@ -161,10 +167,12 @@ export class ClientAPI {
       filesToZip = buildExportFileList(files, {
         includeReadme: extras.includeReadme ?? true,
         includeGitignore: extras.includeGitignore ?? true,
+        includeMakefile: extras.includeMakefile ?? false,
+        includeDeployScript: extras.includeDeployScript ?? false,
         projectName: extras.projectName,
         environment: extras.environment,
         region: extras.region,
-        outputFormat: extras.outputFormat as 'terraform' | 'cloudformation',
+        outputFormat: extras.outputFormat as import("../types").OutputFormat,
         services: extras.services,
       });
     }

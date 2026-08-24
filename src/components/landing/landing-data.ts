@@ -52,9 +52,9 @@ export interface BenefitItem {
 
 export const HERO_STATS = [
   { value: "32+", label: "AWS Services" },
-  { value: "2", label: "IaC Formats" },
-  { value: "4", label: "Wizard Steps" },
-  { value: "100%", label: "Open Source" },
+  { value: "3", label: "IaC Formats" },
+  { value: "4", label: "Compliance Frameworks" },
+  { value: "100%", label: "Client-Side & Safe" },
 ] as const;
 
 export interface ServiceOverviewItem {
@@ -72,48 +72,58 @@ export interface ServiceDetailItem {
 
 export const LANDING_FEATURES: FeatureItem[] = [
   {
-    icon: Cloud,
-    title: "Service Selection",
-    desc: "Choose from VPC, EC2, S3, RDS, ALB, IAM and more AWS services",
+    icon: Code,
+    title: "Multi-Engine IaC",
+    desc: "Generate production-grade Terraform, AWS CloudFormation, and TypeScript AWS CDK stacks.",
   },
   {
-    icon: Zap,
-    title: "Auto Dependencies",
-    desc: "Service dependencies are automatically resolved and included",
+    icon: GitBranch,
+    title: "Automated CI/CD Pipelines",
+    desc: "Instant GitHub Actions (OIDC auth), GitLab CI/CD, and AWS CodeBuild specs ready to deploy.",
   },
   {
     icon: ShieldCheck,
-    title: "Validation",
-    desc: "Infrastructure is validated for conflicts and missing resources",
+    title: "Multi-Framework Compliance",
+    desc: "Real-time auditing & 1-click remediation for SOC 2 Type II, HIPAA, PCI-DSS, and CIS AWS Benchmark.",
+  },
+  {
+    icon: Zap,
+    title: "FinOps & Graviton Optimizer",
+    desc: "Proactive cost right-sizing, Graviton processor savings, and 1-yr / 3-yr Savings Plans projections.",
+  },
+  {
+    icon: Workflow,
+    title: "Smart Dependency Graph",
+    desc: "Automatic service topology resolution (VPC, Subnets, Security Groups, IAM roles auto-included).",
   },
   {
     icon: Package,
-    title: "Export & Deploy",
-    desc: "Download Terraform or CloudFormation templates as a ZIP archive",
+    title: "Full Deployment Toolkits",
+    desc: "Downloadable ZIP bundles with Makefiles, deploy.sh scripts, and Dockerized IaC execution commands.",
   },
 ];
 
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
   {
     step: "1",
-    title: "Select Services",
-    desc: "Choose the AWS services you need from our comprehensive catalog. Dependencies are automatically resolved and included.",
+    title: "Select Services & Architecture",
+    desc: "Choose from 32+ AWS services or launch pre-built 1-click architecture blueprints. Dependencies are resolved automatically.",
     icon: Server,
-    features: ["32+ AWS Services", "Visual Selection", "Auto Dependencies"],
+    features: ["32+ AWS Services", "Architecture Blueprints", "Auto Dependencies"],
   },
   {
     step: "2",
-    title: "Configure & Generate",
-    desc: "Set regions, instance types, and other parameters with our intuitive interface. Generate clean, production-ready IaC templates.",
+    title: "Configure, Audit & Optimize",
+    desc: "Tailor CIDRs, instance classes, and security policies. Review live FinOps cost projections and compliance readiness scores.",
     icon: Code,
-    features: ["Best Practices", "Security Configs", "Multiple Formats"],
+    features: ["Well-Architected Rules", "SOC2 / HIPAA Compliance", "FinOps Advisor"],
   },
   {
     step: "3",
-    title: "Export & Deploy",
-    desc: "Download as ZIP, copy files, and deploy with terraform apply or CloudFormation. Get your infrastructure running in minutes.",
+    title: "Generate, Export & Automate",
+    desc: "Inspect synthesized code, generate CI/CD workflows, and download complete bundles with Makefiles and deployment scripts.",
     icon: Package,
-    features: ["Terraform & CloudFormation", "Ready to Deploy", "Documentation"],
+    features: ["Terraform, CFN & CDK", "GitHub Actions & GitLab", "Docker & Makefiles"],
   },
 ];
 
@@ -152,20 +162,20 @@ export const USE_CASES: UseCaseItem[] = [
 
 export const BENEFITS: BenefitItem[] = [
   {
-    title: "Save Time & Reduce Errors",
-    desc: "Eliminate manual IaC writing and avoid common configuration mistakes. Our templates follow AWS best practices and include proper security configurations.",
+    title: "Enterprise Governance & Multi-Framework Compliance",
+    desc: "Ensure continuous security posture with automated auditing and 1-click remediation for SOC 2 Type II, HIPAA, PCI-DSS, and CIS AWS Foundations.",
   },
   {
-    title: "Learn Cloud Architecture",
-    desc: "Understand how AWS services connect and depend on each other. Visualize relationships and learn proper infrastructure patterns.",
+    title: "FinOps Intelligence & Graviton Savings",
+    desc: "Proactively reduce AWS cloud spending. Automatically detect x86 instances and switch to Arm-based AWS Graviton for an immediate ~20% compute savings.",
   },
   {
-    title: "Consistent Standards",
-    desc: "Generate standardized infrastructure across teams and projects. Ensure naming conventions, tagging, and security policies are consistent.",
+    title: "Multi-Engine IaC Synthesis (Terraform, CFN & CDK)",
+    desc: "Never get locked into a single format. Generate cleanly structured Terraform HCL, AWS CloudFormation JSON, or modern TypeScript AWS CDK constructs.",
   },
   {
-    title: "Multi-Format Support",
-    desc: "Choose between Terraform and CloudFormation based on your team's preferences. Export clean, readable, and production-ready code.",
+    title: "Turnkey CI/CD & Deployment Automation",
+    desc: "Ship infrastructure with enterprise-grade GitHub Actions workflows (OIDC token auth), GitLab CI/CD, AWS CodeBuild, Makefiles, and Docker runners.",
   },
 ];
 

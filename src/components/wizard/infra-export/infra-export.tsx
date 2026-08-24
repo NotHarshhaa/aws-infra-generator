@@ -19,10 +19,13 @@ import {
   Shield,
   Package,
   Eye,
+  GitBranch,
+  Container,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -30,6 +33,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useInfraStore } from "@/lib/store";
 import { downloadInfrastructure } from "@/lib/api";
+import { getAllCicdPipelines, type CicdPipeline } from "@/lib/cicd-generators";
 import {
   wizardStyles,
   WizardHeader,
@@ -82,8 +86,18 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [includeReadme, setIncludeReadme] = useState(true);
   const [includeGitignore, setIncludeGitignore] = useState(true);
+  const [includeMakefile, setIncludeMakefile] = useState(true);
+  const [includeDeployScript, setIncludeDeployScript] = useState(true);
   const [selectedDeployment, setSelectedDeployment] = useState("terraform");
+  const [selectedCicd, setSelectedCicd] = useState("github-actions");
   const [showLineNumbers, setShowLineNumbers] = useState(false);
+
+  const cicdPipelines = getAllCicdPipelines({
+    projectName: projectName || "aws-infra",
+    environment,
+    region,
+    outputFormat,
+  });
 
   // Calculate export statistics
   const calculateExportStats = (): ExportStats => {
@@ -204,6 +218,8 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
           files: generatedFiles,
           includeReadme,
           includeGitignore,
+          includeMakefile,
+          includeDeployScript,
         }
       );
 
@@ -317,64 +333,82 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
           ]}
         />
         <div className="mt-2 space-y-1">
-          <div className="flex items-center gap-1.5 text-[11px] text-emerald-600">
-            <CheckCircle2 className="h-3 w-3" />
-            Generated successfully
+          <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-medium">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Generated successfully with validated syntax
           </div>
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Shield className="h-3 w-3" />
-            Security best practices applied
+            <Shield className="h-3.5 w-3.5 text-orange-500" />
+            Security & Well-Architected governance checks applied
           </div>
         </div>
       </WizardPanel>
 
-      <WizardPanel variant="accent" title="Download Package" icon={FileArchive}>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-            <div className="flex-1 space-y-2">
-              <p className="text-sm sm:font-medium truncate">
-                {projectName}-{outputFormat}.zip
-              </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                {generatedFiles.length} files &bull; {outputFormat === "terraform" ? "Terraform" : "CloudFormation"} &bull; {environment}
-              </p>
+      <WizardPanel variant="accent" title="Download IaC Package" icon={FileArchive}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex-1 space-y-2.5">
+              <div>
+                <p className="text-sm font-semibold truncate">
+                  {projectName}-{outputFormat}.zip
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {generatedFiles.length} template files &bull; {outputFormat.toUpperCase()} &bull; {environment} ({region})
+                </p>
+              </div>
               
               {/* Download Options */}
-              <div className="space-y-1 sm:space-y-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={includeReadme}
                     onCheckedChange={setIncludeReadme}
-                    className="scale-75 sm:scale-100"
+                    className="scale-75 sm:scale-90"
                   />
-                  <Label className="text-xs sm:text-sm">Include README.md</Label>
+                  <Label className="text-xs cursor-pointer">README.md</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={includeGitignore}
                     onCheckedChange={setIncludeGitignore}
-                    className="scale-75 sm:scale-100"
+                    className="scale-75 sm:scale-90"
                   />
-                  <Label className="text-xs sm:text-sm">Include .gitignore</Label>
+                  <Label className="text-xs cursor-pointer">.gitignore</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={includeMakefile}
+                    onCheckedChange={setIncludeMakefile}
+                    className="scale-75 sm:scale-90"
+                  />
+                  <Label className="text-xs cursor-pointer">Makefile</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={includeDeployScript}
+                    onCheckedChange={setIncludeDeployScript}
+                    className="scale-75 sm:scale-90"
+                  />
+                  <Label className="text-xs cursor-pointer">deploy.sh</Label>
                 </div>
               </div>
             </div>
             
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto">
               <Button
                 size="sm"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm bg-orange-500 hover:bg-orange-600 text-white"
+                className="w-full sm:w-auto rounded-full h-9 px-5 text-xs font-semibold bg-orange-500 hover:bg-orange-600 text-white shadow-xs"
               >
                 {isDownloading ? (
                   <>
-                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-1 sm:mr-2" />
-                    Preparing ZIP...
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2" />
+                    Packaging ZIP...
                   </>
                 ) : (
                   <>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download ZIP
+                    <Download className="mr-1.5 h-4 w-4" />
+                    Download ZIP Bundle
                   </>
                 )}
               </Button>
@@ -390,7 +424,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                       variant="outline"
                       size="sm"
                       onClick={handleCopySummary}
-                      className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+                      className="w-full sm:w-auto rounded-full h-8 text-xs border-border/70"
                     />
                   }
                 >
@@ -401,8 +435,8 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                     </>
                   ) : (
                     <>
-                      <Share2 className="mr-1 h-3 w-3" />
-                      Copy Summary
+                      <Share2 className="mr-1.5 h-3.5 w-3.5" />
+                      Copy Project Summary
                     </>
                   )}
                 </TooltipTrigger>
@@ -414,12 +448,13 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
           </div>
       </WizardPanel>
 
+      {/* Generated Code Viewer */}
       <WizardPanel
         title="Generated Files"
-        description="Preview & copy"
+        description="Preview & copy code"
         icon={FileCode2}
         action={
-          <Button variant="outline" size="sm" onClick={copyAllFiles} className="h-7 text-xs">
+          <Button variant="outline" size="sm" onClick={copyAllFiles} className="rounded-full h-7 text-xs">
             {copiedFile === "all-files" ? (
               <>
                 <Check className="mr-1 h-3 w-3" />
@@ -474,6 +509,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCopy(file.content, file.name)}
+                              className="rounded-full h-7 px-3 text-xs"
                             />
                           }
                         >
@@ -490,7 +526,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                           )}
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Copy file content to clipboard</p>
+                          <p>Copy file content</p>
                         </TooltipContent>
                       </Tooltip>
                       
@@ -501,6 +537,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                               variant="outline"
                               size="sm"
                               onClick={() => openFilePreview(file.content, file.name)}
+                              className="rounded-full h-7 px-3 text-xs"
                             />
                           }
                         >
@@ -514,7 +551,7 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                     </div>
                   </div>
                   
-                  <ScrollArea className={cn("w-full h-[240px] sm:h-[360px] rounded-lg", wizardStyles.codeBlock)}>
+                  <ScrollArea className={cn("w-full h-[240px] sm:h-[360px] rounded-2xl", wizardStyles.codeBlock)}>
                     <pre className="p-4 text-xs font-mono">
                       {showLineNumbers ? (
                         <div className="flex">
@@ -538,10 +575,66 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
           </Tabs>
       </WizardPanel>
 
-      <WizardPanel title="Deploy Instructions" description="Choose your method" icon={Terminal}>
+      {/* Enterprise CI/CD Pipeline Generator */}
+      <WizardPanel
+        title="Automated CI/CD Pipelines"
+        description="Ready-to-use workflows for GitHub, GitLab & AWS CodeBuild"
+        icon={GitBranch}
+      >
+        <Tabs value={selectedCicd} onValueChange={setSelectedCicd} className="w-full">
+          <TabsList className="rounded-full bg-muted/50 p-1 mb-3">
+            {cicdPipelines.map((pipe) => (
+              <TabsTrigger
+                key={pipe.id}
+                value={pipe.id}
+                className="rounded-full text-xs font-medium px-3.5 py-1.5 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs"
+              >
+                {pipe.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {cicdPipelines.map((pipe) => (
+            <TabsContent key={pipe.id} value={pipe.id} className="space-y-3 mt-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold font-mono">{pipe.filename}</span>
+                  <p className="text-[11px] text-muted-foreground">{pipe.description}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCopy(pipe.content, pipe.id)}
+                  className="rounded-full h-7 px-3 text-xs"
+                >
+                  {copiedFile === pipe.id ? (
+                    <>
+                      <Check className="mr-1 h-3 w-3" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-3 w-3" />
+                      Copy Pipeline
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <ScrollArea className={cn("w-full h-[220px] rounded-2xl", wizardStyles.codeBlock)}>
+                <pre className="p-4 text-xs font-mono">
+                  <code>{pipe.content}</code>
+                </pre>
+              </ScrollArea>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </WizardPanel>
+
+      {/* Deployment Instructions */}
+      <WizardPanel title="Deployment Methods & Automation Tooling" description="Run locally, in Docker, or via CI/CD" icon={Terminal}>
           <div className="space-y-4">
-            {/* Deployment Options */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {deploymentOptions.map((option) => {
                 const Icon = option.icon;
                 const isSelected = selectedDeployment === option.id;
@@ -549,32 +642,32 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                 return (
                   <div
                     key={option.id}
-                    className={`relative cursor-pointer rounded-lg border p-4 transition-all ${
+                    className={cn(
+                      "cursor-pointer rounded-2xl border p-3.5 transition-all text-left",
                       isSelected
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:bg-muted/50'
-                    }`}
+                        ? "border-orange-500/60 bg-orange-500/10 shadow-xs ring-1 ring-orange-500/20"
+                        : "border-border/70 hover:bg-muted/40"
+                    )}
                     onClick={() => setSelectedDeployment(option.id)}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                        isSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
-                        <Icon className="h-5 w-5" />
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "flex h-9 w-9 items-center justify-center rounded-xl",
+                        isSelected ? "bg-orange-500 text-white" : "bg-muted text-muted-foreground"
+                      )}>
+                        <Icon className="h-4 w-4" />
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{option.name}</h4>
-                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-semibold tracking-tight">{option.name}</h4>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1">{option.description}</p>
                       </div>
                     </div>
                     
-                    <div className="mt-3 flex items-center gap-2">
-                      <Badge variant={option.difficulty === 'Beginner' ? 'secondary' : option.difficulty === 'Intermediate' ? 'default' : 'destructive'} className="text-xs">
+                    <div className="mt-2.5 flex items-center gap-1.5">
+                      <Badge variant="secondary" className="rounded-full text-[9px] px-1.5 py-0 font-medium">
                         {option.difficulty}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="rounded-full text-[9px] px-1.5 py-0">
                         {option.estimatedTime}
                       </Badge>
                     </div>
@@ -584,93 +677,68 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
             </div>
             
             {/* Selected Commands */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h4 className="font-medium">Deployment Commands</h4>
-                <Badge variant="outline" className="text-xs">
-                  {deploymentOptions.find(opt => opt.id === selectedDeployment)?.name}
-                </Badge>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-xs font-semibold">Deployment Commands</h4>
+                  <Badge variant="outline" className="rounded-full text-[10px]">
+                    {deploymentOptions.find(opt => opt.id === selectedDeployment)?.name}
+                  </Badge>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    const commands = deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.join('\n') || '';
+                    try {
+                      await navigator.clipboard.writeText(commands);
+                      setCopiedFile("commands");
+                      setTimeout(() => setCopiedFile(null), 2000);
+                    } catch (err) {
+                      console.error("Failed to copy commands:", err);
+                    }
+                  }}
+                  className="rounded-full h-7 px-3 text-xs"
+                >
+                  {copiedFile === "commands" ? (
+                    <>
+                      <Check className="mr-1 h-3 w-3" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 h-3 w-3" />
+                      Copy Commands
+                    </>
+                  )}
+                </Button>
               </div>
               
-              <div className="rounded-lg bg-muted/50 border p-4 space-y-2">
+              <div className="rounded-2xl bg-zinc-950 p-3.5 space-y-1.5 text-zinc-200 border border-border/80">
                 {deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.map((cmd, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-muted-foreground select-none">$</span>
-                    <code className="text-sm font-mono">{cmd}</code>
+                  <div key={i} className="flex items-center gap-2 font-mono text-xs">
+                    <span className="text-zinc-500 select-none">$</span>
+                    <code className="text-emerald-400">{cmd}</code>
                   </div>
                 ))}
               </div>
-              
-              <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          const commands = deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.join('\n') || '';
-                          try {
-                            await navigator.clipboard.writeText(commands);
-                            setCopiedFile("commands");
-                            setTimeout(() => setCopiedFile(null), 2000);
-                          } catch (err) {
-                            console.error("Failed to copy commands:", err);
-                          }
-                        }}
-                      />
-                    }
-                  >
-                    {copiedFile === "commands" ? (
-                      <>
-                        <Check className="mr-1 h-3 w-3" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="mr-1 h-3 w-3" />
-                        Copy Commands
-                      </>
-                    )}
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Copy commands to clipboard</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
             </div>
-            
-            {/* Deployment Tips */}
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <div className="space-y-1">
-                  <p className="font-medium">Before deploying:</p>
-                  <ul className="text-sm space-y-1 ml-4">
-                    <li>• Ensure you have proper AWS credentials configured</li>
-                    <li>• Review the generated code for any custom modifications</li>
-                    <li>• Test in a non-production environment first</li>
-                    <li>• Keep your state files secure and backed up</li>
-                  </ul>
-                </div>
-              </AlertDescription>
-            </Alert>
           </div>
       </WizardPanel>
 
       <WizardActionBar>
         <div className="flex gap-2 flex-1 sm:flex-none">
-          <Button variant="outline" size="sm" onClick={onBackToHome} className="h-8 flex-1 sm:h-9 text-xs">
-            <Home className="mr-1 h-3 w-3" />
+          <Button variant="outline" size="sm" onClick={onBackToHome} className="rounded-full h-8 flex-1 sm:h-9 text-xs">
+            <Home className="mr-1 h-3.5 w-3.5" />
             Home
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setStep("generate")} className="h-8 flex-1 sm:h-9 text-xs">
-            <ArrowLeft className="mr-1 h-3 w-3" />
+          <Button variant="outline" size="sm" onClick={() => setStep("generate")} className="rounded-full h-8 flex-1 sm:h-9 text-xs">
+            <ArrowLeft className="mr-1 h-3.5 w-3.5" />
             Back
           </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={handleStartOver} className="h-8 w-full sm:w-auto sm:h-9 text-xs">
-          <RotateCcw className="mr-1 h-3 w-3" />
+        <Button variant="outline" size="sm" onClick={handleStartOver} className="rounded-full h-8 w-full sm:w-auto sm:h-9 text-xs">
+          <RotateCcw className="mr-1 h-3.5 w-3.5" />
           Start Over
         </Button>
       </WizardActionBar>

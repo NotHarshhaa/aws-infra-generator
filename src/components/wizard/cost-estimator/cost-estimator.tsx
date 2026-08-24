@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   DollarSign,
   TrendingUp,
@@ -10,6 +10,9 @@ import {
   ChevronUp,
   Calculator,
   PieChart,
+  Sparkles,
+  Zap,
+  CheckCircle2,
 } from "lucide-react";
 import {
   Card,
@@ -28,9 +31,11 @@ import {
   type TotalCostEstimate,
   type CostEstimate,
 } from "@/lib";
+import { analyzeFinOps, type FinOpsRecommendation } from "@/lib/finops-analyzer";
+import { cn } from "@/lib/utils";
 
 export function CostEstimator() {
-  const { selectedServices, serviceConfig, region, environment } = useInfraStore();
+  const { selectedServices, serviceConfig, region, environment, updateServiceConfig } = useInfraStore();
   const [costEstimate, setCostEstimate] = useState<TotalCostEstimate | null>(null);
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
   const [showDisclaimer, setShowDisclaimer] = useState(true);
@@ -49,6 +54,21 @@ export function CostEstimator() {
     }
   }, [selectedServices, serviceConfig, region, environment]);
 
+  const finOpsData = useMemo(() => {
+    if (!costEstimate) return null;
+    return analyzeFinOps(selectedServices, serviceConfig, costEstimate.monthly);
+  }, [selectedServices, serviceConfig, costEstimate]);
+
+  const handleApplyFinOps = (rec: FinOpsRecommendation) => {
+    if (rec.autoFixAction) {
+      updateServiceConfig(
+        rec.autoFixAction.serviceId,
+        rec.autoFixAction.key,
+        rec.autoFixAction.value
+      );
+    }
+  };
+
   const toggleServiceExpansion = (serviceId: string) => {
     const newExpanded = new Set(expandedServices);
     if (newExpanded.has(serviceId)) {
@@ -60,11 +80,11 @@ export function CostEstimator() {
   };
 
   const getCostColor = (cost: number): string => {
-    if (cost === 0) return "text-green-600";
-    if (cost < 50) return "text-green-600";
-    if (cost < 200) return "text-yellow-600";
-    if (cost < 500) return "text-orange-600";
-    return "text-red-600";
+    if (cost === 0) return "text-emerald-600 dark:text-emerald-400";
+    if (cost < 50) return "text-emerald-600 dark:text-emerald-400";
+    if (cost < 200) return "text-yellow-600 dark:text-yellow-400";
+    if (cost < 500) return "text-orange-600 dark:text-orange-400";
+    return "text-red-600 dark:text-red-400";
   };
 
   const getCostBadgeVariant = (cost: number): "default" | "secondary" | "destructive" | "outline" => {
@@ -77,7 +97,7 @@ export function CostEstimator() {
 
   if (!costEstimate || selectedServices.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 px-4 py-8 text-center">
+      <div className="rounded-2xl border border-dashed border-border/80 bg-muted/20 px-4 py-8 text-center">
         <Calculator className="h-8 w-8 mx-auto text-muted-foreground mb-2 opacity-60" />
         <p className="text-xs text-muted-foreground">Select services to see cost estimates</p>
       </div>
@@ -85,196 +105,172 @@ export function CostEstimator() {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-card/80 p-3 sm:p-4">
+    <div className="space-y-4">
+      {/* Primary Cost Header Card */}
+      <div className="rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 via-card to-card p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
           <div>
             <h3 className="text-sm font-semibold flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-orange-500" />
-              Estimated Cost
+              Estimated Infrastructure Monthly Cost
             </h3>
-            <p className="text-[11px] text-muted-foreground capitalize">
+            <p className="text-xs text-muted-foreground capitalize">
               {costEstimate.environment} · {costEstimate.region}
             </p>
           </div>
-          <Badge variant="outline" className="text-[10px] w-fit">
-            {costEstimate.services.length} services
+          <Badge variant="outline" className="rounded-full text-xs font-semibold px-2.5 py-0.5 w-fit">
+            {selectedServices.length} Active Services
           </Badge>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-center py-2 bg-background/50 rounded-lg border border-border/50">
-          <div>
-            <span className="text-[10px] text-muted-foreground uppercase font-mono">Monthly</span>
-            <p className="text-lg font-bold text-orange-600 dark:text-orange-400 font-mono">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+            <span className="text-xs text-muted-foreground font-medium">Monthly On-Demand</span>
+            <div className={cn("text-2xl font-bold font-mono tracking-tight mt-0.5", getCostColor(costEstimate.monthly))}>
               ${costEstimate.monthly.toFixed(2)}
-            </p>
+            </div>
+            <span className="text-[10px] text-muted-foreground">~${(costEstimate.monthly / 730).toFixed(3)}/hr</span>
           </div>
-          <div>
-            <span className="text-[10px] text-muted-foreground uppercase font-mono">Yearly</span>
-            <p className="text-lg font-bold text-foreground font-mono">
-              ${costEstimate.yearly.toFixed(2)}
-            </p>
+
+          <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3">
+            <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">1-Yr Savings Plan</span>
+            <div className="text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 mt-0.5">
+              ${(costEstimate.monthly * 0.72).toFixed(2)}
+            </div>
+            <span className="text-[10px] text-emerald-700/80 dark:text-emerald-300/80 font-medium">Save ~28% with 1-yr commitment</span>
+          </div>
+
+          <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3">
+            <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">3-Yr Savings Plan</span>
+            <div className="text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 mt-0.5">
+              ${(costEstimate.monthly * 0.48).toFixed(2)}
+            </div>
+            <span className="text-[10px] text-emerald-700/80 dark:text-emerald-300/80 font-medium">Save ~52% with 3-yr commitment</span>
           </div>
         </div>
-
-        {/* Category Cost Allocation Bar */}
-        {costEstimate.monthly > 0 && (
-          <div className="mt-3 space-y-1.5 pt-2 border-t border-border/40">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground font-medium">Cost Distribution</span>
-              <span className="font-mono text-muted-foreground font-medium">
-                ${costEstimate.monthly.toFixed(2)} / mo
-              </span>
-            </div>
-            <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex">
-              {costEstimate.services.map((svc, i) => {
-                const pct = (svc.monthlyCost / (costEstimate.monthly || 1)) * 100;
-                if (pct === 0) return null;
-                const colors = [
-                  "bg-blue-500",
-                  "bg-amber-500",
-                  "bg-emerald-500",
-                  "bg-purple-500",
-                  "bg-rose-500",
-                  "bg-indigo-500",
-                ];
-                return (
-                  <div
-                    key={svc.service}
-                    style={{ width: `${pct}%` }}
-                    className={`h-full ${colors[i % colors.length]}`}
-                    title={`${svc.serviceName}: $${svc.monthlyCost.toFixed(2)}`}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-          {showDisclaimer && (
-            <>
-              <Separator />
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Cost Estimate Disclaimer</AlertTitle>
-                <AlertDescription className="text-xs">
-                  {costEstimate.disclaimer}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="ml-2 h-6 px-2"
-                    onClick={() => setShowDisclaimer(false)}
-                  >
-                    Dismiss
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            </>
-          )}
       </div>
 
-      <div className="rounded-xl border border-border/80 bg-card/80 p-3 sm:p-4">
-        <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
-          <PieChart className="h-4 w-4 text-orange-500" />
-          Cost Breakdown
-        </h3>
-        <div className="space-y-2">
-          {costEstimate.services
-            .sort((a, b) => b.monthlyCost - a.monthlyCost)
-            .map((service: CostEstimate) => (
+      {/* FinOps Proactive Optimization Advisor */}
+      {finOpsData && finOpsData.recommendations.length > 0 && (
+        <div className="rounded-2xl border border-orange-500/25 bg-gradient-to-br from-orange-500/5 via-card to-card p-4 shadow-xs">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-orange-500" />
+              FinOps Right-Sizing & Savings Opportunities
+            </h3>
+            <Badge className="rounded-full bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/25 text-[10px]">
+              Save up to ${finOpsData.potentialMonthlySavingsUsd.toFixed(2)}/mo
+            </Badge>
+          </div>
+
+          <div className="space-y-2">
+            {finOpsData.recommendations.map((rec) => (
               <div
-                key={service.service}
-                className="border rounded-lg p-2 sm:p-3 hover:bg-accent/50 transition-colors"
+                key={rec.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-border/70 bg-background/60 text-xs shadow-xs"
               >
-                <div
-                  className="flex items-center justify-between cursor-pointer"
-                  onClick={() => toggleServiceExpansion(service.service)}
-                >
-                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-xs sm:text-sm truncate">
-                        {service.serviceName}
-                      </div>
-                      <div className="text-[10px] sm:text-xs text-muted-foreground">
-                        {service.breakdown.length} component(s)
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    <Badge variant={getCostBadgeVariant(service.monthlyCost)} className="text-[10px] sm:text-xs">
-                      ${service.monthlyCost.toFixed(2)}/mo
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-foreground">{rec.title}</span>
+                    <Badge variant="outline" className="rounded-full text-[9px] px-2 py-0 bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-mono">
+                      -{rec.percentageSavings}%
                     </Badge>
-                    {expandedServices.has(service.service) ? (
-                      <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                    )}
+                    <Badge variant="secondary" className="rounded-full text-[9px] px-1.5 py-0 uppercase">
+                      {rec.category}
+                    </Badge>
                   </div>
+                  <p className="text-muted-foreground mt-1 text-[11px] leading-relaxed">
+                    {rec.description}
+                  </p>
                 </div>
 
-                {expandedServices.has(service.service) && (
-                  <div className="mt-3 pt-3 border-t space-y-2">
-                    {/* Cost Breakdown Items */}
-                    <div className="space-y-2">
-                      {service.breakdown.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between text-xs"
-                        >
-                          <div className="text-muted-foreground">{item.item}</div>
-                          <div className="font-mono">
-                            {item.cost > 0 ? `$${item.cost.toFixed(2)}` : "Free"} /{" "}
-                            {item.unit}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Notes */}
-                    {service.notes.length > 0 && (
-                      <div className="mt-2 pt-2 border-t">
-                        <div className="text-xs font-semibold mb-1 text-muted-foreground">
-                          Notes:
-                        </div>
-                        <ul className="space-y-1">
-                          {service.notes.map((note, idx) => (
-                            <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
-                              <span className="text-primary mt-0.5">•</span>
-                              <span>{note}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+                {rec.autoFixAction && (
+                  <Button
+                    size="sm"
+                    onClick={() => handleApplyFinOps(rec)}
+                    className="shrink-0 h-7 rounded-full text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-xs"
+                  >
+                    <Zap className="mr-1 h-3 w-3" />
+                    Apply Graviton
+                  </Button>
                 )}
               </div>
             ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-3 sm:p-4">
-        <h3 className="text-sm font-semibold flex items-center gap-2 text-blue-800 dark:text-blue-200 mb-2">
-          <TrendingUp className="h-4 w-4" />
-          Optimization Tips
-        </h3>
-        <div className="text-[11px] sm:text-xs space-y-1.5 text-blue-900/90 dark:text-blue-100/90">
-            <div className="flex items-start gap-1.5 sm:gap-2">
-              <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
-              <span>Use Reserved Instances or Savings Plans (up to 72% savings)</span>
+      {/* Service Breakdown Accordion */}
+      <div className="rounded-2xl border border-border/70 bg-card/85 p-4 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <PieChart className="h-3.5 w-3.5" />
+            Service-by-Service Cost Breakdown
+          </h4>
+          <span className="text-[11px] text-muted-foreground font-mono">
+            {costEstimate.services.length} items
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          {costEstimate.services.map((service) => (
+            <div
+              key={service.service}
+              className="rounded-xl border border-border/60 bg-muted/20 p-3 transition-colors hover:bg-muted/40"
+            >
+              <div
+                className="flex items-center justify-between cursor-pointer gap-2"
+                onClick={() => toggleServiceExpansion(service.service)}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-xs text-foreground uppercase tracking-wide">
+                      {service.service}
+                    </span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-mono">
+                      ${service.monthlyCost.toFixed(2)}/mo
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {expandedServices.has(service.service) ? (
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+              </div>
+
+              {expandedServices.has(service.service) && (
+                <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+                  <div className="space-y-1.5">
+                    {service.breakdown.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{item.item}</span>
+                        <span className="font-mono font-medium text-foreground">
+                          {item.cost > 0 ? `$${item.cost.toFixed(2)}` : "Free Tier"} / {item.unit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {service.notes.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-border/30">
+                      <ul className="space-y-1">
+                        {service.notes.map((note, idx) => (
+                          <li key={idx} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                            <span className="text-orange-500 mt-0.5">•</span>
+                            <span>{note}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="flex items-start gap-1.5 sm:gap-2">
-              <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
-              <span>Enable S3 Intelligent-Tiering for automatic optimization</span>
-            </div>
-            <div className="flex items-start gap-1.5 sm:gap-2">
-              <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
-              <span>Use Spot Instances for non-critical workloads (up to 90% savings)</span>
-            </div>
-            <div className="flex items-start gap-1.5 sm:gap-2">
-              <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mt-0.5 flex-shrink-0" />
-              <span>Set up CloudWatch alarms to monitor costs</span>
-            </div>
+          ))}
         </div>
       </div>
     </div>

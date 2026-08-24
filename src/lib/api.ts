@@ -32,6 +32,8 @@ export async function downloadInfrastructure(payload: {
   files?: GeneratedFile[];
   includeReadme?: boolean;
   includeGitignore?: boolean;
+  includeMakefile?: boolean;
+  includeDeployScript?: boolean;
 }): Promise<Blob> {
   return clientAPI.downloadInfrastructure(payload, options);
 }

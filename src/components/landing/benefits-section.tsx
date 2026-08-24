@@ -5,23 +5,23 @@ import { landingStyles } from "./shared/landing-styles";
 export function BenefitsSection() {
   return (
     <LandingSection
-      eyebrow="Benefits"
-      title="Why choose AWS Infra Generator?"
-      description="Save time, reduce errors, and keep infrastructure consistent across projects."
+      eyebrow="Enterprise Value"
+      title="Engineered for Modern Platform & Cloud Teams"
+      description="Accelerate delivery, enforce governance, and optimize infrastructure cost without operational friction."
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-5xl mx-auto">
         {BENEFITS.map((benefit, index) => (
           <div
             key={benefit.title}
-            className={index % 2 === 0 ? landingStyles.card : landingStyles.cardAccent}
+            className="rounded-3xl border border-border/80 bg-card/85 p-5 sm:p-6 shadow-xs transition-all duration-300 hover:border-orange-500/40 hover:shadow-md"
           >
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-orange-500/15 text-xs font-bold text-orange-600 dark:text-orange-400">
-                {index + 1}
+            <div className="flex items-start gap-3.5">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-xs font-bold text-orange-600 dark:text-orange-400 font-mono">
+                0{index + 1}
               </span>
               <div>
-                <h3 className="text-sm sm:text-base font-semibold">{benefit.title}</h3>
-                <p className="mt-1 text-[11px] sm:text-sm text-muted-foreground leading-relaxed">
+                <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">{benefit.title}</h3>
+                <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
                   {benefit.desc}
                 </p>
               </div>

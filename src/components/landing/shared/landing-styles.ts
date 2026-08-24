@@ -5,9 +5,9 @@ export const landingStyles = {
   ...wizardStyles,
   page: cn(
     "relative space-y-12 sm:space-y-20 pb-12",
-    "before:pointer-events-none before:absolute before:inset-0 before:-z-10",
-    "before:bg-[radial-gradient(circle_at_1px_1px,oklch(0.4_0_0/0.05)_1px,transparent_0)]",
-    "before:[background-size:24px_24px] dark:before:bg-[radial-gradient(circle_at_1px_1px,oklch(0.9_0_0/0.04)_1px,transparent_0)]"
+    "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:transform-gpu",
+    "before:bg-[radial-gradient(circle_at_1px_1px,oklch(0.4_0_0/0.04)_1px,transparent_0)]",
+    "before:[background-size:28px_28px] dark:before:bg-[radial-gradient(circle_at_1px_1px,oklch(0.9_0_0/0.03)_1px,transparent_0)]"
   ),
   section: "relative scroll-mt-24 px-2 sm:px-0",
   sectionHeader: "text-center space-y-2.5 sm:space-y-3.5 mb-8 sm:mb-12 max-w-3xl mx-auto",
@@ -44,7 +44,7 @@ export const landingStyles = {
     "rounded-full h-10 sm:h-11 px-6 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-xs hover:shadow-sm hover:scale-[1.02] transition-all cursor-pointer"
   ),
   heroGlow: cn(
-    "pointer-events-none absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full",
-    "bg-gradient-to-tr from-orange-500/20 via-amber-500/15 to-transparent blur-3xl dark:from-orange-500/15 dark:via-amber-500/10"
+    "pointer-events-none absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full transform-gpu",
+    "bg-gradient-to-tr from-orange-500/15 via-amber-500/10 to-transparent blur-2xl dark:from-orange-500/10 dark:via-amber-500/5"
   ),
 };

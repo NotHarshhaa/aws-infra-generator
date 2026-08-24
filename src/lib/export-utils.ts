@@ -68,11 +68,173 @@ export function buildGitignoreContent(outputFormat: OutputFormat): string {
   return `${lines.join("\n")}\n`;
 }
 
+export function buildMakefileContent(outputFormat: OutputFormat, projectName: string): string {
+  if (outputFormat === "terraform") {
+    return `# Makefile for ${projectName} (Terraform)
+.PHONY: help init fmt validate plan apply destroy cost
+
+help:
+\t@echo "Available commands:"
+\t@echo "  make init      - Initialize Terraform backend and provider plugins"
+\t@echo "  make fmt       - Format all .tf files"
+\t@echo "  make validate  - Validate Terraform configuration syntax"
+\t@echo "  make plan      - Generate and show an execution plan"
+\t@echo "  make apply     - Builds or changes infrastructure"
+\t@echo "  make destroy   - Destroy all Terraform-managed infrastructure"
+
+init:
+\tterraform init
+
+fmt:
+\tterraform fmt -recursive
+
+validate:
+\tterraform validate
+
+plan:
+\tterraform plan -out=tfplan
+
+apply:
+\tterraform apply tfplan
+
+destroy:
+\tterraform destroy
+`;
+  }
+
+  if (outputFormat === "cdk") {
+    return `# Makefile for ${projectName} (AWS CDK)
+.PHONY: help install build synth diff deploy destroy
+
+help:
+\t@echo "Available commands:"
+\t@echo "  make install  - Install npm dependencies"
+\t@echo "  make build    - Compile TypeScript to JS"
+\t@echo "  make synth    - Synthesize CloudFormation template"
+\t@echo "  make diff     - Compare local stack with deployed stack"
+\t@echo "  make deploy   - Deploy this stack to your AWS account"
+\t@echo "  make destroy  - Destroy deployed stack"
+
+install:
+\tnpm install
+
+build:
+\tnpm run build
+
+synth:
+\tnpx cdk synth
+
+diff:
+\tnpx cdk diff
+
+deploy:
+\tnpx cdk deploy --require-approval broadening
+
+destroy:
+\tnpx cdk destroy
+`;
+  }
+
+  return `# Makefile for ${projectName} (CloudFormation)
+.PHONY: help validate deploy delete
+
+help:
+\t@echo "Available commands:"
+\t@echo "  make validate  - Validate CloudFormation template"
+\t@echo "  make deploy    - Deploy CloudFormation stack"
+\t@echo "  make delete    - Delete CloudFormation stack"
+
+validate:
+\taws cloudformation validate-template --template-body file://template.json
+
+deploy:
+\taws cloudformation deploy --template-file template.json --stack-name ${projectName}-stack --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
+delete:
+\taws cloudformation delete-stack --stack-name ${projectName}-stack
+`;
+}
+
+export function buildDeployScriptContent(outputFormat: OutputFormat, projectName: string, region: string): string {
+  if (outputFormat === "terraform") {
+    return `#!/usr/bin/env bash
+# deploy.sh - Interactive deployment script for ${projectName}
+set -euo pipefail
+
+echo "========================================="
+echo " Deploying ${projectName} (Terraform)"
+echo " Region: ${region}"
+echo "========================================="
+
+# 1. Verify AWS CLI & Auth
+if ! command -v aws &> /dev/null; then
+    echo "❌ Error: AWS CLI is not installed."
+    exit 1
+fi
+
+echo "🔍 Checking AWS identity..."
+aws sts get-caller-identity
+
+# 2. Terraform commands
+echo "🚀 Initializing Terraform..."
+terraform init
+
+echo "🔍 Validating syntax..."
+terraform validate
+
+echo "📋 Creating execution plan..."
+terraform plan -out=tfplan
+
+read -p "Do you want to apply this plan to your AWS account? (y/N) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "⚡ Applying changes..."
+    terraform apply tfplan
+    echo "✅ Deployment completed successfully!"
+else
+    echo "⏹️ Deployment cancelled."
+fi
+`;
+  }
+
+  return `#!/usr/bin/env bash
+# deploy.sh - Interactive deployment script for ${projectName}
+set -euo pipefail
+
+echo "========================================="
+echo " Deploying ${projectName} (CloudFormation)"
+echo " Region: ${region}"
+echo "========================================="
+
+if ! command -v aws &> /dev/null; then
+    echo "❌ Error: AWS CLI is not installed."
+    exit 1
+fi
+
+echo "🔍 Checking AWS identity..."
+aws sts get-caller-identity
+
+echo "🔍 Validating template..."
+aws cloudformation validate-template --template-body file://template.json --region ${region}
+
+echo "🚀 Deploying stack ${projectName}-stack..."
+aws cloudformation deploy \\
+    --template-file template.json \\
+    --stack-name "${projectName}-stack" \\
+    --region "${region}" \\
+    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
+echo "✅ Stack deployment completed successfully!"
+`;
+}
+
 export function buildExportFileList(
   files: GeneratedFile[],
   options: {
     includeReadme: boolean;
     includeGitignore: boolean;
+    includeMakefile?: boolean;
+    includeDeployScript?: boolean;
     projectName: string;
     environment: string;
     region: string;
@@ -103,6 +265,24 @@ export function buildExportFileList(
       path: `${options.projectName}/.gitignore`,
       content: buildGitignoreContent(options.outputFormat),
       language: "text",
+    });
+  }
+
+  if (options.includeMakefile) {
+    exportFiles.push({
+      name: "Makefile",
+      path: `${options.projectName}/Makefile`,
+      content: buildMakefileContent(options.outputFormat, options.projectName),
+      language: "makefile",
+    });
+  }
+
+  if (options.includeDeployScript) {
+    exportFiles.push({
+      name: "deploy.sh",
+      path: `${options.projectName}/deploy.sh`,
+      content: buildDeployScriptContent(options.outputFormat, options.projectName, options.region),
+      language: "bash",
     });
   }
 

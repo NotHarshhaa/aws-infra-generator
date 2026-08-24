@@ -80,6 +80,32 @@ export type {
   TerraformPlanSummary,
 } from "./terraform-plan-types";
 
+// CI/CD Generators
+export {
+  generateGithubActionsWorkflow,
+  generateGitlabCiPipeline,
+  generateCodeBuildSpec,
+  getAllCicdPipelines,
+  type CicdPipeline,
+} from "./cicd-generators";
+
+// Compliance & Governance
+export {
+  auditCompliance,
+  COMPLIANCE_FRAMEWORKS,
+  COMPLIANCE_RULES,
+  type ComplianceFramework,
+  type ComplianceFinding,
+  type ComplianceScore,
+} from "./compliance-auditor";
+
+// FinOps & Cost Optimization
+export {
+  analyzeFinOps,
+  type FinOpsAnalysis,
+  type FinOpsRecommendation,
+} from "./finops-analyzer";
+
 // Generator helpers
 export {
   terraformSubnetIdList,

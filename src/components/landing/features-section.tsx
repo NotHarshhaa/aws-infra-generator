@@ -7,17 +7,22 @@ export function FeaturesSection() {
     <LandingSection
       id="features"
       eyebrow="Capabilities"
-      title="Everything you need to ship infra"
-      description="From service selection to export — one workflow, no manual boilerplate."
+      title="Next-Gen AWS Cloud Infrastructure Studio"
+      description="From architecture blueprints and live compliance audits to CI/CD generation and FinOps right-sizing."
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {LANDING_FEATURES.map((feature) => (
-          <div key={feature.title} className={landingStyles.card}>
-            <div className={landingStyles.iconBox}>
-              <feature.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+          <div
+            key={feature.title}
+            className="group rounded-3xl border border-border/80 bg-card/85 p-5 shadow-xs transition-all duration-300 hover:border-orange-500/40 hover:bg-card hover:shadow-md"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 group-hover:scale-105 transition-transform duration-200">
+              <feature.icon className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm sm:text-base font-semibold">{feature.title}</h3>
-            <p className="mt-1 text-[11px] sm:text-sm text-muted-foreground leading-relaxed">
+            <h3 className="mt-4 text-base font-semibold text-foreground tracking-tight">
+              {feature.title}
+            </h3>
+            <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
               {feature.desc}
             </p>
           </div>
