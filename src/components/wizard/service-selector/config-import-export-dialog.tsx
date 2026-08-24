@@ -32,12 +32,7 @@ export function ConfigImportExportDialog({
     environment,
     region,
     outputFormat,
-    setSelectedServices,
-    updateServiceConfig,
-    setProjectName,
-    setEnvironment,
-    setRegion,
-    setOutputFormat,
+    importConfig,
   } = useInfraStore();
 
   const [activeTab, setActiveTab] = useState<"export" | "import">("export");
@@ -90,30 +85,13 @@ export function ConfigImportExportDialog({
         throw new Error("Invalid JSON structure");
       }
 
-      if (Array.isArray(data.selectedServices)) {
-        setSelectedServices(data.selectedServices);
-      }
-
-      if (data.serviceConfig && typeof data.serviceConfig === "object") {
-        Object.entries(data.serviceConfig).forEach(([serviceId, item]: [string, any]) => {
-          if (item && item.config) {
-            Object.entries(item.config).forEach(([key, val]: [string, any]) => {
-              updateServiceConfig(serviceId, key, val);
-            });
-          }
-        });
-      }
-
-      if (data.projectName) setProjectName(String(data.projectName));
-      if (data.environment) setEnvironment(data.environment as Environment);
-      if (data.region) setRegion(String(data.region));
-      if (data.outputFormat) setOutputFormat(data.outputFormat as OutputFormat);
+      importConfig(data);
 
       toast.success("Architecture configuration imported successfully!");
       onOpenChange(false);
       setImportJsonText("");
-    } catch (err: any) {
-      toast.error(`Failed to import configuration: ${err.message || "Invalid JSON"}`);
+    } catch (err: unknown) {
+      toast.error(`Failed to import configuration: ${err instanceof Error ? err.message : "Invalid JSON"}`);
     }
   };
 

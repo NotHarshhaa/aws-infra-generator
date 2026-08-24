@@ -1,7 +1,5 @@
-import { Star, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Star, AlertTriangle, CheckCircle2, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getServiceById } from "@/lib/aws-services";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
 import { wizardStyles, WizardPanel } from "@/components/wizard/shared";
@@ -58,7 +56,7 @@ export function ServiceCardsList({
                         onClick={() => onToggleService(service.id)}
                         className={cn(
                           "group flex w-full items-start gap-2 rounded-lg border p-2 sm:p-2.5 text-left transition-all",
-                          "hover:border-orange-500/40 hover:bg-orange-500/5",
+                          "hover:border-orange-500/40 hover:bg-orange-500/5 cursor-pointer",
                           isSelected
                             ? "border-orange-500/50 bg-orange-500/10 ring-1 ring-orange-500/20"
                             : "border-border/70 bg-muted/20"
@@ -103,12 +101,16 @@ export function ServiceCardsList({
                           </div>
                         </div>
 
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => onToggleService(service.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 shrink-0 mt-0.5"
-                        />
+                        <div
+                          className={cn(
+                            "h-4 w-4 shrink-0 mt-0.5 rounded-[4px] border flex items-center justify-center transition-colors",
+                            isSelected
+                              ? "bg-orange-500 border-orange-500 text-white"
+                              : "border-input bg-background/50 group-hover:border-orange-500/50"
+                          )}
+                        >
+                          {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
+                        </div>
                       </button>
                     );
                   })}

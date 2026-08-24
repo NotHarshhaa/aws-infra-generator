@@ -1,6 +1,5 @@
 import { Zap, Star, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { PRESET_TEMPLATES, type PresetTemplate, cn } from "@/lib";
 import { awsIconMap } from "@/components/shared/aws-icon-map";
 import { WizardPanel } from "@/components/wizard/shared";
@@ -21,6 +20,12 @@ export function QuickStartTemplates({ onSelectTemplate }: QuickStartTemplatesPro
         {PRESET_TEMPLATES.slice(0, 3).map((template) => {
           const Icon = awsIconMap[template.icon];
           const isPopular = ["simple-web-app", "serverless-api", "static-website"].includes(template.id);
+          const formatLabel =
+            template.globalConfig.outputFormat === "terraform"
+              ? "TF"
+              : template.globalConfig.outputFormat === "cdk"
+              ? "CDK"
+              : "CFN";
 
           return (
             <button
@@ -28,7 +33,7 @@ export function QuickStartTemplates({ onSelectTemplate }: QuickStartTemplatesPro
               type="button"
               onClick={() => onSelectTemplate(template)}
               className={cn(
-                "group flex flex-col rounded-lg border border-border/70 bg-background/60 p-2.5 sm:p-3 text-left",
+                "group flex flex-col rounded-lg border border-border/70 bg-background/60 p-2.5 sm:p-3 text-left cursor-pointer",
                 "hover:border-orange-500/40 hover:bg-orange-500/5 transition-all hover:shadow-sm"
               )}
             >
@@ -48,7 +53,7 @@ export function QuickStartTemplates({ onSelectTemplate }: QuickStartTemplatesPro
               </div>
               <div className="flex flex-wrap gap-1 mb-2">
                 <Badge className="text-[10px] h-4 px-1 bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/20">
-                  {template.globalConfig.outputFormat === "terraform" ? "TF" : "CFN"}
+                  {formatLabel}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] h-4 px-1">
                   {template.estimatedServices} svc

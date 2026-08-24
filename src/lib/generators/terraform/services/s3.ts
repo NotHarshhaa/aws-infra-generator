@@ -81,14 +81,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "main" {
   }
 }
 
-# S3 Bucket logging configuration (optional)
-resource "aws_s3_bucket_logging" "main" {
-  bucket = aws_s3_bucket.main.id
-
-  target_bucket = aws_s3_bucket.main.id
-  target_prefix = "log/"
-}
-
 # S3 Bucket policy for additional security
 resource "aws_s3_bucket_policy" "main" {
   bucket = aws_s3_bucket.main.id

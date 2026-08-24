@@ -494,25 +494,21 @@ export function InfraGenerator({ onBackToHome }: InfraGeneratorProps) {
                       </Button>
                     </div>
                     <ScrollArea className={cn("w-full rounded-lg", wizardStyles.codeBlock, "h-[280px] sm:h-[400px]")}>
-                      <pre className="p-3 sm:p-4">
-                        <code className={showLineNumbers ? 'flex' : ''}>
-                          {showLineNumbers ? (
-                            <div className="flex">
-                              <div className="pr-4 text-gray-400 select-none border-r">
-                                {file.content.split('\n').map((_, i) => (
-                                  <div key={i} className="text-right">
-                                    {i + 1}
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="pl-4">
-                                <code>{file.content}</code>
-                              </div>
+                      <pre className="p-3 sm:p-4 text-xs font-mono">
+                        {showLineNumbers ? (
+                          <div className="flex">
+                            <div className="pr-4 text-gray-400 select-none border-r">
+                              {file.content.split('\n').map((_, i) => (
+                                <div key={i} className="text-right">
+                                  {i + 1}
+                                </div>
+                              ))}
                             </div>
-                          ) : (
-                            <code>{file.content}</code>
-                          )}
-                        </code>
+                            <code className="pl-4 flex-1 overflow-x-auto">{file.content}</code>
+                          </div>
+                        ) : (
+                          <code>{file.content}</code>
+                        )}
                       </pre>
                     </ScrollArea>
                   </TabsContent>

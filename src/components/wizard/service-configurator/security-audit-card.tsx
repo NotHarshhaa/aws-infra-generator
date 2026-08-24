@@ -35,10 +35,6 @@ export function SecurityAuditCard() {
     }
   };
 
-  const criticalCount = findings.filter((f) => f.severity === "critical").length;
-  const highCount = findings.filter((f) => f.severity === "high").length;
-  const mediumCount = findings.filter((f) => f.severity === "medium").length;
-
   return (
     <Card className="border-border/60 bg-gradient-to-br from-card via-card to-amber-500/5 shadow-xs">
       <CardHeader className="pb-3">

@@ -28,7 +28,9 @@ resource "aws_lambda_function" "main" {
   memory_size     = ${memorySize}
   timeout         = ${timeout}
   
-  ${enableTracing ? `tracing_config_mode = "Active"` : ''}
+  ${enableTracing ? `tracing_config {
+    mode = "Active"
+  }` : ''}
   ${reservedConcurrency ? `reserved_concurrent_executions = ${reservedConcurrency}` : ''}
   
   ${enableVpc ? `

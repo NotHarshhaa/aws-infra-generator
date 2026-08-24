@@ -207,14 +207,6 @@ resource "aws_instance" "main" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-# EBS volume attachment for additional storage
-resource "aws_volume_attachment" "data_volume" {
-  count       = var.instance_count
-  device_name = "/dev/sdf"
-  volume_id   = aws_instance.main[count.index].ebs_block_device[0].volume_id
-  instance_id = aws_instance.main[count.index].id
 }`;
 
   return {

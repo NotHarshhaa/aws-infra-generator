@@ -1,4 +1,4 @@
-import { AWSService, Environment, OutputFormat } from "./types";
+import { Environment, OutputFormat } from "./types";
 
 export interface PresetTemplate {
   id: string;

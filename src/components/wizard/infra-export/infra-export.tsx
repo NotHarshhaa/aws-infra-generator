@@ -515,25 +515,21 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                   </div>
                   
                   <ScrollArea className={cn("w-full h-[240px] sm:h-[360px] rounded-lg", wizardStyles.codeBlock)}>
-                    <pre className="p-4 text-sm">
-                      <code className={showLineNumbers ? 'flex' : ''}>
-                        {showLineNumbers ? (
-                          <div className="flex">
-                            <div className="pr-4 text-gray-400 select-none border-r">
-                              {file.content.split('\n').map((_, i) => (
-                                <div key={i} className="text-right">
-                                  {i + 1}
-                                </div>
-                              ))}
-                            </div>
-                            <div className="pl-4">
-                              <code>{file.content}</code>
-                            </div>
+                    <pre className="p-4 text-xs font-mono">
+                      {showLineNumbers ? (
+                        <div className="flex">
+                          <div className="pr-4 text-gray-400 select-none border-r">
+                            {file.content.split('\n').map((_, i) => (
+                              <div key={i} className="text-right">
+                                {i + 1}
+                              </div>
+                            ))}
                           </div>
-                        ) : (
-                          <code>{file.content}</code>
-                        )}
-                      </code>
+                          <code className="pl-4 flex-1 overflow-x-auto">{file.content}</code>
+                        </div>
+                      ) : (
+                        <code>{file.content}</code>
+                      )}
                     </pre>
                   </ScrollArea>
                 </div>
@@ -612,15 +608,30 @@ export function InfraExport({ onBackToHome }: InfraExportProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
+                        onClick={async () => {
                           const commands = deploymentOptions.find(opt => opt.id === selectedDeployment)?.commands.join('\n') || '';
-                          navigator.clipboard.writeText(commands);
+                          try {
+                            await navigator.clipboard.writeText(commands);
+                            setCopiedFile("commands");
+                            setTimeout(() => setCopiedFile(null), 2000);
+                          } catch (err) {
+                            console.error("Failed to copy commands:", err);
+                          }
                         }}
                       />
                     }
                   >
-                    <Copy className="mr-1 h-3 w-3" />
-                    Copy Commands
+                    {copiedFile === "commands" ? (
+                      <>
+                        <Check className="mr-1 h-3 w-3" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-1 h-3 w-3" />
+                        Copy Commands
+                      </>
+                    )}
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Copy commands to clipboard</p>

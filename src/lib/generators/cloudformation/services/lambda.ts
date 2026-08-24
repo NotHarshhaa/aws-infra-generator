@@ -117,10 +117,10 @@ export function generateLambda(
 
   // Environment Variables
   if (Object.keys(environmentVariables).length > 0) {
-    const envVars = Object.entries(environmentVariables).map(([key, value]) => ({
-      Variable: key,
-      Value: value,
-    }));
+    const envVars: Record<string, string> = {};
+    for (const [key, value] of Object.entries(environmentVariables)) {
+      envVars[key] = String(value);
+    }
     functionProperties.Environment = { Variables: envVars };
   }
 

@@ -149,7 +149,10 @@ export class InfraValidator {
       if (parts.length !== 2) {
         return false;
       }
-      const prefix = parseInt(parts[1]);
+      if (!/^\d+$/.test(parts[1])) {
+        return false;
+      }
+      const prefix = parseInt(parts[1], 10);
       if (prefix < 16 || prefix > 28) {
         return false;
       }
@@ -158,7 +161,10 @@ export class InfraValidator {
         return false;
       }
       for (const octet of octets) {
-        const val = parseInt(octet);
+        if (!/^\d+$/.test(octet)) {
+          return false;
+        }
+        const val = parseInt(octet, 10);
         if (val < 0 || val > 255) {
           return false;
         }

@@ -22,6 +22,14 @@ interface InfraStore {
   selectedTemplate: PresetTemplate | null;
   setSelectedTemplate: (template: PresetTemplate | null) => void;
   applyPresetTemplate: (template: PresetTemplate) => void;
+  importConfig: (data: {
+    selectedServices?: string[];
+    serviceConfig?: Record<string, unknown>;
+    projectName?: string;
+    environment?: Environment;
+    region?: string;
+    outputFormat?: OutputFormat;
+  }) => void;
 
   selectedServices: string[];
   toggleService: (serviceId: string) => void;
@@ -143,6 +151,42 @@ export const useInfraStore = create<InfraStore>()(
           environment: template.globalConfig.environment,
           region: template.globalConfig.region,
           outputFormat: template.globalConfig.outputFormat,
+          generatedFiles: [],
+          validationResult: null,
+          configSnapshot: null,
+          isGenerationStale: false,
+        });
+      },
+
+      importConfig: (data) => {
+        const services = Array.isArray(data.selectedServices) ? data.selectedServices : [];
+        const resolvedServices = resolveServicesWithDependencies(services);
+        const importedCustomConfigs: Record<string, Record<string, string | number | boolean>> = {};
+        if (data.serviceConfig && typeof data.serviceConfig === "object") {
+          for (const [sId, item] of Object.entries(data.serviceConfig)) {
+            if (item && typeof item === "object" && "config" in item) {
+              const rawConfig = (item as { config?: Record<string, unknown> }).config;
+              if (rawConfig && typeof rawConfig === "object") {
+                const cleanConfig: Record<string, string | number | boolean> = {};
+                for (const [k, v] of Object.entries(rawConfig)) {
+                  if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+                    cleanConfig[k] = v;
+                  }
+                }
+                importedCustomConfigs[sId] = cleanConfig;
+              }
+            }
+          }
+        }
+        const serviceConfig = ensureServiceConfigs(resolvedServices, {}, importedCustomConfigs);
+
+        set({
+          selectedServices: resolvedServices,
+          serviceConfig,
+          projectName: typeof data.projectName === "string" && data.projectName ? data.projectName : get().projectName,
+          environment: data.environment || get().environment,
+          region: data.region || get().region,
+          outputFormat: data.outputFormat || get().outputFormat,
           generatedFiles: [],
           validationResult: null,
           configSnapshot: null,

@@ -28,7 +28,7 @@ export function buildEc2(
           IpProtocol: "tcp",
           FromPort: 22,
           ToPort: 22,
-          CidrIp: { "Fn::Join": [",", { Ref: "AllowedCidrBlocks" }] },
+          CidrIp: { "Fn::Select": ["0", { Ref: "AllowedCidrBlocks" }] },
           Description: "SSH access from allowed CIDR blocks",
         },
         // HTTP access (restricted in production)

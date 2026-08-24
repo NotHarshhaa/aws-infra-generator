@@ -445,6 +445,25 @@ export function generateVariables(
     );
   }
 
+  if (services.includes("route53")) {
+    const r53Cfg = config.route53?.config || {};
+    lines.push(
+      ``,
+      `# Route53 Configuration`,
+      `variable "domain_name" {`,
+      `  description = "Domain name for Route53 hosted zone"`,
+      `  type        = string`,
+      `  default     = "${r53Cfg.domain_name || `${projectName}-${environment}.example.com`}"`,
+      `}`,
+      ``,
+      `variable "hosted_zone_id" {`,
+      `  description = "Existing Route53 Hosted Zone ID (if not creating a new one)"`,
+      `  type        = string`,
+      `  default     = "${r53Cfg.hosted_zone_id || ""}"`,
+      `}`
+    );
+  }
+
   if (services.includes("dynamodb")) {
     const dynamoCfg = config.dynamodb?.config || {};
     lines.push(
