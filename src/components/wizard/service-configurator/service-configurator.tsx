@@ -16,6 +16,7 @@ import { ConfigSummaryCard } from "./config-summary-card";
 import { ServiceConfigAccordion } from "./service-config-accordion";
 import { SecurityAuditCard } from "./security-audit-card";
 import { ConfiguratorTabs } from "./configurator-tabs";
+import { ConfiguratorActions } from "./configurator-actions";
 import { useConfigValidation } from "./use-config-validation";
 import type { ServiceConfiguratorProps } from "./types";
 
