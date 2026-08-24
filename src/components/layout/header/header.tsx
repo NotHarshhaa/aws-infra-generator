@@ -92,23 +92,20 @@ export function Header({ onBackToHome, showNav = true, onGetStarted }: HeaderPro
       <header
         className={cn(
           "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
-          "border-b backdrop-blur-xl supports-[backdrop-filter]:bg-background/80",
+          "border-b backdrop-blur-2xl supports-[backdrop-filter]:bg-background/80",
           scrolled
-            ? "border-orange-500/20 bg-background/90 shadow-sm shadow-orange-500/5"
-            : "border-border/50 bg-background/70"
+            ? "border-border/80 bg-background/95 shadow-xs"
+            : "border-border/40 bg-background/70"
         )}
       >
-        <div className="container mx-auto flex h-14 sm:h-[3.75rem] items-center gap-2 sm:gap-3 px-3 sm:px-4">
+        <div className="container mx-auto flex h-14 sm:h-16 items-center gap-2 sm:gap-3 px-3 sm:px-4">
           <button
             type="button"
             onClick={onBackToHome}
-            className="group flex min-w-0 shrink-0 items-center gap-2 sm:gap-2.5 rounded-lg border-0 bg-transparent p-0 cursor-pointer"
+            className="group flex min-w-0 shrink-0 items-center gap-2.5 rounded-full border-0 bg-transparent p-1 -ml-1 cursor-pointer transition-transform hover:scale-[1.02]"
           >
             <div
-              className={cn(
-                landingStyles.iconBox,
-                "h-8 w-8 sm:h-9 sm:w-9 p-0 group-hover:border-orange-500/40 transition-colors"
-              )}
+              className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-orange-500/20 via-orange-500/10 to-amber-500/10 border border-orange-500/20 shadow-xs group-hover:border-orange-500/40 transition-colors"
             >
               <img
                 src={logoSrc}
@@ -118,59 +115,57 @@ export function Header({ onBackToHome, showNav = true, onGetStarted }: HeaderPro
               />
             </div>
             <div className="min-w-0 text-left">
-              <span className="block truncate text-sm font-bold tracking-tight leading-none group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                AWS Infra Generator
-              </span>
-              <span className="hidden sm:block text-[10px] text-muted-foreground leading-tight mt-0.5">
-                {showNav ? "Infrastructure as Code" : "Wizard mode"}
+              <div className="flex items-center gap-1.5">
+                <span className="block truncate text-sm sm:text-base font-bold tracking-tight leading-none group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                  AWS Infra
+                </span>
+                <span className="rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 px-1.5 py-0.2 text-[9px] font-semibold uppercase tracking-wider">
+                  Studio
+                </span>
+              </div>
+              <span className="hidden sm:block text-[11px] text-muted-foreground leading-tight mt-0.5 font-normal">
+                {showNav ? "Cloud IaC Generator" : "Studio workspace"}
               </span>
             </div>
           </button>
 
           {showNav && (
-            <nav className="hidden lg:flex flex-1 justify-center min-w-0 px-2">
-              <div
-                className={cn(
-                  landingStyles.segmented,
-                  "max-w-full overflow-x-auto",
-                  landingStyles.filterRail
-                )}
-              >
-                <div className={cn(landingStyles.filterList, "gap-0.5 p-0.5")}>
-                  {NAV_ITEMS.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleNavClick(item.id)}
-                      className={cn(
-                        landingStyles.pill,
-                        "border-0 bg-transparent hover:bg-background/70 hover:text-foreground"
-                      )}
-                    >
-                      <item.icon className="h-3.5 w-3.5 text-orange-500" />
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
+            <nav className="hidden lg:flex flex-1 justify-center min-w-0 px-4">
+              <div className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/35 backdrop-blur-md p-1 shadow-xs">
+                {NAV_ITEMS.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNavClick(item.id)}
+                    className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-background hover:text-foreground hover:shadow-xs cursor-pointer"
+                  >
+                    <item.icon className="h-3.5 w-3.5 text-orange-500" />
+                    {item.label}
+                  </button>
+                ))}
               </div>
             </nav>
           )}
 
           {!showNav && (
-            <div className="hidden sm:flex flex-1 items-center">
-              <span className={landingStyles.eyebrow}>Building infrastructure</span>
+            <div className="hidden sm:flex flex-1 items-center pl-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-600 dark:text-orange-400">
+                <Sparkles className="h-3 w-3" />
+                Active Studio Session
+              </span>
             </div>
           )}
 
-          <div className="ml-auto flex items-center gap-1 sm:gap-1.5 shrink-0">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
             {showNav && onGetStarted && (
               <Button
                 size="sm"
                 onClick={handleGetStarted}
-                className={cn("hidden md:inline-flex text-xs", landingStyles.ctaPrimary)}
+                className="hidden md:inline-flex rounded-full px-4 h-8 sm:h-9 text-xs font-medium bg-orange-500 hover:bg-orange-600 text-white shadow-xs hover:shadow-sm gap-1.5 transition-all"
               >
-                Get Started
-                <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                <Sparkles className="h-3.5 w-3.5" />
+                Launch Studio
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             )}
 
@@ -179,9 +174,9 @@ export function Header({ onBackToHome, showNav = true, onGetStarted }: HeaderPro
                 variant="outline"
                 size="sm"
                 onClick={onBackToHome}
-                className="hidden sm:inline-flex h-8 text-xs border-orange-500/25 hover:bg-orange-500/10"
+                className="hidden sm:inline-flex rounded-full h-8 sm:h-9 px-3.5 text-xs border-border/70 hover:bg-muted/60"
               >
-                <Home className="mr-1 h-3.5 w-3.5" />
+                <Home className="mr-1.5 h-3.5 w-3.5" />
                 Home
               </Button>
             )}
@@ -195,8 +190,8 @@ export function Header({ onBackToHome, showNav = true, onGetStarted }: HeaderPro
               title="View on GitHub"
               className="hidden sm:inline-flex"
             >
-              <span className={cn(landingStyles.pill, "h-8 px-2.5 hover:border-orange-500/30 transition-colors")}>
-                <Github className="h-3.5 w-3.5" />
+              <span className="inline-flex h-8 sm:h-9 w-8 sm:w-9 items-center justify-center rounded-full border border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors">
+                <Github className="h-4 w-4" />
               </span>
             </a>
 
@@ -205,7 +200,7 @@ export function Header({ onBackToHome, showNav = true, onGetStarted }: HeaderPro
                 variant="outline"
                 size="icon"
                 onClick={() => setMobileMenuOpen((open) => !open)}
-                className="lg:hidden h-8 w-8 border-border/70"
+                className="lg:hidden h-8 w-8 rounded-full border-border/70"
                 title="Toggle menu"
                 aria-expanded={mobileMenuOpen}
                 aria-label="Toggle navigation menu"

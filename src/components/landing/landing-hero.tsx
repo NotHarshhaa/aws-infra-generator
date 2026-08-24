@@ -32,20 +32,20 @@ export function LandingHero({ onGetStarted }: LandingHeroProps) {
     mounted && resolvedTheme === "dark" ? "/AWS-Dark.svg" : "/AWS-Light.svg";
 
   return (
-    <section className="relative overflow-hidden px-1 sm:px-0 pt-2 sm:pt-4">
+    <section className="relative overflow-hidden px-2 sm:px-0 pt-4 sm:pt-8">
       <div className={landingStyles.heroGlow} />
 
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-8">
-        <div className="space-y-4 sm:space-y-5 text-center lg:text-left">
+      <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-10">
+        <div className="space-y-5 sm:space-y-6 text-center lg:text-left">
           <div className="flex justify-center lg:justify-start">
             <span className={landingStyles.eyebrow}>
-              <Sparkles className="h-3 w-3" />
-              Platform Engineering Tool
+              <Sparkles className="h-3.5 w-3.5" />
+              Cloud Architecture Studio 2.0
             </span>
           </div>
 
           <div className="flex justify-center lg:justify-start">
-            <div className="inline-flex items-center justify-center rounded-xl border border-orange-500/25 bg-card/80 p-3 shadow-sm backdrop-blur-sm">
+            <div className="inline-flex items-center justify-center rounded-2xl border border-orange-500/20 bg-card/85 p-3.5 shadow-xs backdrop-blur-xl hover:border-orange-500/35 transition-colors">
               <img
                 src={logoSrc}
                 alt="AWS Logo"
@@ -55,28 +55,27 @@ export function LandingHero({ onGetStarted }: LandingHeroProps) {
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15]">
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.12]">
             Design AWS infrastructure.
-            <span className="block text-orange-600 dark:text-orange-400">
-              Ship IaC in minutes.
+            <span className="block bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 bg-clip-text text-transparent">
+              Generate IaC in seconds.
             </span>
           </h1>
 
-          <p className="text-xs sm:text-base text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
-            Select services, configure parameters, and generate production-ready
-            Terraform or CloudFormation — with validation, diagrams, and cost
-            estimates built in.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+            Assemble multi-tier AWS architectures with live dependency resolution, security policy auditing, interactive diagrams, and 1-click Terraform, CloudFormation, and AWS CDK output.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-3.5">
             <Button
               size="lg"
               onClick={onGetStarted}
-              className={cn("w-full sm:w-auto text-sm", landingStyles.ctaPrimary)}
+              className={cn("w-full sm:w-auto text-sm gap-2", landingStyles.ctaPrimary)}
               id="get-started"
             >
-              Get Started
-              <ArrowRight className="ml-1.5 h-4 w-4" />
+              <Sparkles className="h-4 w-4" />
+              Launch Studio
+              <ArrowRight className="h-4 w-4" />
             </Button>
             <a
               href="https://github.com/NotHarshhaa/aws-infra-generator"
@@ -84,17 +83,17 @@ export function LandingHero({ onGetStarted }: LandingHeroProps) {
               rel="noopener noreferrer"
               className="w-full sm:w-auto"
             >
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-sm h-9 sm:h-10">
-                <Github className="mr-1.5 h-4 w-4" />
-                View on GitHub
+              <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full text-sm h-10 sm:h-11 px-5 border-border/70 hover:bg-muted/60">
+                <Github className="mr-2 h-4 w-4" />
+                GitHub Repository
               </Button>
             </a>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 max-w-xl mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-xl mx-auto lg:mx-0 pt-2">
             {HERO_STATS.map((stat) => (
-              <div key={stat.label} className={landingStyles.statChip}>
-                <span className={cn(landingStyles.statValue, "text-orange-600 dark:text-orange-400")}>
+              <div key={stat.label} className={cn(landingStyles.statChip, "p-3 rounded-2xl bg-card/60")}>
+                <span className={cn(landingStyles.statValue, "text-orange-600 dark:text-orange-400 text-lg sm:text-2xl")}>
                   {stat.value}
                 </span>
                 <span className={landingStyles.statLabel}>{stat.label}</span>
@@ -103,18 +102,23 @@ export function LandingHero({ onGetStarted }: LandingHeroProps) {
           </div>
         </div>
 
-        <div className={cn(landingStyles.panelAccent, "relative overflow-hidden p-0")}>
-          <div className="flex items-center gap-2 border-b border-orange-500/15 px-3 py-2 sm:px-4">
+        <div className={cn(landingStyles.panelAccent, "relative overflow-hidden p-0 rounded-3xl shadow-sm border-orange-500/25")}>
+          <div className="flex items-center gap-2 border-b border-border/50 bg-muted/40 px-4 py-3">
+            <div className="flex items-center gap-1.5 mr-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+            </div>
             <Terminal className="h-3.5 w-3.5 text-orange-500" />
-            <span className="text-[11px] sm:text-xs font-medium text-muted-foreground">
-              main.tf — preview
+            <span className="text-xs font-medium text-muted-foreground font-mono">
+              main.tf — live preview
             </span>
-            <span className="ml-auto rounded-md border border-green-500/30 bg-green-500/10 px-1.5 py-0.5 text-[10px] font-medium text-green-700 dark:text-green-400">
-              validated
+            <span className="ml-auto rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+              ● validated
             </span>
           </div>
-          <pre className={cn(landingStyles.codeBlock, "rounded-none border-0 h-[220px] sm:h-[280px]")}>
-            <code className="block p-3 sm:p-4 whitespace-pre-wrap">{HERO_CODE}</code>
+          <pre className={cn(landingStyles.codeBlock, "rounded-none border-0 h-[240px] sm:h-[300px] bg-zinc-950 p-4")}>
+            <code className="block text-xs font-mono leading-relaxed whitespace-pre-wrap text-zinc-200">{HERO_CODE}</code>
           </pre>
         </div>
       </div>

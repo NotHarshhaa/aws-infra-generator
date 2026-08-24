@@ -6,14 +6,15 @@ import { cn } from "@/lib/utils";
 
 const STEPS: {
   id: WizardStep;
+  stepNum: string;
   label: string;
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { id: "services", label: "Services", shortLabel: "Pick", icon: Layers },
-  { id: "configure", label: "Configure", shortLabel: "Config", icon: Settings },
-  { id: "generate", label: "Generate", shortLabel: "Gen", icon: Sparkles },
-  { id: "export", label: "Export", shortLabel: "Export", icon: Download },
+  { id: "services", stepNum: "1", label: "Select Services", shortLabel: "Services", icon: Layers },
+  { id: "configure", stepNum: "2", label: "Configure Stack", shortLabel: "Config", icon: Settings },
+  { id: "generate", stepNum: "3", label: "Generate IaC", shortLabel: "Generate", icon: Sparkles },
+  { id: "export", stepNum: "4", label: "Export & Deploy", shortLabel: "Export", icon: Download },
 ];
 
 interface WizardStepNavProps {
@@ -28,9 +29,9 @@ export function WizardStepNav({
   completedSteps,
 }: WizardStepNavProps) {
   return (
-    <nav className="mb-3 sm:mb-5 px-1">
-      <div className="rounded-xl border border-border/80 bg-card/60 backdrop-blur-sm p-1 sm:p-1.5">
-        <div className="grid grid-cols-4 gap-0.5 sm:gap-1">
+    <nav className="mb-4 sm:mb-6 px-1">
+      <div className="rounded-full border border-border/70 bg-card/85 backdrop-blur-2xl p-1.5 shadow-xs max-w-4xl mx-auto">
+        <div className="grid grid-cols-4 gap-1 sm:gap-2">
           {STEPS.map((step) => {
             const isActive = currentStep === step.id;
             const isCompleted = completedSteps.includes(step.id);
@@ -44,37 +45,38 @@ export function WizardStepNav({
                 onClick={() => isClickable && onStepClick(step.id)}
                 disabled={!isClickable}
                 className={cn(
-                  "relative flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 sm:flex-row sm:gap-2 sm:px-3 sm:py-2.5 transition-all",
-                  isActive && "bg-orange-500 text-white shadow-md shadow-orange-500/20",
-                  isCompleted &&
-                    !isActive &&
-                    "bg-orange-500/10 text-orange-700 dark:text-orange-300 hover:bg-orange-500/15 cursor-pointer",
-                  !isActive &&
-                    !isCompleted &&
-                    "text-muted-foreground cursor-not-allowed opacity-50"
+                  "group relative flex items-center justify-center gap-1.5 sm:gap-2.5 rounded-full px-2 py-2 sm:px-4 sm:py-2.5 transition-all text-left",
+                  isActive
+                    ? "bg-orange-500 text-white shadow-xs font-semibold"
+                    : isCompleted
+                    ? "bg-orange-500/10 text-orange-700 dark:text-orange-300 hover:bg-orange-500/15 cursor-pointer font-medium"
+                    : "text-muted-foreground/60 cursor-not-allowed opacity-60 hover:opacity-75"
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-md text-xs",
-                    isActive && "bg-white/20",
-                    isCompleted && !isActive && "bg-orange-500/20",
-                    !isActive && !isCompleted && "bg-muted"
+                    "flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform group-hover:scale-105",
+                    isActive
+                      ? "bg-white text-orange-600 shadow-xs"
+                      : isCompleted
+                      ? "bg-orange-500 text-white"
+                      : "bg-muted text-muted-foreground border border-border/50"
                   )}
                 >
                   {isCompleted && !isActive ? (
-                    <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <Check className="h-3.5 w-3.5 stroke-[2.5]" />
                   ) : (
-                    <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span>{step.stepNum}</span>
                   )}
                 </span>
-                <span className="text-[10px] sm:text-sm font-medium leading-none">
-                  <span className="sm:hidden">{step.shortLabel}</span>
-                  <span className="hidden sm:inline">{step.label}</span>
-                </span>
-                {isActive && (
-                  <span className="absolute -bottom-0.5 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-white/80 sm:hidden" />
-                )}
+                
+                <div className="min-w-0 flex items-center gap-1.5">
+                  <Icon className={cn("h-3.5 w-3.5 hidden md:inline-block shrink-0", isActive ? "text-white" : isCompleted ? "text-orange-500" : "text-muted-foreground")} />
+                  <span className="text-[11px] sm:text-xs tracking-tight truncate">
+                    <span className="sm:hidden">{step.shortLabel}</span>
+                    <span className="hidden sm:inline">{step.label}</span>
+                  </span>
+                </div>
               </button>
             );
           })}
