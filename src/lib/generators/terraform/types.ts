@@ -13,4 +13,7 @@ export interface GenerateRequest {
   region: string;
   format: string;
   projectName: string;
+  backendType?: "local" | "s3";
+  ownerEmail?: string;
+  costCenter?: string;
 }

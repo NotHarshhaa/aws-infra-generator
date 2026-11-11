@@ -78,22 +78,37 @@ export class ClientAPI {
         projectName: request.projectName,
       });
 
-      let generator: TerraformGenerator | CloudFormationGenerator | CDKGenerator;
+      let files: GeneratedFile[];
       if (request.format === "terraform") {
-        generator = this.terraformGenerator;
+        files = this.terraformGenerator.generate(
+          resolvedServices,
+          request.config,
+          request.environment,
+          request.region,
+          request.projectName,
+          {
+            backendType: request.backendType,
+            ownerEmail: request.ownerEmail,
+            costCenter: request.costCenter,
+          }
+        );
       } else if (request.format === "cdk") {
-        generator = this.cdkGenerator;
+        files = this.cdkGenerator.generate(
+          resolvedServices,
+          request.config,
+          request.environment,
+          request.region,
+          request.projectName
+        );
       } else {
-        generator = this.cloudFormationGenerator;
+        files = this.cloudFormationGenerator.generate(
+          resolvedServices,
+          request.config,
+          request.environment,
+          request.region,
+          request.projectName
+        );
       }
-
-      const files = generator.generate(
-        resolvedServices,
-        request.config,
-        request.environment,
-        request.region,
-        request.projectName,
-      );
 
       console.log(`Generated ${files.length} files for ${request.format}`);
       return { files, validation };

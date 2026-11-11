@@ -14,8 +14,8 @@ export function generateVariables(
     `  type        = string`,
     `  default     = "${region}"`,
     `  validation {`,
-    `    condition     = can(regex("^us-(east|west)-[1-2]$", var.aws_region)) || can(regex("^eu-(central|west)-[1-3]$", var.aws_region))`,
-    `    error_message = "AWS region must be a valid commercial region."`,
+    `    condition     = can(regex("^[a-z]{2}(-[a-z]+)+-[0-9]+$", var.aws_region))`,
+    `    error_message = "AWS region must be a valid AWS region identifier (e.g. us-east-1, eu-west-1, ap-south-1)."`,
     `  }`,
     `}`,
     ``,
@@ -76,6 +76,10 @@ export function generateVariables(
 
   if (services.includes("vpc")) {
     const vpcCfg = config.vpc?.config || {};
+    const defaultAzs = [`${region}a`, `${region}b`, `${region}c`];
+    const azs = vpcCfg.availability_zones && vpcCfg.availability_zones.length >= 2
+      ? vpcCfg.availability_zones
+      : defaultAzs;
     lines.push(
       ``,
       `# VPC Configuration`,
@@ -92,7 +96,7 @@ export function generateVariables(
       `variable "availability_zones" {`,
       `  description = "List of availability zones to use"`,
       `  type        = list(string)`,
-      `  default     = ${JSON.stringify(vpcCfg.availability_zones || ["us-east-1a", "us-east-1b", "us-east-1c"])}`,
+      `  default     = ${JSON.stringify(azs)}`,
       `  validation {`,
       `    condition     = length(var.availability_zones) >= 2`,
       `    error_message = "At least 2 availability zones must be specified for high availability."`,
@@ -123,8 +127,8 @@ export function generateVariables(
       `  type        = string`,
       `  default     = "${ec2Cfg.instance_type || "t3.medium"}"`,
       `  validation {`,
-      `    condition     = contains(["t3.micro", "t3.small", "t3.medium", "t3.large", "m5.large", "m5.xlarge"], var.instance_type)`,
-      `    error_message = "Instance type must be a supported type."`,
+      `    condition     = can(regex("^[a-z0-9]+\\.[a-z0-9]+$", var.instance_type))`,
+      `    error_message = "Instance type must follow valid AWS instance naming (e.g. t3.micro, t4g.small, c5.large)."`,
       `  }`,
       `}`,
       ``,
@@ -133,8 +137,8 @@ export function generateVariables(
       `  type        = number`,
       `  default     = ${ec2Cfg.instance_count || 2}`,
       `  validation {`,
-      `    condition     = var.instance_count >= 1 && var.instance_count <= 10`,
-      `    error_message = "Instance count must be between 1 and 10."`,
+      `    condition     = var.instance_count >= 1 && var.instance_count <= 50`,
+      `    error_message = "Instance count must be between 1 and 50."`,
       `  }`,
       `}`,
       ``,

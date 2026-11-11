@@ -140,6 +140,63 @@ export class InfraValidator {
       }
     }
 
+    if (services.includes("s3")) {
+      const s3Config = config.s3?.config || {};
+      const bucketName = s3Config.bucket_name;
+      if (typeof bucketName === "string" && bucketName.trim()) {
+        if (!/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(bucketName)) {
+          errors.push({
+            service: "S3",
+            message:
+              "Bucket name must be between 3 and 63 characters long, lowercase letters, numbers, hyphens or periods only.",
+            type: "config",
+          });
+        }
+      }
+      if (s3Config.block_public_access === false) {
+        warnings.push({
+          service: "S3",
+          message: "Public access blocking is disabled. Bucket content may be publicly accessible.",
+        });
+      }
+    }
+
+    if (services.includes("dynamodb")) {
+      const dynamoConfig = config.dynamodb?.config || {};
+      const tableName = dynamoConfig.table_name;
+      if (typeof tableName === "string" && tableName.trim()) {
+        if (!/^[a-zA-Z0-9_.-]{3,255}$/.test(tableName)) {
+          errors.push({
+            service: "DynamoDB",
+            message:
+              "Table name must be 3-255 characters (letters, numbers, underscores, periods, and hyphens).",
+            type: "config",
+          });
+        }
+      }
+    }
+
+    if (environment === "production") {
+      const vpcConfig = config.vpc?.config || {};
+      const privateSubnets = vpcConfig.private_subnets || "2";
+      if (services.includes("vpc") && String(privateSubnets) === "0") {
+        warnings.push({
+          service: "VPC",
+          message:
+            "Production stacks strongly recommend private subnets to isolate backend workloads from the public internet.",
+        });
+      }
+
+      const hasDataStores = services.some((s) => ["rds", "s3", "dynamodb"].includes(s));
+      if (hasDataStores && !services.includes("kms")) {
+        warnings.push({
+          service: "Security",
+          message:
+            "Production data stores detected without KMS. Consider adding AWS KMS for customer-managed encryption keys.",
+        });
+      }
+    }
+
     return { valid: errors.length === 0, errors, warnings };
   }
 

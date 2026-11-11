@@ -1,6 +1,7 @@
 import { GeneratedFile, ServiceBuilderResult } from './types';
 import { getCloudFormationBuildContext } from '../../cloudformation-helpers';
 import { buildParameters } from './core/parameters';
+import { generateParametersFile } from './core/parameters-file';
 import { buildVpc } from './services/vpc';
 import { buildEc2 } from './services/ec2';
 import { buildS3 } from './services/s3';
@@ -132,13 +133,16 @@ export class CloudFormationGenerator {
 
     const content = JSON.stringify(template, null, 2);
 
-    return [
+    const files: GeneratedFile[] = [
       {
         name: "template.json",
         path: `${projectName}/template.json`,
         content,
         language: "json",
       },
+      generateParametersFile(services, config, environment, region, projectName),
     ];
+
+    return files;
   }
 }

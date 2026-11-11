@@ -8,6 +8,9 @@ export async function generateInfrastructure(payload: {
   region: string;
   format: string;
   projectName: string;
+  backendType?: "local" | "s3";
+  ownerEmail?: string;
+  costCenter?: string;
 }): Promise<{ files: GeneratedFile[]; validation: ValidationResult }> {
   return clientAPI.generateInfrastructure(payload);
 }

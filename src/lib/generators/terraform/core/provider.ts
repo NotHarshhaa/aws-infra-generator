@@ -1,7 +1,13 @@
 import { GeneratedFile } from '../types';
 
-export function generateProvider(region: string, projectName: string, environment: string): GeneratedFile {
-  const backendConfig = environment === 'production' 
+export function generateProvider(
+  region: string,
+  projectName: string,
+  environment: string,
+  backendType?: "local" | "s3"
+): GeneratedFile {
+  const useS3Backend = backendType ? backendType === "s3" : environment === "production";
+  const backendConfig = useS3Backend
     ? `  backend "s3" {
     bucket         = "${projectName}-${environment}-terraform-state"
     key            = "terraform.tfstate"

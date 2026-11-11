@@ -2,6 +2,7 @@ import { GeneratedFile } from './types';
 import { generateProvider } from './core/provider';
 import { generateVariables } from './core/variables';
 import { generateOutputs } from './core/outputs';
+import { generateTfvars } from './core/tfvars';
 import { generateVpc } from './services/vpc';
 import { generateEc2 } from './services/ec2';
 import { generateS3 } from './services/s3';
@@ -48,15 +49,23 @@ export class TerraformGenerator {
     config: Record<string, any>,
     environment: string,
     region: string,
-    projectName: string
+    projectName: string,
+    options?: {
+      backendType?: "local" | "s3";
+      ownerEmail?: string;
+      costCenter?: string;
+    }
   ): GeneratedFile[] {
     const files: GeneratedFile[] = [];
 
     // Provider / main.tf
-    files.push(generateProvider(region, projectName, environment));
+    files.push(generateProvider(region, projectName, environment, options?.backendType));
 
     // Variables
     files.push(generateVariables(services, config, environment, region, projectName));
+
+    // Variables Values (terraform.tfvars)
+    files.push(generateTfvars(services, config, environment, region, projectName, options));
 
     // Per-service files
     const serviceGenerators: Record<string, Function> = {

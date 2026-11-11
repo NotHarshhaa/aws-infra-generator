@@ -13,6 +13,7 @@ import { computeConfigSnapshot } from "./service-dependencies";
 import {
   ensureServiceConfigs,
   resolveServicesWithDependencies,
+  createDefaultServiceConfig,
 } from "./service-config-utils";
 
 interface InfraStore {
@@ -52,6 +53,17 @@ interface InfraStore {
   setRegion: (region: string) => void;
   outputFormat: OutputFormat;
   setOutputFormat: (format: OutputFormat) => void;
+  backendType: "local" | "s3";
+  setBackendType: (type: "local" | "s3") => void;
+  ownerEmail: string;
+  setOwnerEmail: (email: string) => void;
+  costCenter: string;
+  setCostCenter: (costCenter: string) => void;
+
+  applyBestPractices: () => void;
+  applyFinOpsOptimizations: () => void;
+  resetServiceConfigToDefault: (serviceId: string) => void;
+  resetAllServiceConfigs: () => void;
 
   isGenerating: boolean;
   generatedFiles: GeneratedFile[];
@@ -75,6 +87,9 @@ const initialState = {
   environment: "development" as Environment,
   region: "us-east-1",
   outputFormat: "terraform" as OutputFormat,
+  backendType: "local" as "local" | "s3",
+  ownerEmail: "admin@example.com",
+  costCenter: "engineering",
   isGenerating: false,
   generatedFiles: [] as GeneratedFile[],
   validationResult: null as ValidationResult | null,
@@ -307,6 +322,155 @@ export const useInfraStore = create<InfraStore>()(
         const nextState = { ...state, outputFormat: format };
         set({ outputFormat: format, ...markGenerationStale(nextState) });
       },
+      setBackendType: (type) => {
+        const state = get();
+        const nextState = { ...state, backendType: type };
+        set({ backendType: type, ...markGenerationStale(nextState) });
+      },
+      setOwnerEmail: (email) => {
+        const state = get();
+        const nextState = { ...state, ownerEmail: email };
+        set({ ownerEmail: email, ...markGenerationStale(nextState) });
+      },
+      setCostCenter: (costCenter) => {
+        const state = get();
+        const nextState = { ...state, costCenter };
+        set({ costCenter, ...markGenerationStale(nextState) });
+      },
+
+      applyBestPractices: () => {
+        const state = get();
+        const nextConfig: ServiceConfig = { ...state.serviceConfig };
+
+        if (state.selectedServices.includes("s3") && nextConfig.s3) {
+          nextConfig.s3 = {
+            ...nextConfig.s3,
+            config: {
+              ...nextConfig.s3.config,
+              encryption: true,
+              versioning: true,
+              block_public_access: true,
+            },
+          };
+        }
+
+        if (state.selectedServices.includes("rds") && nextConfig.rds) {
+          nextConfig.rds = {
+            ...nextConfig.rds,
+            config: {
+              ...nextConfig.rds.config,
+              storage_encrypted: true,
+              backup_retention_period: 7,
+              ...(state.environment !== "development" ? { multi_az: true } : {}),
+            },
+          };
+        }
+
+        if (state.selectedServices.includes("vpc") && nextConfig.vpc) {
+          nextConfig.vpc = {
+            ...nextConfig.vpc,
+            config: {
+              ...nextConfig.vpc.config,
+              enable_dns: true,
+              enable_nat: true,
+            },
+          };
+        }
+
+        if (state.selectedServices.includes("dynamodb") && nextConfig.dynamodb) {
+          nextConfig.dynamodb = {
+            ...nextConfig.dynamodb,
+            config: {
+              ...nextConfig.dynamodb.config,
+              encryption: true,
+              point_in_time_recovery: true,
+            },
+          };
+        }
+
+        const nextState = { ...state, serviceConfig: nextConfig };
+        set({
+          serviceConfig: nextConfig,
+          ...markGenerationStale(nextState),
+        });
+      },
+
+      applyFinOpsOptimizations: () => {
+        const state = get();
+        const nextConfig: ServiceConfig = { ...state.serviceConfig };
+
+        // Switch EC2 to Graviton (t4g)
+        if (state.selectedServices.includes("ec2") && nextConfig.ec2) {
+          const currentType = String(nextConfig.ec2.config?.instance_type || "t3.micro");
+          const graviton = currentType
+            .replace("t3.", "t4g.")
+            .replace("t2.", "t4g.")
+            .replace("m5.", "m6g.")
+            .replace("c5.", "c7g.");
+          nextConfig.ec2 = {
+            ...nextConfig.ec2,
+            config: { ...nextConfig.ec2.config, instance_type: graviton },
+          };
+        }
+
+        // Switch RDS to Graviton
+        if (state.selectedServices.includes("rds") && nextConfig.rds) {
+          const currentClass = String(nextConfig.rds.config?.instance_class || "db.t3.micro");
+          const graviton = currentClass
+            .replace("db.t3.", "db.t4g.")
+            .replace("db.m5.", "db.m6g.");
+          nextConfig.rds = {
+            ...nextConfig.rds,
+            config: { ...nextConfig.rds.config, instance_class: graviton },
+          };
+        }
+
+        // If dev environment, avoid costly NAT gateways
+        if (state.environment === "development" && state.selectedServices.includes("vpc") && nextConfig.vpc) {
+          nextConfig.vpc = {
+            ...nextConfig.vpc,
+            config: { ...nextConfig.vpc.config, enable_nat: false },
+          };
+        }
+
+        const nextState = { ...state, serviceConfig: nextConfig };
+        set({
+          serviceConfig: nextConfig,
+          ...markGenerationStale(nextState),
+        });
+      },
+
+      resetServiceConfigToDefault: (serviceId: string) => {
+        const state = get();
+        const defaults = createDefaultServiceConfig(serviceId);
+        if (!defaults) return;
+
+        const nextConfig: ServiceConfig = {
+          ...state.serviceConfig,
+          [serviceId]: defaults,
+        };
+
+        const nextState = { ...state, serviceConfig: nextConfig };
+        set({
+          serviceConfig: nextConfig,
+          ...markGenerationStale(nextState),
+        });
+      },
+
+      resetAllServiceConfigs: () => {
+        const state = get();
+        const nextConfig: ServiceConfig = {};
+        for (const sId of state.selectedServices) {
+          const defaults = createDefaultServiceConfig(sId);
+          if (defaults) nextConfig[sId] = defaults;
+        }
+
+        const nextState = { ...state, serviceConfig: nextConfig };
+        set({
+          serviceConfig: nextConfig,
+          ...markGenerationStale(nextState),
+        });
+      },
 
       setIsGenerating: (val) => set({ isGenerating: val }),
       setGeneratedFiles: (files) => {
@@ -339,6 +503,9 @@ export const useInfraStore = create<InfraStore>()(
         environment: state.environment,
         region: state.region,
         outputFormat: state.outputFormat,
+        backendType: state.backendType,
+        ownerEmail: state.ownerEmail,
+        costCenter: state.costCenter,
         configSnapshot: state.configSnapshot,
         isGenerationStale:
           state.isGenerationStale || state.generatedFiles.length > 0,
